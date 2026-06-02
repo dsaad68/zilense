@@ -2,7 +2,7 @@
 
 <img src="public/icons/icon-128.png" alt="Zilense icon" width="120" height="120">
 
-# Zilense — Chinese Dictionary
+# Zilense · Chinese Dictionary
 
 **Hover or select any Chinese on a page → tone-colored pinyin, meaning, stroke order & a clean reader, right in the Chrome side panel.**
 
@@ -44,7 +44,7 @@ npm run test:e2e     # Playwright smoke test (loads dist/ in Chromium; build fir
 - **Select** a word (or right-click → *Look up “…” in Zilense*) → whole-word
   reading + character breakdown. Surrounding punctuation is trimmed, and a phrase
   that isn’t one entry is segmented into its words.
-- **Search** by hanzi, pinyin (tone marks optional, e.g. `nihao`), or English —
+- **Search** by hanzi, pinyin (tone marks optional, e.g. `nihao`), or English,
   ranked so common/HSK words beat rare homographs.
 - **🔊 Pronounce** plays Mandarin via the browser’s speech synthesis (when a
   zh-CN voice is installed).
@@ -52,7 +52,7 @@ npm run test:e2e     # Playwright smoke test (loads dist/ in Chromium; build fir
 - **⚙ Settings**: accent color, Chinese face (sans/serif), pinyin tone colors; plus dark mode.
 
 > Note: Chrome only lets the side panel open from a user gesture, so hovering
-> can't auto-open it — open the panel once (toolbar icon menu → **Open side
+> can't auto-open it, open the panel once (toolbar icon menu → **Open side
 > panel**, or right-click → *Look up …*), then it updates live as you hover and
 > select. The toolbar menu also lets you toggle the inline hover popup and
 > disable hover on the current site (selection and pinning keep working there).
@@ -63,11 +63,11 @@ npm run test:e2e     # Playwright smoke test (loads dist/ in Chromium; build fir
 |------|---------|
 | Manifest (MV3) | `manifest.config.js` (CRXJS), `vite.config.js` |
 | Data pipelines | `assets/scripts/build-dict.mjs` → `src/data/cedict.json` (entries + traditional↔simplified maps + merged HSK/POS/char data); `assets/scripts/convert-chars.mjs` → `assets/char-data/char-data.json` (radical/components/strokes, from makemeahanzi); `assets/scripts/fetch-fonts.mjs` → `src/sidepanel/fonts/` + `fonts.css` (vendored Google Fonts). `assets/scripts/convert-hsk.mjs` (`npm run convert:hsk`) → `assets/hsk-vocab/hsk-data.json` (HSK level + POS + official gloss, parsed from the committed `.xls` lists). All build/data scripts live under `assets/`. |
-| Dictionary logic | `src/lib/dict-core.js` (pure lookup/search/segment — unit-tested), `src/lib/dict.js` (loads the index, wraps core), `src/lib/pinyin.js`, `src/lib/storage.js`, `src/lib/examples.js` (Tatoeba) |
+| Dictionary logic | `src/lib/dict-core.js` (pure lookup/search/segment, unit-tested), `src/lib/dict.js` (loads the index, wraps core), `src/lib/pinyin.js`, `src/lib/storage.js`, `src/lib/examples.js` (Tatoeba) |
 | Side panel UI | `src/sidepanel/` (`App.jsx` + `components/`, `panel.css`) |
 | On-page lookup | `src/content/content.js` (hover + click-to-pin + select), `content.css` |
 | Background | `src/background/service-worker.js` (panel open + context menu) |
-| Tests | `test/*.test.mjs` (`npm test`, Node's built-in runner: dict-core, pinyin, content-core, manifest, storage-helpers, reader-stash; DOM logic — reader-extract, word-walk — via happy-dom); `e2e/*.spec.js` (`npm run test:e2e`, Playwright extension tests: `panel.spec.js` side-panel smoke test, `reader.spec.js` Reader pin-to-panel + forged-message hardening) |
+| Tests | `test/*.test.mjs` (`npm test`, Node's built-in runner: dict-core, pinyin, content-core, manifest, storage-helpers, reader-stash; DOM logic, reader-extract, word-walk, via happy-dom); `e2e/*.spec.js` (`npm run test:e2e`, Playwright extension tests: `panel.spec.js` side-panel smoke test, `reader.spec.js` Reader pin-to-panel + forged-message hardening) |
 
 ## Known limitations / next steps
 
@@ -91,7 +91,7 @@ npm run test:e2e     # Playwright smoke test (loads dist/ in Chromium; build fir
   lookup comes from `content_scripts` matches, which needs no host permission.
   `minimum_chrome_version` is `116` (Side Panel API floor is 114; 116 makes
   opening the panel from a page-side user gesture reliable).
-- **Fonts**: three typefaces, each with a job — **Noto Sans SC** for all Chinese
+- **Fonts**: three typefaces, each with a job, **Noto Sans SC** for all Chinese
   glyphs (switchable to **Noto Serif SC** in Settings), **Source Serif 4**
   (variable, optical-size axis) for English content, and the **system UI sans**
   for functional chrome (labels, badges, tabs, pinyin). They are **self-hosted**:
@@ -100,10 +100,10 @@ npm run test:e2e     # Playwright smoke test (loads dist/ in Chromium; build fir
   remote stylesheet/font dependency** (MV3-friendly, works offline). CJK ships as
   many `unicode-range` subset files; the browser fetches only the ranges a page
   uses at runtime. The committed fonts add ~44 MB to the repo and the build
-  emits ~10 MB into `dist/` (deduped), so `dist/` is ~25 MB — most of the rest is
+  emits ~10 MB into `dist/` (deduped), so `dist/` is ~25 MB, most of the rest is
   the dictionary JSON.
 - **Licensing**: the application code is **MIT** ([`LICENSE`](./LICENSE)). Bundled
-  and fetched third-party data, fonts, and libraries keep their own licenses —
+  and fetched third-party data, fonts, and libraries keep their own licenses,
   **CC-CEDICT** (CC BY-SA 4.0, attribution + share-alike), **makemeahanzi**
   (Arphic Public License + LGPL), **Noto SC / Source Serif 4** (SIL OFL 1.1),
   **Tatoeba** (CC BY 2.0 FR), Readability (Apache-2.0), React (MIT). Full
@@ -114,7 +114,7 @@ npm run test:e2e     # Playwright smoke test (loads dist/ in Chromium; build fir
 
 - **On-page hover** does greedy longest-match word detection (à la the Zhongwen
   extension): the content script collects the forward run of characters under the
-  cursor — **across adjacent text nodes**, so a word split over inline elements
-  (新`<span>`闻`</span>`) still matches — and the panel returns the longest
+  cursor, **across adjacent text nodes**, so a word split over inline elements
+  (新`<span>`闻`</span>`) still matches, and the panel returns the longest
   matching word and how many characters to highlight (新闻 → the 2-char word, not
   新 + 闻).

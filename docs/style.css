@@ -1,4 +1,4 @@
-/* Zilense site — mirrors the extension's design language: warm paper canvas,
+/* Zilense site, mirrors the extension's design language: warm paper canvas,
    ink text, vermilion accent, Source Serif for English, tone-colored pinyin. */
 
 :root {
@@ -105,7 +105,7 @@ a:hover { text-decoration: underline; }
 .foot a { color: var(--ink2); }
 
 /* ========================================================================
-   SHOWCASE MOCKUPS — HTML stand-ins for screenshots. Scoped under .bw
+   SHOWCASE MOCKUPS, HTML stand-ins for screenshots. Scoped under .bw
    (browser window) and .ui (side-panel theme) so they never collide with
    the marketing-page rules above, and keep a fixed warm theme regardless
    of the visitor's OS dark mode (like product imagery would).
