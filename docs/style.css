@@ -139,7 +139,7 @@ a:hover { text-decoration: underline; }
   background: #fff; border: 1px solid rgba(0, 0, 0, .14);
   box-shadow: 0 34px 80px rgba(80, 60, 30, .30), 0 6px 16px rgba(0, 0, 0, .12);
 }
-.bw .tok { cursor: pointer; transition: background .12s, color .12s; }
+.bw .tok { cursor: pointer; white-space: nowrap; transition: background .12s, color .12s; }
 .bw .tok:hover { background: #f6e4df; color: #b23a2e; text-decoration-color: transparent; }
 .bw .tok.active:hover { background: #c8443a; color: #fff; }
 .bw-bar { display: flex; align-items: flex-end; height: 44px; background: #202124; padding: 0 8px; }
@@ -189,14 +189,15 @@ a:hover { text-decoration: underline; }
 /* inline hover popup that appears over the hovered word (like the real extension) */
 .bw .post { position: relative; }
 .bw .hoverpop {
-  position: absolute; z-index: 6; min-width: 132px; max-width: 240px; pointer-events: none;
+  position: absolute; z-index: 6; min-width: 150px; max-width: 320px; pointer-events: none;
   background: #fbf7ee; border: 1px solid #d8ccb5; border-radius: 12px; padding: 10px 13px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, .18); opacity: 0; transform: translateY(3px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, .18); opacity: 0; transform: translateY(-3px);
   transition: opacity .12s, transform .12s;
 }
 .bw .hoverpop.show { opacity: 1; transform: none; }
-.bw .hoverpop::after { content: ""; position: absolute; left: 20px; bottom: -7px; width: 12px; height: 12px;
-  background: #fbf7ee; border-right: 1px solid #d8ccb5; border-bottom: 1px solid #d8ccb5; transform: rotate(45deg); }
+/* popup sits below the hovered word, so the arrow points up from its top edge */
+.bw .hoverpop::after { content: ""; position: absolute; left: 24px; top: -7px; width: 12px; height: 12px;
+  background: #fbf7ee; border-left: 1px solid #d8ccb5; border-top: 1px solid #d8ccb5; transform: rotate(45deg); }
 .bw .hp-hanzi { font-family: "Noto Sans SC", sans-serif; font-size: 22px; font-weight: 700; color: #2a2520; line-height: 1; }
 .bw .hp-py { font-family: "Noto Sans SC", sans-serif; font-weight: 500; margin: 4px 0 5px; }
 .bw .hp-def { font-family: var(--font-en); font-size: 13.5px; color: #6b6258; line-height: 1.45; }
@@ -353,6 +354,9 @@ a:hover { text-decoration: underline; }
   background: var(--bg); border: 1px solid var(--line2); border-radius: 16px;
   padding: 24px; box-shadow: 0 16px 40px rgba(35, 25, 12, .22);
 }
+/* a section/group label as the first line of a card shouldn't add a top gap */
+.feat-visual > .ui > .group-label:first-child { margin-top: 0; }
+.ui .stroke-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 2px; }
 
 /* tone-pinyin showpiece */
 .tonebig { font-family: var(--font-han); font-size: 46px; font-weight: 700; display: flex; gap: 18px;
@@ -362,11 +366,13 @@ a:hover { text-decoration: underline; }
 .tone-legend b { font-weight: 700; }
 
 /* HSK level chips + tinted paragraph */
-.hsk-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
-.hsk-chip { font-family: var(--font-ui); font-size: 12px; font-weight: 700; color: #fff;
-  border-radius: 7px; padding: 5px 11px; }
-.hsk-para { font-family: var(--font-han); font-size: 22px; line-height: 1.9; }
-.hsk-para mark { background: transparent; border-radius: 4px; padding: 0 3px; color: #fff; }
+.hsk-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+.hsk-chip { font-family: var(--font-ui); font-size: 12px; font-weight: 700; color: var(--ink);
+  border-radius: 6px; padding: 5px 11px; }
+/* highlighted words match the extension: a soft translucent band tint over the
+   text, keeping the original dark glyphs (not solid boxes with white text) */
+.hsk-para { font-family: var(--font-han); font-size: 22px; line-height: 2.1; color: var(--ink); }
+.hsk-para mark { color: inherit; background: transparent; border-radius: 3px; padding: 1px 2px; }
 
 /* reader mock */
 .reader-mock { background: #faf6ec; border: 1px solid var(--line2); border-radius: 14px; padding: 24px 26px;
