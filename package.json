@@ -1,0 +1,39 @@
+{
+  "name": "mydict-extension",
+  "private": true,
+  "version": "1.0.1",
+  "type": "module",
+  "license": "MIT",
+  "description": "HanziLens - Chinese dictionary in the Chrome side panel (hover, select, search & save)",
+  "scripts": {
+    "convert:chars": "node assets/scripts/convert-chars.mjs",
+    "convert:hsk": "node assets/scripts/convert-hsk.mjs",
+    "fetch:fonts": "node assets/scripts/fetch-fonts.mjs",
+    "build:dict": "node assets/scripts/build-dict.mjs",
+    "predev": "node assets/scripts/build-dict.mjs",
+    "prebuild": "node assets/scripts/build-dict.mjs",
+    "dev": "vite",
+    "build": "vite build",
+    "postbuild": "node assets/scripts/copy-notices.mjs",
+    "pack": "npm run build && node assets/scripts/pack.mjs",
+    "preview": "vite preview",
+    "pretest": "node assets/scripts/build-dict.mjs",
+    "test": "node --test",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "@mozilla/readability": "^0.6.0",
+    "hanzi-writer": "^3.5.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@crxjs/vite-plugin": "^2.0.0-beta.28",
+    "@happy-dom/global-registrator": "^20.9.0",
+    "@playwright/test": "^1.49.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "cc-cedict": "^1.0.0",
+    "happy-dom": "^20.9.0",
+    "vite": "^5.4.11"
+  }
+}

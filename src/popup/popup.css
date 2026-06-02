@@ -1,0 +1,73 @@
+/* popup.css — the toolbar action menu. Mirrors the side panel's warm "paper"
+   palette + accent and the same switch/knob look, honoring the dark setting. */
+:root {
+  --font-ui: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-en: "Source Serif 4", Georgia, "Times New Roman", serif;
+}
+body[data-theme="light"] {
+  --bg: #f5efe3; --bg2: #efe7d6; --card: #fbf7ee; --card2: #f1e9da;
+  --ink: #2a2520; --ink2: #6b6258; --ink3: #9a9082; --line: #e3d9c6; --line2: #d8ccb5;
+  --accent: #c8443a;
+}
+body[data-theme="dark"] {
+  --bg: #211e19; --bg2: #29251f; --card: #2c2822; --card2: #332e26;
+  --ink: #ece3d2; --ink2: #b3a896; --ink3: #877d6d; --line: #393429; --line2: #453f33;
+  --accent: #e0685c;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  width: 248px; background: var(--bg); color: var(--ink);
+  font-family: var(--font-ui); -webkit-font-smoothing: antialiased;
+}
+.pop { display: flex; flex-direction: column; gap: 8px; padding: 12px; }
+
+.brand {
+  display: flex; align-items: center; gap: 8px;
+  font-weight: 700; font-size: 14px; color: var(--ink);
+  padding: 2px 2px 8px; border-bottom: 1px solid var(--line);
+}
+.seal {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 24px; height: 24px; border-radius: 7px; color: #fff; font-size: 14px;
+  background: var(--accent); box-shadow: 0 2px 8px rgba(200, 68, 58, .3);
+}
+
+.action {
+  display: flex; align-items: center; gap: 10px; width: 100%;
+  font-family: var(--font-ui); font-size: 14px; font-weight: 600; color: var(--ink);
+  background: var(--card); border: 1px solid var(--line2); border-radius: 10px;
+  padding: 10px 12px; cursor: pointer; transition: background .14s, border-color .14s;
+}
+.action:hover { background: var(--card2); border-color: var(--accent); }
+.action .ic { color: var(--accent); font-size: 15px; line-height: 1; }
+
+.row {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 4px 4px 4px 6px;
+}
+.set-label { font-family: var(--font-en); font-size: 14px; color: var(--ink); }
+.sub { display: block; font-family: var(--font-ui); font-size: 11px; color: var(--ink3); margin-top: 1px; }
+
+.switch {
+  flex: none; width: 42px; height: 24px; border-radius: 999px; border: none; cursor: pointer;
+  padding: 0; background: var(--line2); position: relative; transition: background .16s;
+}
+.switch.on { background: var(--accent); }
+.switch .knob {
+  position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%;
+  background: #fff; transition: transform .16s; box-shadow: 0 1px 3px rgba(0, 0, 0, .3);
+}
+.switch.on .knob { transform: translateX(18px); }
+
+.rule { height: 1px; background: var(--line); margin: 2px 0; }
+
+.picker {
+  flex: none; font-family: var(--font-ui); font-size: 13px; font-weight: 600; color: var(--ink);
+  background: var(--card); border: 1px solid var(--line2); border-radius: 8px;
+  padding: 6px 8px; cursor: pointer; transition: border-color .14s;
+}
+.picker:hover { border-color: var(--accent); }
+.picker:focus { outline: none; border-color: var(--accent); }
+.picker:disabled { opacity: .4; cursor: default; }

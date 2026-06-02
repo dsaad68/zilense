@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HanziLens</title>
+    <link rel="stylesheet" href="./popup.css" />
+  </head>
+  <body data-theme="light">
+    <div class="pop">
+      <div class="brand"><span class="seal" lang="zh">译</span> HanziLens</div>
+
+      <button id="open-panel" class="action">
+        <span class="ic">▤</span>
+        <span class="label">Open side panel</span>
+      </button>
+
+      <button id="reader-mode" class="action">
+        <span class="ic">📖</span>
+        <span class="label">Reader mode</span>
+      </button>
+
+      <div class="row">
+        <span class="set-label">Hover popup</span>
+        <button id="hover-toggle" class="switch" role="switch" aria-checked="false">
+          <span class="knob"></span>
+        </button>
+      </div>
+
+      <div class="row">
+        <span class="set-label">
+          Disable on this site
+          <span id="host" class="sub"></span>
+        </span>
+        <button id="site-toggle" class="switch" role="switch" aria-checked="false">
+          <span class="knob"></span>
+        </button>
+      </div>
+
+      <div class="rule"></div>
+
+      <div class="row">
+        <span class="set-label">Highlight HSK ≤</span>
+        <select id="hsk-level" class="picker" aria-label="Highlight HSK level">
+          <option value="0">Off</option>
+          <option value="1">HSK 1</option>
+          <option value="2">HSK 2</option>
+          <option value="3">HSK 3</option>
+          <option value="4">HSK 4</option>
+          <option value="5">HSK 5</option>
+          <option value="6">HSK 6</option>
+          <option value="7">All (7–9)</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <span class="set-label">Color by level</span>
+        <button id="hsk-color" class="switch" role="switch" aria-checked="false">
+          <span class="knob"></span>
+        </button>
+      </div>
+    </div>
+    <script type="module" src="./popup.js"></script>
+  </body>
+</html>

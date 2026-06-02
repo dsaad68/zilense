@@ -1,0 +1,30 @@
+import { defineConfig } from 'vite'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import react from '@vitejs/plugin-react'
+import { crx } from '@crxjs/vite-plugin'
+import manifest from './manifest.config.js'
+
+const __dirname = dirname(fileURLToPath(import.meta.url))
+
+export default defineConfig({
+  plugins: [react(), crx({ manifest })],
+  // CRXJS needs a stable HMR port for the side panel during dev.
+  server: {
+    port: 5173,
+    strictPort: true,
+    hmr: { port: 5173 },
+  },
+  build: {
+    // match the manifest's minimum_chrome_version
+    target: 'chrome116',
+    rollupOptions: {
+      // Reader mode is reached only via web_accessible_resources (the content
+      // script injects it as an iframe), not from the manifest's page slots that
+      // CRXJS auto-discovers — so register its HTML as an explicit build input,
+      // or its <script>/<link> source paths ship un-bundled. CRXJS merges this
+      // with its own manifest-derived inputs.
+      input: { reader: resolve(__dirname, 'src/reader/index.html') },
+    },
+  },
+})

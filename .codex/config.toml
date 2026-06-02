@@ -1,0 +1,8 @@
+[mcp_servers.deepwiki]
+url = "https://mcp.deepwiki.com/mcp"
+
+[mcp_servers.parallel-search-mcp]
+url = "https://search-mcp.parallel.ai/mcp"
+
+[mcp_servers.parallel-task-mcp]
+url = "https://task-mcp.parallel.ai/mcp"
