@@ -64,6 +64,7 @@
             <p class="note">Reading tip: hover any single character for its meaning, or select a whole
               word like <span lang="zh" style="color:#b23a2e;font-weight:500">朋友</span> for the word reading plus a
               character-by-character breakdown.</p>
+            <div class="hoverpop" id="hoverpop" aria-hidden="true"></div>
           </div>
         </div>
 
@@ -380,17 +381,35 @@
       var entry = document.getElementById('demo-entry');
       if (!entry) return;
       var toks = document.querySelectorAll('.bw .tok');
+      var pop = document.getElementById('hoverpop');
+      var post = document.querySelector('.bw .post');
+      var lead = document.querySelector('.bw .lead');
+
+      function popup(t, d) {
+        if (!pop || !post) return;
+        pop.innerHTML = '<div class="hp-hanzi" lang="zh">' + d.h + '</div>' +
+          '<div class="hp-py" lang="zh">' + pyHtml(d.py) + '</div>' +
+          '<div class="hp-def">' + d.defs.slice(0, 2).map(function (x, i) { return (i + 1) + '. ' + x; }).join('&nbsp; ') + '</div>';
+        pop.classList.add('show');
+        var pr = post.getBoundingClientRect(), tr = t.getBoundingClientRect();
+        var left = tr.left - pr.left;
+        left = Math.max(0, Math.min(left, post.clientWidth - pop.offsetWidth));
+        pop.style.left = left + 'px';
+        pop.style.top = (tr.top - pr.top - pop.offsetHeight - 10) + 'px';
+      }
       function show(t) {
         var d = DEMO[t.getAttribute('data-w')];
         if (!d) return;
         toks.forEach(function (x) { x.classList.remove('active'); });
         t.classList.add('active');
         entry.innerHTML = renderEntry(d);
+        popup(t, d);
       }
       toks.forEach(function (t) {
         t.addEventListener('mouseenter', function () { show(t); });
         t.addEventListener('click', function () { show(t); });
       });
+      if (lead && pop) lead.addEventListener('mouseleave', function () { pop.classList.remove('show'); });
     })();
 
     // Live stroke-order animation (progressive enhancement; static box if it fails).
