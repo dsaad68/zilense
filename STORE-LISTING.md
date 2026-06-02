@@ -4,16 +4,16 @@ Copy-paste source for the Chrome Web Store developer dashboard. Everything here
 is factual and matches the shipped code (`manifest.config.js`, `src/`) and the
 [privacy policy](./docs/privacy.md).
 
-- **Name:** HanziLens - Chinese Dictionary
+- **Name:** Zilense - Chinese Dictionary
 - **Category:** Productivity (alt: Education)
-- **Privacy policy URL:** https://dsaad68.github.io/hanzilens/privacy
+- **Privacy policy URL:** https://dsaad68.github.io/zilense/privacy
 - **Default language:** English
 
 ---
 
 ## Single-purpose description
 
-> HanziLens has one purpose: to look up Chinese words and characters and show
+> Zilense has one purpose: to look up Chinese words and characters and show
 > their reading and meaning. Hovering or selecting Chinese text on a page, or
 > typing a query, opens a dictionary entry (pinyin, definition, stroke order,
 > example sentences) in the browser side panel.
@@ -29,7 +29,7 @@ is factual and matches the shipped code (`manifest.config.js`, `src/`) and the
 
 ## Detailed description (store listing body)
 
-> **HanziLens turns any web page into a Chinese reading aid.** Hover a Chinese
+> **Zilense turns any web page into a Chinese reading aid.** Hover a Chinese
 > character — or select a whole word — and its tone-colored pinyin and English
 > meaning appear instantly in the Chrome side panel. No copy-paste, no leaving
 > the page.
@@ -54,7 +54,7 @@ is factual and matches the shipped code (`manifest.config.js`, `src/`) and the
 >   sans face, tone colors, dark mode).
 >
 > **Private by design.** Your saved words, settings, and history stay on your
-> device. HanziLens has no analytics and no tracking, and it never sends the
+> device. Zilense has no analytics and no tracking, and it never sends the
 > pages you visit anywhere. It reaches the network only when you open the
 > example-sentences or stroke-order section for a specific word. See the privacy
 > policy for details.
@@ -73,7 +73,7 @@ One line each — paste into the corresponding dashboard field.
 | **`activeTab`** | Read the active tab's URL and id only when the user clicks the toolbar icon — to open the side panel for that tab and to offer "disable on this site." No background access to tabs. |
 | **`storage`** | Persist the user's saved-word deck, display settings, and recent lookups locally on the device. No data leaves the device. |
 | **`sidePanel`** | The side panel is the extension's primary UI, where dictionary entries are displayed. |
-| **`contextMenus`** | Add right-click items: "Look up '…' in HanziLens" for selected text, and "Open in HanziLens Reader" for the page. |
+| **`contextMenus`** | Add right-click items: "Look up '…' in Zilense" for selected text, and "Open in Zilense Reader" for the page. |
 | **Host permission `https://tatoeba.org/*`** | Fetch example sentences for a looked-up word, on demand, only when the user expands the Examples section. |
 | **Host permission `https://cdn.jsdelivr.net/*`** | Fetch stroke-order path data (open hanzi-writer data) for a character, on demand, only when the user expands the Stroke order section. |
 
@@ -120,12 +120,12 @@ Answers for the "Privacy practices" tab.
 | User activity (clicks, mouse position, keystroke logging, etc.) | **No** | |
 | Website content (text, images, the pages the user visits) | **No** | The looked-up word/character is sent only to Tatoeba/jsDelivr on demand to fetch examples/stroke data; nothing is stored or sent to the developer. |
 
-**Certifications (check all three — true for HanziLens):**
+**Certifications (check all three — true for Zilense):**
 - ☑ I do not sell or transfer user data to third parties, outside of the approved use cases.
 - ☑ I do not use or transfer user data for purposes that are unrelated to my item's single purpose.
 - ☑ I do not use or transfer user data to determine creditworthiness or for lending purposes.
 
-**Privacy policy URL:** https://dsaad68.github.io/hanzilens/privacy
+**Privacy policy URL:** https://dsaad68.github.io/zilense/privacy
 
 ---
 

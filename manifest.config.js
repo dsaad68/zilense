@@ -3,11 +3,11 @@ import pkg from './package.json' with { type: 'json' }
 
 export default defineManifest({
   manifest_version: 3,
-  name: 'HanziLens - Chinese Dictionary',
+  name: 'Zilense - Chinese Dictionary',
   version: pkg.version,
   description: pkg.description,
   author: { email: 'dsaad68@gmail.com' },
-  homepage_url: 'https://github.com/dsaad68/hanzilens',
+  homepage_url: 'https://github.com/dsaad68/zilense',
   // Side Panel API needs Chrome 114+, and opening the panel from a content-script
   // user gesture (pin-to-open) is reliable from Chrome 116+.
   minimum_chrome_version: '116',
@@ -16,7 +16,7 @@ export default defineManifest({
     default_path: 'src/sidepanel/index.html',
   },
   action: {
-    default_title: 'HanziLens',
+    default_title: 'Zilense',
     // Clicking the icon opens a small menu (open panel / hover popup / disable on
     // this site) instead of opening the panel directly; the menu's button opens
     // the side panel from its own user gesture.

@@ -276,7 +276,7 @@ export function ReaderView({ article, tokenParas, status, p, set, requestHover, 
           {status === 'empty' && (
             <div className="rd-state">
               <div className="rd-state-title">Couldn’t find an article here</div>
-              <div className="rd-state-sub">HanziLens Reader works best on article and blog pages with a main block of text. Try it on a news article or a blog post.</div>
+              <div className="rd-state-sub">Zilense Reader works best on article and blog pages with a main block of text. Try it on a news article or a blog post.</div>
             </div>
           )}
         </article>

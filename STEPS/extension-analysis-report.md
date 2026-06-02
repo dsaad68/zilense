@@ -1,11 +1,11 @@
-# HanziLens Chrome Extension Analysis
+# Zilense Chrome Extension Analysis
 
 Reviewed on 2026-06-01 after the latest project update, through commit
 `9018c6a` plus the currently staged changes. Package version is now `0.3.2`.
 
 ## Summary
 
-HanziLens is moving in the right direction. The latest staged update closes the
+Zilense is moving in the right direction. The latest staged update closes the
 biggest Reader-mode concern from the previous review: the host page no longer
 delivers Reader article data through parent-to-iframe `postMessage`. The content
 script now extracts the article, the worker stashes it in extension session

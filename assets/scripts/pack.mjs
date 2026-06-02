@@ -3,7 +3,7 @@
    postbuild step has copied LICENSE / THIRD-PARTY-NOTICES.md into it).
 
    The zip is created from INSIDE dist/, so manifest.json sits at the zip root —
-   which is what the Chrome Web Store requires. Output: release/hanzilens-<version>.zip
+   which is what the Chrome Web Store requires. Output: release/zilense-<version>.zip
    .DS_Store and other OS cruft are excluded. */
 
 import { execFileSync } from 'node:child_process'
@@ -25,7 +25,7 @@ if (!existsSync(resolve(dist, 'manifest.json'))) {
 }
 
 mkdirSync(releaseDir, { recursive: true })
-const zipPath = resolve(releaseDir, `hanzilens-${version}.zip`)
+const zipPath = resolve(releaseDir, `zilense-${version}.zip`)
 rmSync(zipPath, { force: true }) // overwrite any previous build of this version
 
 // zip from within dist/ so the archive root is the extension root.

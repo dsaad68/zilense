@@ -18,7 +18,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 const distDir = resolve(__dirname, '../dist')
 
 // a small article page with real CC-CEDICT words so segmentation yields tokens
-const ARTICLE_URL = 'https://hanzilens.test/article'
+const ARTICLE_URL = 'https://zilense.test/article'
 const ARTICLE_HTML = `<!doctype html><html lang="zh"><head><meta charset="utf-8">
   <title>测试文章</title></head><body>
   <article>

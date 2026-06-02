@@ -91,7 +91,7 @@ export function SettingsMenu({ settings, onSetting, onClose }) {
           <a className="set-licenses" target="_blank" rel="noreferrer"
             href={(typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.getURL)
               ? chrome.runtime.getURL('THIRD-PARTY-NOTICES.md')
-              : 'https://github.com/dsaad68/hanzilens/blob/main/THIRD-PARTY-NOTICES.md'}>
+              : 'https://github.com/dsaad68/zilense/blob/main/THIRD-PARTY-NOTICES.md'}>
             Licenses&nbsp;→
           </a>
         </p>

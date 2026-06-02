@@ -1,4 +1,12 @@
-# HanziLens - Chinese Dictionary (Chrome side panel)
+<div align="center">
+
+<img src="public/icons/icon-128.png" alt="Zilense icon" width="120" height="120">
+
+# Zilense — Chinese Dictionary
+
+**Hover or select any Chinese on a page → tone-colored pinyin, meaning, stroke order & a clean reader, right in the Chrome side panel.**
+
+</div>
 
 A Chrome MV3 extension that lives in the **side panel**: hover any Chinese
 character on a page (or select a word) and its reading + meaning appear
@@ -26,14 +34,14 @@ npm run test:e2e     # Playwright smoke test (loads dist/ in Chromium; build fir
 1. `npm run build` (or `npm run dev`).
 2. Go to `chrome://extensions`, enable **Developer mode**.
 3. **Load unpacked** → select the `dist/` folder.
-4. Click the **HanziLens** toolbar icon → a small menu opens with **Open side
+4. Click the **Zilense** toolbar icon → a small menu opens with **Open side
    panel**, a **Hover popup** toggle, and **Disable on this site**.
 
 ## Use
 
 - **Hover** a Chinese character on any page → it highlights and loads in the panel.
   Works on **simplified and traditional** pages (中國 resolves to 中国).
-- **Select** a word (or right-click → *Look up “…” in HanziLens*) → whole-word
+- **Select** a word (or right-click → *Look up “…” in Zilense*) → whole-word
   reading + character breakdown. Surrounding punctuation is trimmed, and a phrase
   that isn’t one entry is segmented into its words.
 - **Search** by hanzi, pinyin (tone marks optional, e.g. `nihao`), or English —
@@ -100,9 +108,9 @@ npm run test:e2e     # Playwright smoke test (loads dist/ in Chromium; build fir
   (Arphic Public License + LGPL), **Noto SC / Source Serif 4** (SIL OFL 1.1),
   **Tatoeba** (CC BY 2.0 FR), Readability (Apache-2.0), React (MIT). Full
   attribution is in [`THIRD-PARTY-NOTICES.md`](./THIRD-PARTY-NOTICES.md), which
-  is copied into `dist/` on build and linked from the side-panel Settings. A
-  privacy policy lives in [`docs/privacy.md`](./docs/privacy.md) (published via
-  GitHub Pages).
+  is copied into `dist/` on build and linked from the side-panel Settings. The
+  [privacy policy](https://dsaad68.github.io/zilense/privacy) and project site
+  are published from [`docs/`](./docs) via GitHub Pages.
 
 - **On-page hover** does greedy longest-match word detection (à la the Zhongwen
   extension): the content script collects the forward run of characters under the

@@ -1,13 +1,13 @@
 # Third-Party Notices
 
-HanziLens ("the extension") bundles, derives from, or fetches the following
+Zilense ("the extension") bundles, derives from, or fetches the following
 third-party works. Each is the property of its respective authors and is used
 under the license named below. The full text of each license is available at
 the linked canonical URI; verbatim copies of the licenses that ship with their
 packages are included in the [`licenses/`](./licenses) folder of this repository
 and in the packaged extension.
 
-The HanziLens application source code itself is licensed under the MIT License
+The Zilense application source code itself is licensed under the MIT License
 (see [`LICENSE`](./LICENSE)). The terms below govern the bundled data, fonts,
 and libraries — **not** the application code.
 

@@ -173,14 +173,14 @@ const READER_MENU_ID = 'mydict-reader'
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id: MENU_ID,
-    title: 'Look up “%s” in HanziLens',
+    title: 'Look up “%s” in Zilense',
     contexts: ['selection'],
   })
   // Open the current page in Reader mode (the content script extracts the article
   // and injects the reader overlay). Offered on the page and on a selection.
   chrome.contextMenus.create({
     id: READER_MENU_ID,
-    title: 'Open in HanziLens Reader',
+    title: 'Open in Zilense Reader',
     contexts: ['page', 'selection'],
   })
 })

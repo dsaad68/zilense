@@ -1,10 +1,10 @@
 {
-  "name": "mydict-extension",
+  "name": "zilense",
   "private": true,
   "version": "1.0.1",
   "type": "module",
   "license": "MIT",
-  "description": "HanziLens - Chinese dictionary in the Chrome side panel (hover, select, search & save)",
+  "description": "Zilense - Chinese dictionary in the Chrome side panel (hover, select, search & save)",
   "scripts": {
     "convert:chars": "node assets/scripts/convert-chars.mjs",
     "convert:hsk": "node assets/scripts/convert-hsk.mjs",
