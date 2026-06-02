@@ -109,7 +109,7 @@ a:hover { text-decoration: underline; }
    (browser window) and .ui (side-panel theme) so they never collide with
    the marketing-page rules above, and keep a fixed warm theme regardless
    of the visitor's OS dark mode (like product imagery would).
-   Adapted from Archive/my-dict/project, rebranded Zilense.
+   Recreated from the original Claude Design prototype, rebranded Zilense.
    ===================================================================== */
 
 /* ---- warm panel token scope (fixed light; .ui.dark for the dark demo) ---- */

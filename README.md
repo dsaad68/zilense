@@ -12,8 +12,8 @@ A Chrome MV3 extension that lives in the **side panel**: hover any Chinese
 character on a page (or select a word) and its reading + meaning appear
 instantly, with tone-colored pinyin, search, stroke order, and a saved deck.
 
-Built from the Claude Design handoff in [`Archive/my-dict/`](./Archive/my-dict) (React prototype),
-recreated as a real extension with **Vite + React + CRXJS**, backed by
+Recreated from a Claude Design prototype as a real extension with
+**Vite + React + CRXJS**, backed by
 **CC-CEDICT** (~121k entries) via the [`cc-cedict`](https://github.com/edvardsr/cc-cedict)
 package.
 

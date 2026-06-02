@@ -156,8 +156,8 @@ Answers for the "Privacy practices" tab.
 
 ## Screenshot checklist (1280×800 or 640×400 PNG/JPEG; 1–5 images)
 
-Raw captures exist in `Archive/my-dict/project/screenshots/` — re-shoot/crop to
-the required size against a real Chinese article. Suggested set:
+Capture fresh screenshots against a real Chinese article, cropped to the required
+size. Suggested set:
 
 1. **Hover lookup** — cursor over a highlighted character, side panel showing the
    entry (pinyin + meaning).
