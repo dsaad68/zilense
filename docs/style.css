@@ -206,7 +206,7 @@ a:hover { text-decoration: underline; }
 /* ---- docked panel (right) ---- */
 .bw .dock { width: 416px; flex: none; border-left: 1px solid rgba(0, 0, 0, .12);
   display: flex; flex-direction: column; background: var(--bg); }
-@media (max-width: 760px) { .bw .dock { width: auto; border-left: none; border-top: 1px solid rgba(0, 0, 0, .12); } }
+@media (max-width: 760px) { .bw .dock { width: auto; height: 480px; border-left: none; border-top: 1px solid rgba(0, 0, 0, .12); } }
 .dock-head { height: 30px; flex: none; display: flex; align-items: center; padding: 0 12px;
   font-family: var(--font-ui); font-size: 11px; letter-spacing: .04em; color: var(--ink3);
   background: var(--bg2); border-bottom: 1px solid var(--line); }
@@ -235,7 +235,11 @@ a:hover { text-decoration: underline; }
 .ui .tab.on { color: var(--accent); }
 .ui .tab.on::after { content: ""; position: absolute; left: 8px; right: 8px; bottom: 0; height: 2.5px;
   background: var(--accent); border-radius: 2px; }
-.ui .p-body { border-top: 1px solid var(--line); overflow: hidden; }
+.ui .searchbar, .ui .tabs { flex: none; }
+.ui .p-body { flex: 1 1 0; min-height: 0; overflow-y: auto; border-top: 1px solid var(--line); }
+.ui .p-body::-webkit-scrollbar { width: 9px; }
+.ui .p-body::-webkit-scrollbar-thumb { background: var(--line2); border-radius: 9px; border: 2px solid var(--bg); }
+.ui .iconbtn svg, .ui .search-ic svg { display: block; }
 
 .ui .entry { padding: 18px 16px 22px; }
 .ui .entry-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
