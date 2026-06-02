@@ -37,8 +37,10 @@
       </div>
       <p style="font-family:var(--font-ui);font-size:13px;color:var(--ink3);margin-top:14px">Coming to the Chrome Web Store</p>
     </header>
+  </div><!-- /wrap -->
 
-    <!-- ============ SIGNATURE MOCKUP ============ -->
+  <!-- ============ SIGNATURE MOCKUP ============ -->
+  <div class="bw-stage">
     <div class="bw" role="img" aria-label="Zilense side panel docked next to a Chinese article in Chrome">
       <div class="bw-bar">
         <span class="bw-lights"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i></span>
@@ -58,7 +60,7 @@
             <div class="kicker">Graded reader · Beginner</div>
             <h1 lang="zh">我的中文生活</h1>
             <div class="byline">My Life in Chinese · 78 characters · ~2 min</div>
-            <p class="lead" lang="zh"><span class="tok word active">你好</span><span class="punct">！</span>我是一个<span class="tok word">学生</span><span class="punct">。</span>我在<span class="tok word">中国</span><span class="tok word">学习</span><span class="tok word">中文</span><span class="punct">。</span>我很<span class="tok word">喜欢</span><span class="tok word">喝茶</span><span class="punct">。</span></p>
+            <p class="lead" lang="zh"><span class="tok word active" data-w="你好">你好</span><span class="punct">！</span><span class="tok" data-w="我">我</span><span class="tok" data-w="是">是</span><span class="tok word" data-w="一个">一个</span><span class="tok word" data-w="学生">学生</span><span class="punct">。</span><span class="tok" data-w="我">我</span><span class="tok" data-w="在">在</span><span class="tok word" data-w="中国">中国</span><span class="tok word" data-w="学习">学习</span><span class="tok word" data-w="中文">中文</span><span class="punct">。</span><span class="tok" data-w="我">我</span><span class="tok" data-w="很">很</span><span class="tok word" data-w="喜欢">喜欢</span><span class="tok word" data-w="喝茶">喝茶</span><span class="punct">。</span></p>
             <p class="note">Reading tip: hover any single character for its meaning, or select a whole
               word like <span lang="zh" style="color:#b23a2e;font-weight:500">朋友</span> for the word reading plus a
               character-by-character breakdown.</p>
@@ -78,7 +80,7 @@
           <div class="searchbar"><span class="search-ic">🔍</span><input placeholder="Search 汉字 or English…" readonly></div>
           <div class="tabs"><button class="tab on">Dictionary</button><button class="tab">Saved</button></div>
           <div class="p-body">
-            <div class="entry">
+            <div class="entry" id="demo-entry">
               <div class="entry-head">
                 <div class="hanzi-big" lang="zh">你好</div>
                 <div class="entry-actions"><span aria-label="Pronounce">🔊</span><span aria-label="Save">☆</span></div>
@@ -105,7 +107,9 @@
 
       </div>
     </div>
+  </div><!-- /bw-stage -->
 
+  <div class="wrap">
     <!-- ============ FEATURE SHOWCASE ============ -->
     <div class="showcase">
 
@@ -323,6 +327,72 @@
 
   <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5.0/dist/hanzi-writer.min.js"></script>
   <script>
+    // ---- Live hover demo: hovering a word in the article updates the side panel ----
+    var DEMO = {
+      '你好': { h: '你好', py: [['nǐ',3],['hǎo',3]], hsk: 1, pos: 'interjection', freq: 'very common',
+        defs: ['hello','hi','how do you do'],
+        chars: [{h:'你',py:[['nǐ',3]],g:'you (singular)'},{h:'好',py:[['hǎo',3]],g:'good'}],
+        ex: { zh:'你好，我叫小明。', py:'<span class="tone-3">Nǐ</span> <span class="tone-3">hǎo</span>, <span class="tone-3">wǒ</span> <span class="tone-4">jiào</span> <span class="tone-3">Xiǎo</span><span class="tone-2">míng</span>.', en:'Hi, my name is Xiaoming.' } },
+      '我': { h:'我', py:[['wǒ',3]], hsk:1, pos:'pronoun', defs:['I','me'] },
+      '是': { h:'是', py:[['shì',4]], hsk:1, pos:'verb', defs:['to be','is / are / am'] },
+      '一个': { h:'一个', py:[['yí',2],['gè',4]], pos:'phrase', defs:['one (item)','a'],
+        chars:[{h:'一',py:[['yī',1]],g:'one'},{h:'个',py:[['gè',4]],g:'measure word'}] },
+      '学生': { h:'学生', py:[['xué',2],['shēng',1]], hsk:1, pos:'noun', defs:['student','pupil'],
+        chars:[{h:'学',py:[['xué',2]],g:'to study'},{h:'生',py:[['shēng',1]],g:'to be born; life'}] },
+      '在': { h:'在', py:[['zài',4]], hsk:1, pos:'preposition', defs:['at, in, on','to be located at'] },
+      '中国': { h:'中国', py:[['zhōng',1],['guó',2]], hsk:1, pos:'proper noun', defs:['China'],
+        chars:[{h:'中',py:[['zhōng',1]],g:'middle; center'},{h:'国',py:[['guó',2]],g:'country'}] },
+      '学习': { h:'学习', py:[['xué',2],['xí',2]], hsk:1, pos:'verb', defs:['to study','to learn'],
+        chars:[{h:'学',py:[['xué',2]],g:'to study'},{h:'习',py:[['xí',2]],g:'to practice'}] },
+      '中文': { h:'中文', py:[['zhōng',1],['wén',2]], hsk:1, pos:'noun', defs:['Chinese language'],
+        chars:[{h:'中',py:[['zhōng',1]],g:'middle; center'},{h:'文',py:[['wén',2]],g:'language; writing'}] },
+      '很': { h:'很', py:[['hěn',3]], hsk:1, pos:'adverb', defs:['very','quite'] },
+      '喜欢': { h:'喜欢', py:[['xǐ',3],['huān',1]], hsk:1, pos:'verb', freq:'very common', defs:['to like','to be fond of'],
+        chars:[{h:'喜',py:[['xǐ',3]],g:'to like, to be fond of'},{h:'欢',py:[['huān',1]],g:'joyful, merry'}] },
+      '喝茶': { h:'喝茶', py:[['hē',1],['chá',2]], pos:'verb phrase', defs:['to drink tea'],
+        chars:[{h:'喝',py:[['hē',1]],g:'to drink'},{h:'茶',py:[['chá',2]],g:'tea'}] }
+    };
+    function pyHtml(arr) { return arr.map(function (p) { return '<span class="tone-' + p[1] + '">' + p[0] + '</span>'; }).join(' '); }
+    function renderEntry(d) {
+      var meta = (d.hsk ? '<span class="badge-hsk">HSK ' + d.hsk + '</span>' : '') +
+                 (d.pos ? '<span class="pos">' + d.pos + '</span>' : '') +
+                 (d.freq ? '<span class="freq">· ' + d.freq + '</span>' : '');
+      var chars = (d.chars && d.chars.length)
+        ? '<div class="group-label">Characters · ' + d.chars.length + '</div><div class="charcards">' +
+          d.chars.map(function (c) {
+            return '<div class="charcard"><span class="cc-hanzi" lang="zh">' + c.h +
+              '</span><span class="cc-body"><span class="cc-py" lang="zh">' + pyHtml(c.py) +
+              '</span><span class="cc-gloss">' + c.g + '</span></span><span class="cc-arrow">›</span></div>';
+          }).join('') + '</div>'
+        : '';
+      var ex = d.ex
+        ? '<div class="group-label">Examples</div><div class="examples"><div class="ex"><div class="ex-zh" lang="zh">' +
+          d.ex.zh + '</div><div class="ex-py" lang="zh">' + d.ex.py + '</div><div class="ex-en">' + d.ex.en + '</div></div></div>'
+        : '';
+      return '<div class="entry-head"><div class="hanzi-big" lang="zh">' + d.h +
+        '</div><div class="entry-actions"><span aria-label="Pronounce">🔊</span><span aria-label="Save">☆</span></div></div>' +
+        '<div class="pinyin-row" lang="zh">' + pyHtml(d.py) + '</div>' +
+        '<div class="meta-row">' + meta + '</div>' +
+        '<ol class="defs">' + d.defs.map(function (x) { return '<li>' + x + '</li>'; }).join('') + '</ol>' +
+        chars + ex;
+    }
+    (function () {
+      var entry = document.getElementById('demo-entry');
+      if (!entry) return;
+      var toks = document.querySelectorAll('.bw .tok');
+      function show(t) {
+        var d = DEMO[t.getAttribute('data-w')];
+        if (!d) return;
+        toks.forEach(function (x) { x.classList.remove('active'); });
+        t.classList.add('active');
+        entry.innerHTML = renderEntry(d);
+      }
+      toks.forEach(function (t) {
+        t.addEventListener('mouseenter', function () { show(t); });
+        t.addEventListener('click', function () { show(t); });
+      });
+    })();
+
     // Live stroke-order animation (progressive enhancement; static box if it fails).
     (function () {
       if (!window.HanziWriter) return;
