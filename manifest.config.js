@@ -7,7 +7,7 @@ export default defineManifest({
   version: pkg.version,
   description: pkg.description,
   author: { email: 'dsaad68@gmail.com' },
-  homepage_url: 'https://github.com/dsaad68/zilense',
+  homepage_url: 'https://zilense.com',
   // Side Panel API needs Chrome 114+, and opening the panel from a content-script
   // user gesture (pin-to-open) is reliable from Chrome 116+.
   minimum_chrome_version: '116',

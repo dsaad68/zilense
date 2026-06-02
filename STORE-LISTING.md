@@ -6,7 +6,7 @@ is factual and matches the shipped code (`manifest.config.js`, `src/`) and the
 
 - **Name:** Zilense - Chinese Dictionary
 - **Category:** Productivity (alt: Education)
-- **Privacy policy URL:** https://dsaad68.github.io/zilense/privacy
+- **Privacy policy URL:** https://zilense.com/privacy
 - **Default language:** English
 
 ---
@@ -125,7 +125,7 @@ Answers for the "Privacy practices" tab.
 - ☑ I do not use or transfer user data for purposes that are unrelated to my item's single purpose.
 - ☑ I do not use or transfer user data to determine creditworthiness or for lending purposes.
 
-**Privacy policy URL:** https://dsaad68.github.io/zilense/privacy
+**Privacy policy URL:** https://zilense.com/privacy
 
 ---
 

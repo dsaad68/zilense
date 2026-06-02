@@ -109,7 +109,7 @@ npm run test:e2e     # Playwright smoke test (loads dist/ in Chromium; build fir
   **Tatoeba** (CC BY 2.0 FR), Readability (Apache-2.0), React (MIT). Full
   attribution is in [`THIRD-PARTY-NOTICES.md`](./THIRD-PARTY-NOTICES.md), which
   is copied into `dist/` on build and linked from the side-panel Settings. The
-  [privacy policy](https://dsaad68.github.io/zilense/privacy) and project site
+  [privacy policy](https://zilense.com/privacy) and project site
   are published from [`docs/`](./docs) via GitHub Pages.
 
 - **On-page hover** does greedy longest-match word detection (à la the Zhongwen
