@@ -8,7 +8,7 @@
   <link rel="icon" href="icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Noto+Serif+SC:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -24,65 +24,347 @@
       </span>
     </nav>
 
+    <!-- ============ HERO ============ -->
     <header class="hero">
       <img class="logo" src="icon.png" alt="Zilense icon — the character 字 inside a magnifying glass">
-      <h1>Zilense</h1>
+      <h1>Read Chinese, anywhere you browse</h1>
       <p class="zh" lang="zh">字 <span class="t4">zì</span> &nbsp;·&nbsp; look closely, read clearly</p>
-      <p class="tagline">A Chinese dictionary that lives in your Chrome side panel. Hover or select any
-        character on a page and its reading and meaning appear instantly.</p>
+      <p class="tagline">Hover or select any Chinese character on a page and its tone-colored pinyin,
+        meaning, stroke order, and examples appear instantly — right in the Chrome side panel.</p>
       <div class="cta">
         <a class="btn btn-primary" href="https://github.com/dsaad68/zilense">View on GitHub</a>
         <a class="btn btn-ghost" href="privacy">Privacy policy</a>
       </div>
+      <p style="font-family:var(--font-ui);font-size:13px;color:var(--ink3);margin-top:14px">Coming to the Chrome Web Store</p>
     </header>
 
-    <section class="features">
-      <div class="feature">
-        <div class="ic">🔍</div>
-        <h3>Hover &amp; select lookup</h3>
-        <p>Point at a character to read it, or select a word for the whole-word reading and a
-          character-by-character breakdown. Simplified &amp; traditional.</p>
+    <!-- ============ SIGNATURE MOCKUP ============ -->
+    <div class="bw" role="img" aria-label="Zilense side panel docked next to a Chinese article in Chrome">
+      <div class="bw-bar">
+        <span class="bw-lights"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i></span>
+        <span class="bw-tab"><span class="fav"></span><span class="tt" lang="zh">我的中文生活 — Reader</span></span>
+        <span class="bw-tab dim"><span class="fav" style="background:#3c4043"></span><span class="tt">New Tab</span></span>
       </div>
-      <div class="feature">
-        <div class="ic">🎨</div>
-        <h3>Tone-colored pinyin</h3>
-        <p>Every syllable is colored by its tone — <span lang="zh"><span class="t1">mā</span>
-          <span class="t2">má</span> <span class="t3">mǎ</span> <span class="t4">mà</span>
-          <span class="t5">ma</span></span> — so tones stick.</p>
+      <div class="bw-url"><span class="nav-ic"></span><span class="bw-urlbox">my-reader.app/reader/my-life-in-chinese</span></div>
+      <div class="bw-split">
+
+        <!-- article -->
+        <div class="page">
+          <div class="page-bar">
+            <span class="page-host">my-reader.app</span>
+            <span class="hint">Hover a character → it appears in the panel ↗</span>
+          </div>
+          <div class="post">
+            <div class="kicker">Graded reader · Beginner</div>
+            <h1 lang="zh">我的中文生活</h1>
+            <div class="byline">My Life in Chinese · 78 characters · ~2 min</div>
+            <p class="lead" lang="zh"><span class="tok word active">你好</span><span class="punct">！</span>我是一个<span class="tok word">学生</span><span class="punct">。</span>我在<span class="tok word">中国</span><span class="tok word">学习</span><span class="tok word">中文</span><span class="punct">。</span>我很<span class="tok word">喜欢</span><span class="tok word">喝茶</span><span class="punct">。</span></p>
+            <p class="note">Reading tip: hover any single character for its meaning, or select a whole
+              word like <span lang="zh" style="color:#b23a2e;font-weight:500">朋友</span> for the word reading plus a
+              character-by-character breakdown.</p>
+          </div>
+        </div>
+
+        <!-- docked panel -->
+        <div class="dock ui">
+          <div class="dock-head">Side panel</div>
+          <div class="p-head">
+            <div class="brand"><span class="seal" lang="zh">字</span><span class="brand-name">Zilense</span></div>
+            <div class="head-actions">
+              <button class="iconbtn" aria-label="Settings">⚙</button>
+              <button class="iconbtn" aria-label="Dark mode">☾</button>
+            </div>
+          </div>
+          <div class="searchbar"><span class="search-ic">🔍</span><input placeholder="Search 汉字 or English…" readonly></div>
+          <div class="tabs"><button class="tab on">Dictionary</button><button class="tab">Saved</button></div>
+          <div class="p-body">
+            <div class="entry">
+              <div class="entry-head">
+                <div class="hanzi-big" lang="zh">你好</div>
+                <div class="entry-actions"><span aria-label="Pronounce">🔊</span><span aria-label="Save">☆</span></div>
+              </div>
+              <div class="pinyin-row" lang="zh"><span class="tone-3">nǐ</span> <span class="tone-3">hǎo</span></div>
+              <div class="meta-row"><span class="badge-hsk">HSK 1</span><span class="pos">interjection</span><span class="freq">· very common</span></div>
+              <ol class="defs"><li>hello</li><li>hi</li><li>how do you do</li></ol>
+              <div class="group-label">Characters · 2</div>
+              <div class="charcards">
+                <div class="charcard"><span class="cc-hanzi" lang="zh">你</span><span class="cc-body"><span class="cc-py" lang="zh"><span class="tone-3">nǐ</span></span><span class="cc-gloss">you (singular)</span></span><span class="cc-arrow">›</span></div>
+                <div class="charcard"><span class="cc-hanzi" lang="zh">好</span><span class="cc-body"><span class="cc-py" lang="zh"><span class="tone-3">hǎo</span></span><span class="cc-gloss">good</span></span><span class="cc-arrow">›</span></div>
+              </div>
+              <div class="group-label">Examples</div>
+              <div class="examples">
+                <div class="ex">
+                  <div class="ex-zh" lang="zh">你好，我叫小明。</div>
+                  <div class="ex-py" lang="zh"><span class="tone-3">Nǐ</span> <span class="tone-3">hǎo</span>, <span class="tone-3">wǒ</span> <span class="tone-4">jiào</span> <span class="tone-3">Xiǎo</span><span class="tone-2">míng</span>.</div>
+                  <div class="ex-en">Hi, my name is Xiaoming.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
-      <div class="feature">
-        <div class="ic">✍️</div>
-        <h3>Stroke order</h3>
-        <p>Animated, stroke-by-stroke diagrams for any character, fetched on demand.</p>
-      </div>
-      <div class="feature">
-        <div class="ic">📖</div>
-        <h3>Reader mode</h3>
-        <p>Open any article in a clean, distraction-free reader with selectable fonts, larger text,
-          and optional pinyin above every character — dictionary still live.</p>
-      </div>
-      <div class="feature">
-        <div class="ic">⭐</div>
-        <h3>Saved deck</h3>
-        <p>Star words to build your own study list. It stays on your device.</p>
-      </div>
-      <div class="feature">
-        <div class="ic">🔎</div>
-        <h3>Search anything</h3>
-        <p>By hanzi, pinyin (tone marks optional), or English — ranked so common and HSK words
-          come first.</p>
-      </div>
+    </div>
+
+    <!-- ============ FEATURE SHOWCASE ============ -->
+    <div class="showcase">
+
+      <!-- hover & select -->
+      <section class="feat">
+        <div class="feat-text">
+          <p class="eyebrow">On any page</p>
+          <h2>Hover or select — instant lookup</h2>
+          <p>Point at a character to read it, or select a whole word for its reading and a
+            character-by-character breakdown. Works on simplified and traditional pages
+            (<span lang="zh">中國</span> resolves to <span lang="zh">中国</span>).</p>
+          <p>An optional inline popup shows the meaning right where you're reading — no need to glance away.</p>
+        </div>
+        <div class="feat-visual">
+          <div class="ui popup-mock">
+            <div class="pm-hanzi" lang="zh">朋友</div>
+            <div class="pm-py" lang="zh"><span class="tone-2">péng</span> <span class="tone-5">you</span></div>
+            <div class="pm-def">1. friend &nbsp; 2. companion</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- tone colors -->
+      <section class="feat rev">
+        <div class="feat-text">
+          <p class="eyebrow">Pinyin that teaches</p>
+          <h2>Tone-colored pinyin</h2>
+          <p>Every syllable is colored by its tone, so pronunciation is visible at a glance and
+            the four tones (plus neutral) stick in memory as you read.</p>
+        </div>
+        <div class="feat-visual">
+          <div class="ui" style="text-align:center">
+            <div class="tonebig" lang="zh"><span class="tone-1">mā</span><span class="tone-2">má</span><span class="tone-3">mǎ</span><span class="tone-4">mà</span><span class="tone-5">ma</span></div>
+            <div class="tone-legend">
+              <span><b class="t1" style="color:var(--t1)">1st</b> high</span>
+              <span><b class="t2" style="color:var(--t2)">2nd</b> rising</span>
+              <span><b class="t3" style="color:var(--t3)">3rd</b> dipping</span>
+              <span><b class="t4" style="color:var(--t4)">4th</b> falling</span>
+              <span><b class="t5" style="color:var(--t5)">neutral</b></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- word + character breakdown -->
+      <section class="feat">
+        <div class="feat-text">
+          <p class="eyebrow">Whole words, broken down</p>
+          <h2>Word reading + every character</h2>
+          <p>Smart longest-match segmentation finds the real word under your cursor — even when it's
+            split across inline markup — then shows what each character contributes.</p>
+        </div>
+        <div class="feat-visual">
+          <div class="ui" style="width:300px">
+            <div class="entry-head"><div class="hanzi-big" lang="zh">喜欢</div></div>
+            <div class="pinyin-row" lang="zh"><span class="tone-3">xǐ</span> <span class="tone-1">huān</span></div>
+            <div class="meta-row"><span class="badge-hsk">HSK 1</span><span class="pos">verb</span></div>
+            <ol class="defs"><li>to like</li><li>to be fond of</li></ol>
+            <div class="charcards" style="margin-top:14px">
+              <div class="charcard"><span class="cc-hanzi" lang="zh">喜</span><span class="cc-body"><span class="cc-py" lang="zh"><span class="tone-3">xǐ</span></span><span class="cc-gloss">to like, to be fond of</span></span><span class="cc-arrow">›</span></div>
+              <div class="charcard"><span class="cc-hanzi" lang="zh">欢</span><span class="cc-body"><span class="cc-py" lang="zh"><span class="tone-1">huān</span></span><span class="cc-gloss">joyful, merry</span></span><span class="cc-arrow">›</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- stroke order -->
+      <section class="feat rev">
+        <div class="feat-text">
+          <p class="eyebrow">Learn to write</p>
+          <h2>Animated stroke order</h2>
+          <p>Watch any character drawn stroke by stroke, with its radical and components highlighted.
+            Replay as many times as you like.</p>
+        </div>
+        <div class="feat-visual">
+          <div class="ui" style="display:flex;flex-direction:column;align-items:center;gap:12px">
+            <div class="stroke-box"><div class="stroke-grid"></div><div class="stroke-svg" id="stroke-target"></div></div>
+            <button class="ghostbtn" id="stroke-replay">↻ Replay</button>
+            <div class="radical"><span class="rad-char" lang="zh">子</span><span class="rad-meaning">radical · child</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- HSK -->
+      <section class="feat">
+        <div class="feat-text">
+          <p class="eyebrow">Study by level</p>
+          <h2>HSK levels &amp; one-tap highlighting</h2>
+          <p>Every entry shows its HSK level. From the toolbar, highlight all HSK words up to a chosen
+            level across the whole page — optionally colored band by band.</p>
+        </div>
+        <div class="feat-visual">
+          <div class="ui" style="width:320px">
+            <div class="hsk-chips">
+              <span class="hsk-chip" style="background:#3f7d4f">HSK 1</span>
+              <span class="hsk-chip" style="background:#2f6f8f">HSK 2</span>
+              <span class="hsk-chip" style="background:#3b5b8c">HSK 3</span>
+              <span class="hsk-chip" style="background:#a9781a">HSK 4</span>
+              <span class="hsk-chip" style="background:#b5862f">HSK 5</span>
+              <span class="hsk-chip" style="background:#c8443a">HSK 6</span>
+            </div>
+            <p class="hsk-para" lang="zh">我<mark style="background:#3f7d4f">喜欢</mark>在<mark style="background:#2f6f8f">图书馆</mark><mark style="background:#3f7d4f">学习</mark><mark style="background:#3b5b8c">中文</mark>。</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- reader mode -->
+      <section class="feat rev">
+        <div class="feat-text">
+          <p class="eyebrow">Distraction-free</p>
+          <h2>Reader mode with pinyin ruby</h2>
+          <p>Open any article in a clean reader with selectable fonts, larger text, and column width.
+            Add tone-colored pinyin above every character — and the dictionary stays live as you read.</p>
+        </div>
+        <div class="feat-visual">
+          <div class="ui">
+            <div class="reader-mock" id="reader-mock">
+              <h3 lang="zh">我的中文生活</h3>
+              <p lang="zh" style="margin:0">
+                <ruby>我<rt class="tone-3">wǒ</rt></ruby><ruby>很<rt class="tone-3">hěn</rt></ruby><ruby>喜<rt class="tone-3">xǐ</rt></ruby><ruby>欢<rt class="tone-1">huān</rt></ruby><ruby>喝<rt class="tone-1">hē</rt></ruby><ruby>茶<rt class="tone-2">chá</rt></ruby>。
+              </p>
+              <div class="reader-tools">
+                <span class="theme-sw paper on" data-theme="" title="Paper"></span>
+                <span class="theme-sw sepia" data-theme="sepia" title="Sepia"></span>
+                <span class="theme-sw dark" data-theme="dark" title="Dark"></span>
+                <span class="segmini" style="margin-left:6px"><button class="on">Serif</button><button>Sans</button></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- search -->
+      <section class="feat">
+        <div class="feat-text">
+          <p class="eyebrow">Find anything</p>
+          <h2>Search by hanzi, pinyin, or English</h2>
+          <p>Type characters, pinyin (tone marks optional, e.g. <code>nihao</code>), or an English word.
+            Results are ranked so common and HSK words come first.</p>
+        </div>
+        <div class="feat-visual">
+          <div class="ui" style="width:320px">
+            <div class="searchbar" style="margin:0 0 10px"><span class="search-ic">🔍</span><input value="tea" readonly></div>
+            <div class="result"><span class="r-hanzi" lang="zh">茶</span><span class="r-body"><span class="r-top"><span class="tone-2">chá</span> <span class="r-hsk">HSK 1</span></span><span class="r-gloss">tea</span></span></div>
+            <div class="result"><span class="r-hanzi" lang="zh">喝茶</span><span class="r-body"><span class="r-top"><span class="tone-1">hē</span><span class="tone-2">chá</span></span><span class="r-gloss">to drink tea</span></span></div>
+            <div class="result"><span class="r-hanzi" lang="zh">绿茶</span><span class="r-body"><span class="r-top"><span class="tone-4">lǜ</span><span class="tone-2">chá</span></span><span class="r-gloss">green tea</span></span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- saved deck -->
+      <section class="feat rev">
+        <div class="feat-text">
+          <p class="eyebrow">Build your deck</p>
+          <h2>Save words &amp; revisit history</h2>
+          <p>Star any entry to keep it in your deck, and every deliberate lookup is logged in history.
+            It all stays on your device.</p>
+        </div>
+        <div class="feat-visual">
+          <div class="ui" style="width:320px">
+            <div class="flash"><span class="f-hanzi" lang="zh">朋友</span><span><span class="cc-py" lang="zh"><span class="tone-2">péng</span> <span class="tone-5">you</span></span><div class="f-gloss">friend</div></span><span class="f-star">★</span></div>
+            <div class="flash"><span class="f-hanzi" lang="zh">学习</span><span><span class="cc-py" lang="zh"><span class="tone-2">xué</span> <span class="tone-2">xí</span></span><div class="f-gloss">to study, to learn</div></span><span class="f-star">★</span></div>
+            <div class="flash"><span class="f-hanzi" lang="zh">中文</span><span><span class="cc-py" lang="zh"><span class="tone-1">zhōng</span> <span class="tone-2">wén</span></span><div class="f-gloss">Chinese language</div></span><span class="f-star">★</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- customize -->
+      <section class="feat">
+        <div class="feat-text">
+          <p class="eyebrow">Make it yours</p>
+          <h2>Themes, fonts &amp; tone colors</h2>
+          <p>Pick an accent color, choose a serif or sans Chinese face, toggle tone colors, set your pin
+            key, and switch to dark mode. Try the controls →</p>
+        </div>
+        <div class="feat-visual">
+          <div class="ui settings-pop" id="customize-panel" style="width:280px">
+            <div class="set-title">Display</div>
+            <div class="set-row col">
+              <span class="set-label">Accent</span>
+              <div class="swatches">
+                <button class="swatch on" data-accent="#c8443a" style="background:#c8443a" aria-label="Vermilion">✓</button>
+                <button class="swatch" data-accent="#2f6f4f" style="background:#2f6f4f" aria-label="Jade"></button>
+                <button class="swatch" data-accent="#3b5b8c" style="background:#3b5b8c" aria-label="Indigo"></button>
+                <button class="swatch" data-accent="#b5862f" style="background:#b5862f" aria-label="Gold"></button>
+                <button class="swatch" data-accent="#4a4540" style="background:#4a4540" aria-label="Ink"></button>
+              </div>
+            </div>
+            <div class="set-row"><span class="set-label">Chinese face</span><span class="segmini"><button class="on">Sans</button><button>Serif</button></span></div>
+            <div class="set-row"><span class="set-label">Pinyin tone colors</span><button class="switch on" aria-label="Tone colors"><span class="knob"></span></button></div>
+            <div class="set-row"><span class="set-label">Dark mode</span><button class="switch" id="customize-dark" aria-label="Dark mode"><span class="knob"></span></button></div>
+            <div class="set-row"><span class="set-label">Pin key (hover + press)</span><span class="keycap">p</span></div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- ============ PRIVACY ============ -->
+    <section class="privacy-strip">
+      <h2>Private by design</h2>
+      <p>Your saved words and settings stay on your device. No analytics, no tracking, nothing sent to
+        the developer. <a href="privacy">Read the privacy policy →</a></p>
     </section>
 
+    <!-- ============ FOOTER ============ -->
     <footer class="foot">
-      <p>Private by design: your words and settings stay on your device. No analytics, no tracking.
-        See the <a href="privacy">privacy policy</a>.</p>
       <p>Open source under the MIT License. Dictionary data: CC-CEDICT (CC BY-SA 4.0) · stroke data:
-        makemeahanzi · examples: Tatoeba · fonts: Noto SC / Source Serif 4 (OFL).
-        Full attribution in the
+        makemeahanzi · examples: Tatoeba · fonts: Noto SC / Source Serif 4 (OFL). Full attribution in the
         <a href="https://github.com/dsaad68/zilense/blob/main/THIRD-PARTY-NOTICES.md">third-party notices</a>.</p>
+      <p><a href="https://github.com/dsaad68/zilense">GitHub</a> · <a href="privacy">Privacy</a></p>
     </footer>
 
   </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5.0/dist/hanzi-writer.min.js"></script>
+  <script>
+    // Live stroke-order animation (progressive enhancement; static box if it fails).
+    (function () {
+      if (!window.HanziWriter) return;
+      var target = document.getElementById('stroke-target');
+      if (!target) return;
+      var writer = HanziWriter.create('stroke-target', '学', {
+        width: 150, height: 150, padding: 8,
+        strokeColor: '#c8443a', radicalColor: '#a9781a',
+        showOutline: true, delayBetweenStrokes: 130, strokeAnimationSpeed: 1.1,
+      });
+      writer.animateCharacter();
+      var replay = document.getElementById('stroke-replay');
+      if (replay) replay.addEventListener('click', function () { writer.animateCharacter(); });
+    })();
+
+    // Customize panel: live accent recolor + dark-mode toggle.
+    var panel = document.getElementById('customize-panel');
+    document.querySelectorAll('#customize-panel .swatch').forEach(function (sw) {
+      sw.addEventListener('click', function () {
+        var c = sw.getAttribute('data-accent');
+        panel.style.setProperty('--accent', c);
+        panel.style.setProperty('--accent-soft', c + '1a');
+        document.querySelectorAll('#customize-panel .swatch').forEach(function (x) {
+          x.classList.toggle('on', x === sw);
+          x.textContent = x === sw ? '✓' : '';
+        });
+      });
+    });
+    var darkToggle = document.getElementById('customize-dark');
+    if (darkToggle) darkToggle.addEventListener('click', function () {
+      var on = panel.classList.toggle('dark');
+      darkToggle.classList.toggle('on', on);
+    });
+
+    // Reader mock: theme switch.
+    document.querySelectorAll('.theme-sw').forEach(function (t) {
+      t.addEventListener('click', function () {
+        var rm = document.getElementById('reader-mock');
+        rm.className = 'reader-mock ' + t.getAttribute('data-theme');
+        document.querySelectorAll('.theme-sw').forEach(function (x) { x.classList.toggle('on', x === t); });
+      });
+    });
+  </script>
 </body>
 </html>
