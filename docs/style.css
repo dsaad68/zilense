@@ -346,6 +346,13 @@ a:hover { text-decoration: underline; }
   font-size: 11px; font-weight: 700; color: var(--accent); margin: 0 0 8px; }
 .feat-text h2 { font-family: var(--font-en); font-size: 28px; line-height: 1.2; margin: 0 0 10px; }
 .feat-text p { color: var(--ink2); margin: 0 0 10px; font-size: 17px; }
+/* every feature visual is a self-contained light card (so the fixed warm theme
+   reads correctly even when the page is in dark mode), except the ones that
+   already provide their own surface (popup / settings / reader). */
+.feat-visual > .ui:not(.popup-mock):not(.settings-pop):not(.bare) {
+  background: var(--bg); border: 1px solid var(--line2); border-radius: 16px;
+  padding: 24px; box-shadow: 0 16px 40px rgba(35, 25, 12, .22);
+}
 
 /* tone-pinyin showpiece */
 .tonebig { font-family: var(--font-han); font-size: 46px; font-weight: 700; display: flex; gap: 18px;
