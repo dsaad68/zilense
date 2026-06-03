@@ -194,6 +194,12 @@ async function main() {
   try {
     const all = JSON.parse(await readFile(hskSrc, 'utf8'))
     for (const [word, info] of Object.entries(all)) {
+      // hskSenses is the full official HSK gloss set (level + POS + def + pinyin),
+      // kept for EVERY HSK word — including the handful not in CC-CEDICT — because
+      // the flashcards deck is built from this, sourced entirely from the HSK lists.
+      if (info.senses && info.senses.length) hskSenses[word] = info.senses
+      // hsk/pos maps stay CC-CEDICT-only: they feed search ranking and the on-page
+      // highlight, which can only act on words the dictionary can actually look up.
       if (!entries[word]) continue
       hsk[word] = info.lvl
       // An HSK word is common vocabulary, not a name. If a word exists ONLY
@@ -202,7 +208,6 @@ async function main() {
       const senses = entries[word]
       if (senses.every((s) => s[4] === 1)) for (const s of senses) s.length = 4
       if (info.pos) pos[word] = info.pos
-      if (info.senses && info.senses.length) hskSenses[word] = info.senses
       hskCount++
     }
   } catch {

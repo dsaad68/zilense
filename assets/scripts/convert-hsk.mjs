@@ -1,6 +1,6 @@
 /* convert-hsk.mjs — one-off: turn the messy HSK spreadsheets in
    assets/hsk-vocab/ into one clean, committed JSON:
-     word -> { lvl, pos, senses: [{ lvl, pos, def }, ...] }
+     word -> { lvl, pos, senses: [{ lvl, pos, def, py }, ...] }
    `lvl`/`pos` are the primary (lowest-band) reading for the meta badge; `senses`
    lists ONE entry per source row — nothing is collapsed. A word that appears in
    more than one level's list is kept at each level with that list's own meaning (so
@@ -21,10 +21,11 @@
    gloss — we do NOT read the band out of the per-row 所在等级 cell (column E), which
    mixes YCT / old-HSK / multiple New-HSK tags and would collapse such words.
 
-   Columns per sheet: A 词语(word) · B 拼音 · C 翻译(gloss) · D 词性(POS) · E 所在等级 · F 是否标记
-   The POS cell (词性) holds Chinese abbreviations like "动、名" which we map to
-   English ("verb; noun"). The 翻译 cell is the concise official English gloss
-   ("to love", "cup; glass; mug"). Column E is no longer used.
+   Columns per sheet: A 词语(word) · B 拼音(pinyin) · C 翻译(gloss) · D 词性(POS) · E 所在等级 · F 是否标记
+   We read A (word), B (tone-marked pinyin -> `py`), C (gloss -> `def`) and D (POS).
+   The POS cell holds Chinese abbreviations like "动、名" which we map to English
+   ("verb; noun"). The 翻译 cell is the concise official English gloss ("to love",
+   "cup; glass; mug"). Column E is not used (the band comes from the filename).
 
    Run:  npm run convert:hsk   (re-run only when hsk-vocab/*.xls change) */
 
@@ -117,13 +118,14 @@ const bandLabel = (rank) => (rank <= 6 ? rank : '7-9')
 function parseSheet(xml, shared, into, rank) {
   for (const row of xml.matchAll(/<row[^>]*r="(\d+)"[^>]*>([\s\S]*?)<\/row>/g)) {
     if (row[1] === '1') continue // header
-    let word = null, def = '', pos = ''
+    let word = null, py = '', def = '', pos = ''
     for (const c of row[2].matchAll(/<c\s+r="([A-Z]+)\d+"([^>]*)>([\s\S]*?)<\/c>/g)) {
       const col = c[1]
-      if (col !== 'A' && col !== 'C' && col !== 'D') continue
+      if (col !== 'A' && col !== 'B' && col !== 'C' && col !== 'D') continue
       const tMatch = c[2].match(/\bt="([^"]+)"/)
       const val = cellValue(c[3], tMatch ? tMatch[1] : null, shared)
       if (col === 'A') word = val.trim()
+      else if (col === 'B') py = val.trim()
       else if (col === 'C') def = val.trim()
       else if (col === 'D') pos = val
     }
@@ -137,7 +139,7 @@ function parseSheet(xml, shared, into, rank) {
     // stripped before writing.
     let w = into[word]
     if (!w) into[word] = w = { senses: [] }
-    w.senses.push({ _r: rank, _o: w.senses.length, lvl: bandLabel(rank), pos: mapPos(pos), def })
+    w.senses.push({ _r: rank, _o: w.senses.length, lvl: bandLabel(rank), pos: mapPos(pos), def, py })
   }
 }
 

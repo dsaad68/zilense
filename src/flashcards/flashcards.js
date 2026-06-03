@@ -8,7 +8,7 @@
        login.
    The round + results UI/logic is unchanged: cards are { id, w, p, m }. */
 
-import { loadDict, lookup, hskWordsAtBand, hskWordsUpTo } from '../lib/dict.js'
+import { loadDict, lookup, allHskSenses } from '../lib/dict.js'
 import { loadState } from '../lib/storage.js'
 import { toAnkiTsv } from '../lib/anki.js'
 import * as Progress from './progress.js'
@@ -133,18 +133,46 @@ function toCard(w, band) {
   return { id: w, w, p: e ? e.pinyin : '', m, pos }
 }
 
+// one flashcard for a single HSK sense. Meaning, pinyin and POS all come straight
+// from the HSK vocab list (the `s` sense); CC-CEDICT is only a pinyin fallback for
+// the rare sense whose list row had no pinyin. `idx` is the sense's position among
+// the word's picked senses — null when the word contributes a single card, so its
+// id stays the plain word.
+function senseCard(w, s, idx) {
+  return {
+    id: idx == null ? w : `${w}#${idx}`,
+    w,
+    p: s.py || (lookup(w)?.pinyin ?? ''),
+    m: s.def,
+    pos: s.pos || '',
+  }
+}
+
+// band rank of a sense's level ('7-9' -> 7)
+function senseRank(s) { return s.lvl === '7-9' ? 7 : Number(s.lvl) }
+
 // build the deck for a deck value: 'starred' or 'hsk1'..'hsk7' (7 ⇒ 7–9).
-// For HSK decks `setup.scope` picks 'exact' (just this level) or 'cumulative'
-// (everything up to it); each card shows the meaning from its own band.
+// HSK decks are built ENTIRELY from the HSK vocab lists (no CC-CEDICT gating), one
+// CARD PER SENSE — a word with two meanings at a band (花 [verb] spend / [noun]
+// flower) becomes two cards — so the deck size equals the vocab list's row count.
+// `setup.scope` picks 'exact' (senses at just this level) or 'cumulative' (every
+// sense up to this level).
 async function buildDeck(deckId) {
   if (deckId === 'starred') {
     const { saved } = await loadState()
     return saved.map((w) => toCard(w))
   }
   const band = Number(String(deckId).replace('hsk', '')) || 1
-  const pairs = setup.scope === 'cumulative' ? hskWordsUpTo(band) : hskWordsAtBand(band)
-  // each pair is [word, rank]; use that word's own band for its card meaning
-  return pairs.map(([w, rank]) => toCard(w, rank))
+  const exactLabel = band === 7 ? '7-9' : String(band)
+  const senses = allHskSenses()
+  const cards = []
+  for (const w of Object.keys(senses)) {
+    const picked = senses[w].filter((s) =>
+      setup.scope === 'cumulative' ? senseRank(s) <= band : String(s.lvl) === exactLabel
+    )
+    picked.forEach((s, i) => cards.push(senseCard(w, s, picked.length > 1 ? i : null)))
+  }
+  return cards
 }
 
 async function selectDeck(deckId) {

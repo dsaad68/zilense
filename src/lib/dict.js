@@ -59,6 +59,12 @@ export function hskWordsUpTo(maxRank) {
   return DB ? core.hskWordsUpTo(DB, maxRank) : []
 }
 
+// the full HSK gloss map { word: [{ lvl, pos, def, py }] } — every HSK word,
+// including those absent from CC-CEDICT. Powers the flashcards deck.
+export function allHskSenses() {
+  return DB && DB.hskSenses ? DB.hskSenses : {}
+}
+
 export function compMeaning(c) {
   return DB ? core.compMeaning(DB, c) : ''
 }
