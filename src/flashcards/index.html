@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Flashcards · Zilense</title>
+<link rel="stylesheet" href="./flashcards.css">
+<script>
+// Anti-flash theme: apply the page's saved theme before first paint. The
+// extension's dark setting lives in chrome.storage (async), so flashcards.js
+// seeds this local key from it on first run; the toggle keeps it in sync.
+(function () {
+  try {
+    if (localStorage.getItem('zilense.flashcards.theme') === 'dark') {
+      document.documentElement.dataset.theme = 'dark'
+    }
+  } catch (e) {}
+})()
+</script>
+</head>
+<body>
+<button class="theme-toggle" aria-label="Toggle theme">
+  <span class="icon" aria-hidden="true">
+    <svg class="ico-sun"  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+    <svg class="ico-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
+  </span><span class="label">Light</span>
+</button>
+
+<div class="app">
+
+  <!-- ════════════════════════════════════════════════════════════
+       SCREEN 0 · LOADING (dictionary fetch)
+       ════════════════════════════════════════════════════════════ -->
+  <section class="screen active" id="screen-loading">
+    <div class="topbar">
+      <div class="brand-mark">Zilense · flashcards</div>
+    </div>
+    <h1 id="loading-title">Loading dictionary…</h1>
+    <p class="lead" id="loading-sub">One moment — building your deck.</p>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════
+       SCREEN 1 · HOME / ROUND SETUP
+       ════════════════════════════════════════════════════════════ -->
+  <section class="screen" id="screen-home">
+    <div class="topbar">
+      <div class="brand-mark"><span class="brand-mark-title">Zilense · flashcards</span></div>
+    </div>
+    <h1>Set up a round.</h1>
+    <p class="lead">Pick a deck — your starred words or an HSK level — then a pool, a size, and how the question is presented. Your stats for the current deck are below.</p>
+
+    <!-- Live stats for the current deck -->
+    <section class="stats" id="home-stats">
+      <div class="stat hero"><span class="v" id="hs-seen">0</span><div class="l">Reviewed</div></div>
+      <div class="stat ok"><span class="v" id="hs-correct">0</span><div class="l">Correct</div></div>
+      <div class="stat wrong"><span class="v" id="hs-wrong">0</span><div class="l">Wrong</div></div>
+      <div class="stat unseen"><span class="v" id="hs-unseen">—</span><div class="l">Unseen</div></div>
+      <div class="stat"><span class="v" id="hs-acc">— %</span><div class="l">Accuracy</div></div>
+    </section>
+
+    <!-- Round configuration · single editorial panel -->
+    <div class="setup-panel">
+
+      <!-- Deck -->
+      <div class="setup-row">
+        <div class="setup-row-label">
+          <div class="lbl">Deck</div>
+          <div class="hint" id="deck-hint">Your starred words, or an HSK level</div>
+        </div>
+        <div class="setup-row-control">
+          <select id="deck-select" class="deck-select" aria-label="Deck">
+            <option value="starred">★ Starred words</option>
+            <option value="hsk1">HSK 1</option>
+            <option value="hsk2">HSK 2</option>
+            <option value="hsk3">HSK 3</option>
+            <option value="hsk4">HSK 4</option>
+            <option value="hsk5">HSK 5</option>
+            <option value="hsk6">HSK 6</option>
+            <option value="hsk7">HSK 7–9</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Source pool -->
+      <div class="setup-row">
+        <div class="setup-row-label">
+          <div class="lbl">Source pool</div>
+          <div class="hint" id="pool-count">— words available</div>
+        </div>
+        <div class="setup-row-control">
+          <div class="seg-pill" role="radiogroup" aria-label="Source pool">
+            <label><input type="radio" name="source" value="all" checked><span>All</span></label>
+            <label><input type="radio" name="source" value="unseen"><span>Unseen</span></label>
+            <label><input type="radio" name="source" value="wrong-recent"><span>Wrong · last 3</span></label>
+            <label><input type="radio" name="source" value="wrong-ever"><span>Wrong · ever</span></label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Round size -->
+      <div class="setup-row">
+        <div class="setup-row-label">
+          <div class="lbl">Round size</div>
+          <div class="hint">If the pool is smaller, uses what's available</div>
+        </div>
+        <div class="setup-row-control">
+          <div class="size-row" role="radiogroup" aria-label="Round size">
+            <span class="size-chip" data-size="10"  aria-pressed="false">10</span>
+            <span class="size-chip" data-size="20"  aria-pressed="true">20</span>
+            <span class="size-chip" data-size="30"  aria-pressed="false">30</span>
+            <span class="size-chip" data-size="50"  aria-pressed="false">50</span>
+            <span class="size-chip" data-size="all" aria-pressed="false">All</span>
+            <input type="number" id="size-custom" min="1" max="9999" placeholder="Custom" aria-label="Custom round size">
+          </div>
+        </div>
+      </div>
+
+      <!-- Question side -->
+      <div class="setup-row">
+        <div class="setup-row-label">
+          <div class="lbl">Question side</div>
+          <div class="hint">Which side leads</div>
+        </div>
+        <div class="setup-row-control">
+          <div class="seg-pill" role="radiogroup" aria-label="Question side">
+            <label><input type="radio" name="qmode" value="character" checked><span>Character → meaning</span></label>
+            <label><input type="radio" name="qmode" value="meaning"><span>Meaning → character</span></label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order -->
+      <div class="setup-row">
+        <div class="setup-row-label">
+          <div class="lbl">Order</div>
+          <div class="hint">Random shuffles each round</div>
+        </div>
+        <div class="setup-row-control">
+          <div class="seg-pill" role="radiogroup" aria-label="Order">
+            <label><input type="radio" name="order" value="random" checked><span>Random</span></label>
+            <label><input type="radio" name="order" value="sequential"><span>Sequential</span></label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pinyin -->
+      <div class="setup-row">
+        <div class="setup-row-label">
+          <div class="lbl">Pinyin</div>
+          <div class="hint">Hidden in "meaning → character" so you don't see the answer</div>
+        </div>
+        <div class="setup-row-control">
+          <label class="toggle-switch">
+            <input type="checkbox" id="setup-pinyin" checked>
+            <span class="track"></span>
+            <span class="text">Show on top</span>
+          </label>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="start-row">
+      <span class="summary" id="round-summary">— 20 cards · random · character → meaning</span>
+      <button class="btn solid lg" id="start-btn" type="button">Start round →</button>
+    </div>
+
+    <!-- Data row · export / import / reset for the local progress -->
+    <details class="data-row">
+      <summary>
+        <div class="data-row-label">
+          <span class="lbl">Your progress</span>
+          <span class="sep" aria-hidden="true">•</span>
+          <span class="hint">Export to Anki, back up, restore, or reset — all stored on this device</span>
+        </div>
+        <span class="data-row-chevron" aria-hidden="true"></span>
+      </summary>
+      <div class="data-row-actions">
+        <button class="btn subtle" id="anki-btn" type="button">Export starred → Anki</button>
+        <button class="btn subtle" id="export-btn" type="button">Export JSON</button>
+        <button class="btn subtle" id="import-btn" type="button">Import JSON</button>
+        <input type="file" id="import-input" accept=".json,application/json" hidden>
+        <button class="btn subtle danger-text" id="reset-btn" type="button">Reset progress</button>
+      </div>
+    </details>
+
+    <div class="foot">
+      <span class="left">Star words in the Zilense dictionary to build your own deck.</span>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════
+       SCREEN 2 · ROUND IN PROGRESS
+       ════════════════════════════════════════════════════════════ -->
+  <section class="screen" id="screen-round">
+    <div class="topbar">
+      <div class="brand-mark"><span class="brand-mark-title">Round · <span id="round-meta">— cards</span></span></div>
+      <button class="switch" type="button" id="abandon-btn">End round →</button>
+    </div>
+
+    <div class="card" id="card" role="button" aria-label="Flashcard — click or press space to reveal">
+      <div class="card-flipper">
+
+        <!-- Front face · question -->
+        <div class="card-face card-front">
+          <div class="card-top">
+            <div class="result none"></div>
+            <div class="pinyin">—</div>
+            <div class="progress">— / —</div>
+          </div>
+          <div class="card-body">
+            <div class="q-character" id="q-text-char" hidden></div>
+            <div class="q-meaning" id="q-text-mean" hidden></div>
+          </div>
+          <div class="card-foot">
+            <span class="card-counter">Card 1</span>
+            <span class="hint">Tap or press space to reveal</span>
+          </div>
+        </div>
+
+        <!-- Back face · answer (mark buttons live in the nav row below) -->
+        <div class="card-face card-back">
+          <div class="card-top">
+            <div class="result none"></div>
+            <div class="pinyin">—</div>
+            <div class="progress">— / —</div>
+          </div>
+          <div class="card-body">
+            <div class="answer" id="answer">
+              <div class="a-character" id="a-char"></div>
+              <div class="a-pinyin" id="a-pinyin"></div>
+              <div class="a-meaning" id="a-mean"></div>
+            </div>
+          </div>
+          <div class="card-foot">
+            <span class="card-counter">Card 1</span>
+            <span class="hint">Tap or press space to reveal</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="nav">
+      <div class="nav-buttons">
+        <div class="nav-flipper">
+          <button class="btn solid nav-q" id="reveal-btn" type="button">Reveal</button>
+          <div class="nav-a-group">
+            <button class="btn mark-wrong nav-a" id="btn-wrong" type="button" title="Press shift+space or backspace">
+              <svg class="ico" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+              Missed it
+            </button>
+            <button class="btn mark-correct nav-a" id="btn-correct" type="button" title="Press space">
+              <svg class="ico" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>
+              Got it
+            </button>
+          </div>
+        </div>
+      </div>
+      <span class="keys"><kbd>space</kbd> reveal / got it · <kbd>shift</kbd>+<kbd>space</kbd> or <kbd>backspace</kbd> missed it</span>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════
+       SCREEN 3 · RESULTS
+       ════════════════════════════════════════════════════════════ -->
+  <section class="screen" id="screen-results">
+    <div class="topbar">
+      <div class="brand-mark">Round complete</div>
+      <button class="switch" type="button" id="home-btn">← Home</button>
+    </div>
+
+    <div class="results-hero">
+      <div class="score">
+        <span id="r-correct">0</span><span class="of">/</span><span id="r-total">0</span>
+        <span class="pct" id="r-pct">— %</span>
+      </div>
+      <h2 id="r-headline">Nice work.</h2>
+      <p id="r-subhead">— of the round were correct on the first pass.</p>
+    </div>
+
+    <div class="results-grid">
+      <div class="results-list ok">
+        <span class="lbl">Got it</span>
+        <ul id="r-ok-list"></ul>
+        <div class="empty" id="r-ok-empty" hidden>None this round.</div>
+      </div>
+      <div class="results-list wrong">
+        <span class="lbl">Missed</span>
+        <ul id="r-wrong-list"></ul>
+        <div class="empty" id="r-wrong-empty" hidden>None — clean round.</div>
+      </div>
+    </div>
+
+    <div class="results-actions">
+      <button class="btn solid" id="again-btn" type="button">Replay missed only</button>
+      <button class="btn" id="new-btn" type="button">New round</button>
+      <button class="btn subtle" id="results-home-btn" type="button">← Home</button>
+    </div>
+  </section>
+
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script type="module" src="./flashcards.js"></script>
+</body>
+</html>

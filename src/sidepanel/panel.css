@@ -261,7 +261,8 @@ body {
 .results { padding: 12px 14px 40px; }
 .results-label, .saved-count { font-family: var(--font-ui); text-transform: uppercase; letter-spacing: .1em;
   font-size: 10.5px; font-weight: 700; color: var(--ink3); margin: 4px 4px 10px; }
-.saved-count { display: flex; align-items: center; justify-content: space-between; }
+.saved-count { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.saved-tools { display: inline-flex; gap: 12px; flex-shrink: 0; }
 .hist-clear { font-family: var(--font-ui); text-transform: uppercase; letter-spacing: .08em;
   font-size: 10.5px; font-weight: 700; color: var(--accent); background: none; border: none;
   cursor: pointer; padding: 2px 4px; }

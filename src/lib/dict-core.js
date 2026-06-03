@@ -185,6 +185,19 @@ export function hskWordsUpTo(db, maxRank) {
   return out
 }
 
+/* hskWordsAtBand(db, band) — every HSK word in exactly ONE band, as [word, rank]
+   pairs (band 1–6, or 7 for the advanced 7–9 set). Unlike hskWordsUpTo this is
+   not cumulative — it powers the flashcards "study HSK level N" decks, where each
+   level is its own deck rather than everything up to N. */
+export function hskWordsAtBand(db, band) {
+  const out = []
+  if (!db || !db.hsk || !band) return out
+  for (const word of Object.keys(db.hsk)) {
+    if (hskRank(db.hsk[word]) === band) out.push([word, band])
+  }
+  return out
+}
+
 /* matchRank(db, key, q, qp) — how well `key` matches the (non-Han) query, as
    [rank, defLen], or null. Lower rank is better: 0 = exact def / exact toneless
    pinyin, 1 = whole-word def token (or pinyin prefix), 2 = def prefix / pinyin

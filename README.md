@@ -49,6 +49,11 @@ npm run test:e2e     # Playwright smoke test (loads dist/ in Chromium; build fir
 - **🔊 Pronounce** plays Mandarin via the browser’s speech synthesis (when a
   zh-CN voice is installed).
 - **★ Save** entries to your deck (persists via `chrome.storage`).
+- **🎴 Flashcards** (toolbar menu → **Flashcards**, opens a full-page tab) → study
+  your **starred words** or any **HSK level** with flip cards, pools (unseen /
+  recently missed / ever missed), and keyboard shortcuts; progress is kept on the
+  device. **Export to Anki** turns your starred words into a tab-separated file
+  Anki imports directly (also available from the panel's **Saved** tab).
 - **⚙ Settings**: accent color, Chinese face (sans/serif), pinyin tone colors; plus dark mode.
 
 > Note: Chrome only lets the side panel open from a user gesture, so hovering
@@ -65,9 +70,10 @@ npm run test:e2e     # Playwright smoke test (loads dist/ in Chromium; build fir
 | Data pipelines | `assets/scripts/build-dict.mjs` → `src/data/cedict.json` (entries + traditional↔simplified maps + merged HSK/POS/char data); `assets/scripts/convert-chars.mjs` → `assets/char-data/char-data.json` (radical/components/strokes, from makemeahanzi); `assets/scripts/fetch-fonts.mjs` → `src/sidepanel/fonts/` + `fonts.css` (vendored Google Fonts). `assets/scripts/convert-hsk.mjs` (`npm run convert:hsk`) → `assets/hsk-vocab/hsk-data.json` (HSK level + POS + official gloss, parsed from the committed `.xls` lists). All build/data scripts live under `assets/`. |
 | Dictionary logic | `src/lib/dict-core.js` (pure lookup/search/segment, unit-tested), `src/lib/dict.js` (loads the index, wraps core), `src/lib/pinyin.js`, `src/lib/storage.js`, `src/lib/examples.js` (Tatoeba) |
 | Side panel UI | `src/sidepanel/` (`App.jsx` + `components/`, `panel.css`) |
+| Flashcards page | `src/flashcards/` (`index.html`, `flashcards.js` deck/round logic, `progress.js` local per-device progress, `flashcards.css`); builds decks from starred words + the dictionary's HSK data; `src/lib/anki.js` (pure TSV formatter) |
 | On-page lookup | `src/content/content.js` (hover + click-to-pin + select), `content.css` |
 | Background | `src/background/service-worker.js` (panel open + context menu) |
-| Tests | `test/*.test.mjs` (`npm test`, Node's built-in runner: dict-core, pinyin, content-core, manifest, storage-helpers, reader-stash; DOM logic, reader-extract, word-walk, via happy-dom); `e2e/*.spec.js` (`npm run test:e2e`, Playwright extension tests: `panel.spec.js` side-panel smoke test, `reader.spec.js` Reader pin-to-panel + forged-message hardening) |
+| Tests | `test/*.test.mjs` (`npm test`, Node's built-in runner: dict-core, pinyin, content-core, manifest, storage-helpers, reader-stash, anki; DOM logic, reader-extract, word-walk, via happy-dom); `e2e/*.spec.js` (`npm run test:e2e`, Playwright extension tests: `panel.spec.js` side-panel smoke test, `reader.spec.js` Reader pin-to-panel + forged-message hardening, `flashcards.spec.js` study-an-HSK-deck smoke test) |
 
 ## Known limitations / next steps
 

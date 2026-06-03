@@ -51,6 +51,10 @@ export function wordsContainingChar(char, opts) {
   return DB ? core.wordsContainingChar(DB, INDEX, char, opts) : []
 }
 
+export function hskWordsAtBand(band) {
+  return DB ? core.hskWordsAtBand(DB, band) : []
+}
+
 export function compMeaning(c) {
   return DB ? core.compMeaning(DB, c) : ''
 }

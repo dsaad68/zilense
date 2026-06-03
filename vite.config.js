@@ -24,7 +24,13 @@ export default defineConfig({
       // CRXJS auto-discovers — so register its HTML as an explicit build input,
       // or its <script>/<link> source paths ship un-bundled. CRXJS merges this
       // with its own manifest-derived inputs.
-      input: { reader: resolve(__dirname, 'src/reader/index.html') },
+      // The flashcards page is opened as a top-level tab from the toolbar popup
+      // (chrome.tabs.create + runtime.getURL), so it isn't in a manifest page slot
+      // either — register it the same way so it gets bundled.
+      input: {
+        reader: resolve(__dirname, 'src/reader/index.html'),
+        flashcards: resolve(__dirname, 'src/flashcards/index.html'),
+      },
     },
   },
 })

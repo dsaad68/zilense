@@ -53,6 +53,13 @@ async function init() {
     readerBtn.style.cursor = 'default'
   }
 
+  // Flashcards — open the study page in a new tab. It's an extension page
+  // (opened via runtime.getURL), so it works on any tab and needs no permission.
+  $('flashcards').addEventListener('click', () => {
+    chrome.tabs.create({ url: chrome.runtime.getURL('src/flashcards/index.html') })
+    window.close()
+  })
+
   // Hover popup = settings.inlinePopup (the floating mini-card)
   const hoverBtn = $('hover-toggle')
   let inlinePopup = settings.inlinePopup

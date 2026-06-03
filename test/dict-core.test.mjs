@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'node:path'
-import { lookup, segmentLongest, searchEntries, compMeaning, buildIndex, hskWordsUpTo } from '../src/lib/dict-core.js'
+import { lookup, segmentLongest, searchEntries, compMeaning, buildIndex, hskWordsUpTo, hskWordsAtBand, hskRank } from '../src/lib/dict-core.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 let DB, INDEX
@@ -334,4 +334,21 @@ test('paragraph segmentation: greedy segmentLongest + lookup loop (the worker sh
   assert.ok(out.some((o) => o.t === '喜欢'), '喜欢 is segmented as one word, not two chars')
   assert.ok(out.every((o) => o.py && o.py.length), 'every token resolves to non-empty pinyin')
   assert.ok(out.find((o) => o.t === '喜欢').py.startsWith('xǐ'), '喜欢 pinyin is tone-marked')
+})
+
+test('hskWordsAtBand: returns exactly one band (not cumulative), powers the per-level decks', () => {
+  const b3 = hskWordsAtBand(DB, 3)
+  assert.ok(b3.length > 0, 'HSK band 3 is non-empty')
+  for (const [w, rank] of b3) {
+    assert.equal(rank, 3)
+    assert.equal(hskRank(DB.hsk[w]), 3, `${w} is actually a band-3 word`)
+  }
+  // band 1 is the lowest band, so "at band 1" equals "up to band 1"
+  assert.equal(hskWordsAtBand(DB, 1).length, hskWordsUpTo(DB, 1).length)
+  // band 7 captures the advanced 7–9 set, stored as the string "7-9"
+  const b7 = hskWordsAtBand(DB, 7)
+  assert.ok(b7.length > 0, 'HSK 7–9 band is non-empty')
+  for (const [w] of b7) assert.equal(DB.hsk[w], '7-9')
+  // guard: no band/zero input returns nothing
+  assert.deepEqual(hskWordsAtBand(DB, 0), [])
 })
