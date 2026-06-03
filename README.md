@@ -51,10 +51,23 @@ npm run test:e2e     # Playwright smoke test (loads dist/ in Chromium; build fir
   zh-CN voice is installed).
 - **★ Save** entries to your deck (persists via `chrome.storage`).
 - **🎴 Flashcards** (toolbar menu → **Flashcards**, opens a full-page tab) → study
-  your **starred words** or any **HSK level** with flip cards, pools (unseen /
-  recently missed / ever missed), and keyboard shortcuts; progress is kept on the
-  device. **Export to Anki** turns your starred words into a tab-separated file
-  Anki imports directly (also available from the panel's **Saved** tab).
+  your **starred words** or any **HSK 3.0 level** with flip cards and keyboard
+  shortcuts; progress is kept on the device.
+  - **HSK decks come straight from the official HSK 3.0 word lists** — one card per
+    list row, with that row's exact gloss, part of speech, and pinyin, so a word
+    that carries two senses at a level (花 *verb* "to spend" / *noun* "flower")
+    becomes two cards and the deck size matches the list.
+  - **Level scope** — for an HSK deck, pick **just this level** or **up to this
+    level** (cumulative, every band ≤ the one chosen).
+  - **Round setup** — choose a study **pool** (all / unseen / recently missed /
+    ever missed), a **size**, **order** (random or sequential), and the prompt
+    **direction** (character → meaning or meaning → character). Optional toggles
+    put **pinyin** on top of the character prompt and show **part of speech** on
+    the answer (POS also appears on the front when a word has more than one sense
+    in the deck, so you know which meaning is being asked).
+  - **Progress** is per-device and can be **exported / imported** as JSON, or reset.
+  - **Export to Anki** turns your starred words into a tab-separated file Anki
+    imports directly (also available from the panel's **Saved** tab).
 - **⚙ Settings**: accent color, Chinese face (sans/serif), pinyin tone colors; plus dark mode.
 
 > Note: Chrome only lets the side panel open from a user gesture, so hovering
@@ -71,10 +84,10 @@ npm run test:e2e     # Playwright smoke test (loads dist/ in Chromium; build fir
 | Data pipelines | `assets/scripts/build-dict.mjs` → `src/data/cedict.json` (CC-CEDICT entries + traditional↔simplified maps + merged HSK/POS/char data + merged **CedPane** names/proper nouns); CedPane is fetched once at build time and cached, committed, as `assets/cedpane/cedpane.json` so later builds/tests are deterministic and offline. `assets/scripts/convert-chars.mjs` → `assets/char-data/char-data.json` (radical/components/strokes, from makemeahanzi); `assets/scripts/fetch-fonts.mjs` → `src/sidepanel/fonts/` + `fonts.css` (vendored Google Fonts). `assets/scripts/convert-hsk.mjs` (`npm run convert:hsk`) → `assets/hsk-vocab/hsk-data.json` (HSK level + POS + official gloss, parsed from the committed `.xls` lists). All build/data scripts live under `assets/`. |
 | Dictionary logic | `src/lib/dict-core.js` (pure lookup/search/segment, unit-tested), `src/lib/dict.js` (loads the index, wraps core), `src/lib/pinyin.js`, `src/lib/storage.js`, `src/lib/examples.js` (Tatoeba) |
 | Side panel UI | `src/sidepanel/` (`App.jsx` + `components/`, `panel.css`) |
-| Flashcards page | `src/flashcards/` (`index.html`, `flashcards.js` deck/round logic, `progress.js` local per-device progress, `flashcards.css`); builds decks from starred words + the dictionary's HSK data; `src/lib/anki.js` (pure TSV formatter) |
+| Flashcards page | `src/flashcards/` (`index.html`, `flashcards.js` deck/round/setup logic + custom deck dropdown, `progress.js` local per-device progress, `flashcards.css`); HSK decks are built entirely from the bundled HSK lists (one card per sense, scope = just/​up-to a level), starred decks from saved words; `src/lib/anki.js` (pure TSV formatter) |
 | On-page lookup | `src/content/content.js` (hover + click-to-pin + select), `content.css` |
 | Background | `src/background/service-worker.js` (panel open + context menu) |
-| Tests | `test/*.test.mjs` (`npm test`, Node's built-in runner: dict-core, pinyin, content-core, manifest, storage-helpers, reader-stash, anki; DOM logic, reader-extract, word-walk, via happy-dom); `e2e/*.spec.js` (`npm run test:e2e`, Playwright extension tests: `panel.spec.js` side-panel smoke test, `reader.spec.js` Reader pin-to-panel + forged-message hardening, `flashcards.spec.js` study-an-HSK-deck smoke test) |
+| Tests | `test/*.test.mjs` (`npm test`, Node's built-in runner: dict-core, pinyin, content-core, manifest, storage-helpers, reader-stash, anki, cedpane, familiarity, grammar, hsk-data, meanings, word-family; DOM logic, reader-extract, word-walk, via happy-dom); `e2e/*.spec.js` (`npm run test:e2e`, Playwright extension tests: `panel.spec.js` side-panel smoke test, `reader.spec.js` Reader pin-to-panel + forged-message hardening, `flashcards.spec.js` study-an-HSK-deck smoke test) |
 
 ## Known limitations / next steps
 

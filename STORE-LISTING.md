@@ -47,6 +47,14 @@ is factual and matches the shipped code (`manifest.config.js`, `src/`) and the
 > - **Pronunciation** — hear Mandarin via your browser's speech synthesis.
 > - **Saved deck** — star words to build your own study list; it stays on your
 >   device.
+> - **Flashcards** — study your starred words or any HSK 3.0 level on a full-page
+>   trainer with flip cards and keyboard shortcuts. HSK decks come from the
+>   official word lists (exact gloss, part of speech, and pinyin per entry); pick
+>   just one level or everything up to it, choose a pool (all / unseen / recently
+>   or ever missed), size, order, and prompt direction. Progress stays on your
+>   device and can be exported or imported.
+> - **Export to Anki** — turn your starred words into a tab-separated file Anki
+>   imports directly.
 > - **Reader mode** — open the current article in a clean, distraction-free
 >   reader with selectable fonts, larger text, and optional tone-colored pinyin
 >   above every character — with the dictionary still live as you read.
