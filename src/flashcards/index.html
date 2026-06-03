@@ -9,18 +9,8 @@
      the user's system fonts — same approach the reader page uses. -->
 <link rel="stylesheet" href="../sidepanel/fonts.css">
 <link rel="stylesheet" href="./flashcards.css">
-<script>
-// Anti-flash theme: apply the page's saved theme before first paint. The
-// extension's dark setting lives in chrome.storage (async), so flashcards.js
-// seeds this local key from it on first run; the toggle keeps it in sync.
-(function () {
-  try {
-    if (localStorage.getItem('zilense.flashcards.theme') === 'dark') {
-      document.documentElement.dataset.theme = 'dark'
-    }
-  } catch (e) {}
-})()
-</script>
+<!-- The saved theme is applied at the top of flashcards.js (a bundled module).
+     An inline script here would be blocked by the extension's CSP. -->
 </head>
 <body>
 <button class="theme-toggle" aria-label="Toggle theme">
@@ -241,6 +231,7 @@
           </div>
           <div class="card-body">
             <div class="q-character" id="q-text-char" hidden></div>
+            <div class="card-pos q-char-pos" id="q-char-pos" hidden></div>
             <div class="q-meaning" id="q-text-mean" hidden>
               <span class="card-pos" id="q-text-pos" hidden></span>
               <span id="q-text-mean-text"></span>

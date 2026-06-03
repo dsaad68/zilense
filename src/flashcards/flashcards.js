@@ -15,6 +15,14 @@ import * as Progress from './progress.js'
 
 // ─── Theme ──────────────────────────────────────────────────────
 const THEME_KEY = 'zilense.flashcards.theme'
+// Anti-flash: apply the saved theme as soon as this module runs (the inline
+// <head> script that used to do this is blocked by the extension's CSP, which
+// forbids inline scripts — this bundled module is 'self', so it's allowed).
+try {
+  if (localStorage.getItem(THEME_KEY) === 'dark') {
+    document.documentElement.dataset.theme = 'dark'
+  }
+} catch (e) {}
 function applyTheme(dark) {
   const html = document.documentElement
   if (dark) html.dataset.theme = 'dark'
@@ -138,13 +146,14 @@ function toCard(w, band) {
 // the rare sense whose list row had no pinyin. `idx` is the sense's position among
 // the word's picked senses — null when the word contributes a single card, so its
 // id stays the plain word.
-function senseCard(w, s, idx) {
+function senseCard(w, s, idx, ambig) {
   return {
     id: idx == null ? w : `${w}#${idx}`,
     w,
     p: s.py || (lookup(w)?.pinyin ?? ''),
     m: s.def,
     pos: s.pos || '',
+    ambig, // word has more than one meaning in this deck → POS shown on the front to disambiguate
   }
 }
 
@@ -170,7 +179,8 @@ async function buildDeck(deckId) {
     const picked = senses[w].filter((s) =>
       setup.scope === 'cumulative' ? senseRank(s) <= band : String(s.lvl) === exactLabel
     )
-    picked.forEach((s, i) => cards.push(senseCard(w, s, picked.length > 1 ? i : null)))
+    const ambig = picked.length > 1
+    picked.forEach((s, i) => cards.push(senseCard(w, s, ambig ? i : null, ambig)))
   }
   return cards
 }
@@ -450,19 +460,24 @@ function renderRound() {
     el.classList.toggle('hidden', !showPinyinTop)
   })
 
-  // Part of speech · shown with the meaning when the toggle is on
-  const showPos = setup.pos && !!card.pos
+  // Part of speech. The "Show POS" toggle controls the ANSWER (back) face. On the
+  // QUESTION (front) face it is shown only for words that have more than one meaning
+  // in this deck, so you know which sense the card is asking for.
+  const showPosBack = setup.pos && !!card.pos
+  const showPosFront = !!card.ambig && !!card.pos
 
   // Front face · question
   const qChar = document.getElementById('q-text-char')
   const qMean = document.getElementById('q-text-mean')
+  const qCharPos = document.getElementById('q-char-pos')
   if (setup.qmode === 'character') {
     qChar.textContent = card.w; qChar.hidden = false; qMean.hidden = true
+    qCharPos.textContent = card.pos || ''; qCharPos.hidden = !showPosFront
   } else {
     document.getElementById('q-text-mean-text').textContent = card.m
     const qPos = document.getElementById('q-text-pos')
-    qPos.textContent = card.pos || ''; qPos.hidden = !showPos
-    qMean.hidden = false; qChar.hidden = true
+    qPos.textContent = card.pos || ''; qPos.hidden = !showPosFront
+    qMean.hidden = false; qChar.hidden = true; qCharPos.hidden = true
   }
 
   // Back face · answer
@@ -470,7 +485,7 @@ function renderRound() {
   document.getElementById('a-pinyin').textContent = card.p || ''
   document.getElementById('a-mean-text').textContent = card.m
   const aPos = document.getElementById('a-pos')
-  aPos.textContent = card.pos || ''; aPos.hidden = !showPos
+  aPos.textContent = card.pos || ''; aPos.hidden = !showPosBack
   document.getElementById('a-char').style.display = ''
   document.getElementById('a-mean').style.display = ''
   document.getElementById('a-pinyin').style.display = showPinyinTop ? 'none' : ''
