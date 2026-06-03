@@ -17,12 +17,12 @@ export const DEFAULT_SETTINGS = {
   accent: '#c8443a',
   hanFont: 'sans', // 'sans' | 'serif'
   toneColors: true,
-  showTrad: true, // show the traditional form (繁) beside simplified headwords
+  showTrad: false, // show the traditional form (繁) beside simplified headwords
   inlinePopup: true, // show a small on-page popup near the hovered word
   pinKey: 'p', // press this key while hovering a word to pin it (works on links)
   hskFirst: false, // show the official HSK gloss above the CC-CEDICT defs
   hskColorByLevel: false, // "highlight HSK ≤ N": color matches by band vs one color
-  showFamiliarity: true, // show the New/Learning/Known control + Progress tab
+  showFamiliarity: false, // show the New/Learning/Known control + Progress tab
   dark: false,
 }
 
