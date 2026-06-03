@@ -59,8 +59,8 @@ export function SavedView({ saved, familiarity = {}, showFamiliarity = true, onN
       <div className="saved-count">
         <span>{saved.length} word{saved.length > 1 ? 's' : ''} in deck</span>
         <span className="saved-tools">
-          <button className="hist-clear" onClick={openFlashcards} title="Open the flashcards page in a new tab">Study ↗</button>
-          <button className="hist-clear" onClick={() => exportSavedToAnki(saved)} title="Download these words as an Anki-importable file">Export to Anki</button>
+          <button className="hist-clear" onClick={openFlashcards} title="Open the flashcards page in a new tab">Study</button>
+          <button className="hist-clear" onClick={() => exportSavedToAnki(saved)} title="Download these words as an Anki-importable file">Export</button>
         </span>
       </div>
       {showFamiliarity && <FamFilter value={filter} counts={counts} onChange={setFilter} />}
