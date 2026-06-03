@@ -174,6 +174,21 @@
         </div>
       </div>
 
+      <!-- Part of speech -->
+      <div class="setup-row">
+        <div class="setup-row-label">
+          <div class="lbl">Part of speech</div>
+          <div class="hint">Show the grammatical type (verb, noun…) with the meaning</div>
+        </div>
+        <div class="setup-row-control">
+          <label class="toggle-switch">
+            <input type="checkbox" id="setup-pos">
+            <span class="track"></span>
+            <span class="text">Show POS</span>
+          </label>
+        </div>
+      </div>
+
     </div>
 
     <div class="start-row">
@@ -226,7 +241,10 @@
           </div>
           <div class="card-body">
             <div class="q-character" id="q-text-char" hidden></div>
-            <div class="q-meaning" id="q-text-mean" hidden></div>
+            <div class="q-meaning" id="q-text-mean" hidden>
+              <span class="card-pos" id="q-text-pos" hidden></span>
+              <span id="q-text-mean-text"></span>
+            </div>
           </div>
           <div class="card-foot">
             <span class="card-counter">Card 1</span>
@@ -245,7 +263,10 @@
             <div class="answer" id="answer">
               <div class="a-character" id="a-char"></div>
               <div class="a-pinyin" id="a-pinyin"></div>
-              <div class="a-meaning" id="a-mean"></div>
+              <div class="a-meaning" id="a-mean">
+                <span class="card-pos" id="a-pos" hidden></span>
+                <span id="a-mean-text"></span>
+              </div>
             </div>
           </div>
           <div class="card-foot">

@@ -108,16 +108,29 @@ let ALL = [] // the current deck
 // HSK-band deck, prefer the meaning(s) from that band's vocab list (a word can sit
 // in several bands with a different gloss in each), falling back to the generic
 // dictionary definition when the word carries no HSK sense at that band.
+// merge POS strings ("verb; noun" + "noun") into a deduped "verb; noun"
+function joinPos(list) {
+  const out = []
+  for (const p of list) {
+    for (const part of String(p || '').split(';').map((x) => x.trim()).filter(Boolean)) {
+      if (!out.includes(part)) out.push(part)
+    }
+  }
+  return out.join('; ')
+}
+
 function toCard(w, band) {
   const e = lookup(w)
-  let m = ''
+  let m = '', pos = ''
   if (band && e && e.hskSenses) {
     const label = band === 7 ? '7-9' : String(band)
-    const defs = e.hskSenses.filter((s) => String(s.lvl) === label).map((s) => s.def).filter(Boolean)
-    m = defs.slice(0, 2).join('; ')
+    const at = e.hskSenses.filter((s) => String(s.lvl) === label)
+    m = at.map((s) => s.def).filter(Boolean).slice(0, 2).join('; ')
+    pos = joinPos(at.map((s) => s.pos))
   }
   if (!m) m = e ? (e.defs || []).slice(0, 2).join('; ') : ''
-  return { id: w, w, p: e ? e.pinyin : '', m }
+  if (!pos) pos = e ? (e.pos || '') : ''
+  return { id: w, w, p: e ? e.pinyin : '', m, pos }
 }
 
 // build the deck for a deck value: 'starred' or 'hsk1'..'hsk7' (7 ⇒ 7–9).
@@ -167,6 +180,7 @@ const setup = {
   size: 20, // number | 'all'
   qmode: 'character',
   pinyin: true,
+  pos: false, // show part of speech with the meaning
   order: 'random',
 }
 
@@ -302,6 +316,10 @@ document.getElementById('setup-pinyin').addEventListener('change', (e) => {
   setup.pinyin = e.target.checked
   refreshSummary()
 })
+document.getElementById('setup-pos').addEventListener('change', (e) => {
+  setup.pos = e.target.checked
+  refreshSummary()
+})
 // Start round
 document.getElementById('start-btn').addEventListener('click', () => startRound())
 
@@ -404,19 +422,27 @@ function renderRound() {
     el.classList.toggle('hidden', !showPinyinTop)
   })
 
+  // Part of speech · shown with the meaning when the toggle is on
+  const showPos = setup.pos && !!card.pos
+
   // Front face · question
   const qChar = document.getElementById('q-text-char')
   const qMean = document.getElementById('q-text-mean')
   if (setup.qmode === 'character') {
     qChar.textContent = card.w; qChar.hidden = false; qMean.hidden = true
   } else {
-    qMean.textContent = card.m; qMean.hidden = false; qChar.hidden = true
+    document.getElementById('q-text-mean-text').textContent = card.m
+    const qPos = document.getElementById('q-text-pos')
+    qPos.textContent = card.pos || ''; qPos.hidden = !showPos
+    qMean.hidden = false; qChar.hidden = true
   }
 
   // Back face · answer
   document.getElementById('a-char').textContent = card.w
   document.getElementById('a-pinyin').textContent = card.p || ''
-  document.getElementById('a-mean').textContent = card.m
+  document.getElementById('a-mean-text').textContent = card.m
+  const aPos = document.getElementById('a-pos')
+  aPos.textContent = card.pos || ''; aPos.hidden = !showPos
   document.getElementById('a-char').style.display = ''
   document.getElementById('a-mean').style.display = ''
   document.getElementById('a-pinyin').style.display = showPinyinTop ? 'none' : ''

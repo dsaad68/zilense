@@ -444,6 +444,14 @@ h1 {
   margin-top: 4px;
 }
 
+/* Part of speech shown inline before the meaning (front question + back answer) */
+.card-pos {
+  font-style: italic;
+  color: var(--mute);
+  margin-right: 8px;
+}
+.q-meaning .card-pos { font-size: 0.7em; }
+
 .pos-pill,
 .lvl-pill {
   display: inline-flex; align-items: center;
