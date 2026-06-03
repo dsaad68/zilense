@@ -330,45 +330,8 @@
         </div>
       </section>
 
-      <!-- familiarity / progress -->
-      <section class="feat">
-        <div class="feat-text">
-          <p class="eyebrow">Spaced for memory</p>
-          <h2>Track what you know</h2>
-          <p>Turn on familiarity tracking and tag each word <strong>New</strong>,
-            <strong>Learning</strong>, or <strong>Known</strong> right from its entry — Zilense also
-            counts how many times you've seen it.</p>
-          <p>A <strong>Progress</strong> tab gathers every word you've met, filterable by how well you
-            know it, and the same filter sorts your saved deck. It all stays on your device.</p>
-        </div>
-        <div class="feat-visual">
-          <div class="ui" style="width:330px">
-            <div class="entry-head">
-              <div class="hanzi-big" lang="zh">学习</div>
-              <div class="fam-head">
-                <div class="fam-seg">
-                  <button class="fam-new">New</button>
-                  <button class="fam-learning on"><span class="fam-dot"></span>Learning</button>
-                  <button class="fam-known">Known</button>
-                </div>
-                <span class="fam-seen">seen 6×</span>
-              </div>
-            </div>
-            <div class="pinyin-row" lang="zh"><span class="tone-2">xué</span> <span class="tone-2">xí</span></div>
-            <div class="group-label" style="margin-top:18px">Progress</div>
-            <div class="fam-filter">
-              <span class="fam-pill">All <span class="fam-pill-n">128</span></span>
-              <span class="fam-pill fam-pill-learning on"><span class="fam-dot fam-dot-learning"></span>Learning <span class="fam-pill-n">14</span></span>
-              <span class="fam-pill fam-pill-known"><span class="fam-dot fam-dot-known"></span>Known <span class="fam-pill-n">32</span></span>
-            </div>
-            <div class="flash"><span class="f-hanzi" lang="zh">学习</span><span><span class="cc-py" lang="zh"><span class="tone-2">xué</span> <span class="tone-2">xí</span></span><div class="f-gloss"><span class="fam-dot fam-dot-learning"></span>to study, to learn</div></span></div>
-            <div class="flash"><span class="f-hanzi" lang="zh">中文</span><span><span class="cc-py" lang="zh"><span class="tone-1">zhōng</span> <span class="tone-2">wén</span></span><div class="f-gloss"><span class="fam-dot fam-dot-known"></span>Chinese language</div></span></div>
-          </div>
-        </div>
-      </section>
-
       <!-- flashcards -->
-      <section class="feat rev">
+      <section class="feat">
         <div class="feat-text">
           <p class="eyebrow">Study &amp; review</p>
           <h2>Flashcards for HSK &amp; your saved words</h2>
@@ -403,7 +366,7 @@
       </section>
 
       <!-- customize -->
-      <section class="feat">
+      <section class="feat rev">
         <div class="feat-text">
           <p class="eyebrow">Make it yours</p>
           <h2>Themes, fonts &amp; tone colors</h2>
@@ -432,6 +395,39 @@
         </div>
       </section>
 
+      <!-- familiarity / progress (experimental) -->
+      <section class="feat">
+        <div class="feat-text">
+          <p class="eyebrow">Spaced for memory</p>
+          <h2>Track what you know <span class="tag-exp">Experimental</span></h2>
+          <p>Turn on familiarity tracking and tag each word <strong>New</strong>,
+            <strong>Learning</strong>, or <strong>Known</strong> right from its entry — Zilense also
+            counts how many times you've seen it.</p>
+          <p>A <strong>Progress</strong> tab gathers every word you've met, filterable by how well you
+            know it, and the same filter sorts your saved deck. It all stays on your device.</p>
+        </div>
+        <div class="feat-visual">
+          <div class="ui" style="width:380px">
+            <div class="entry-head">
+              <div class="hanzi-big" lang="zh">学习</div>
+              <div class="fam-head">
+                <div class="fam-seg">
+                  <button class="fam-new">New</button>
+                  <button class="fam-learning on"><span class="fam-dot"></span>Learning</button>
+                  <button class="fam-known">Known</button>
+                </div>
+                <span class="fam-seen">seen 6×</span>
+              </div>
+            </div>
+            <div class="pinyin-row" lang="zh"><span class="tone-2">xué</span> <span class="tone-2">xí</span></div>
+            <div class="meta-row"><span class="badge-hsk">HSK 1</span><span class="pos">verb</span></div>
+            <div class="group-label" style="margin-top:18px">Progress · words you've met</div>
+            <div class="flash"><span class="f-hanzi" lang="zh">学习</span><span><span class="cc-py" lang="zh"><span class="tone-2">xué</span> <span class="tone-2">xí</span></span><div class="f-gloss"><span class="fam-dot fam-dot-learning"></span>to study, to learn</div></span></div>
+            <div class="flash"><span class="f-hanzi" lang="zh">中文</span><span><span class="cc-py" lang="zh"><span class="tone-1">zhōng</span> <span class="tone-2">wén</span></span><div class="f-gloss"><span class="fam-dot fam-dot-known"></span>Chinese language</div></span></div>
+          </div>
+        </div>
+      </section>
+
     </div>
 
     <!-- ============ PRIVACY ============ -->
@@ -443,10 +439,21 @@
 
     <!-- ============ FOOTER ============ -->
     <footer class="foot">
-      <p>Open source under the MIT License. Dictionary data: CC-CEDICT (CC BY-SA 4.0) · stroke data:
-        makemeahanzi · examples: Tatoeba · fonts: Noto SC / Source Serif 4 (OFL). Full attribution in the
-        <a href="https://github.com/dsaad68/zilense/blob/main/THIRD-PARTY-NOTICES.md">third-party notices</a>.</p>
-      <p><a href="https://github.com/dsaad68/zilense">GitHub</a> · <a href="privacy">Privacy</a></p>
+      <div class="foot-top">
+        <div class="foot-brand">
+          <img src="icon.png" alt="" width="28" height="28">
+          <span class="foot-name">Zilense</span>
+        </div>
+        <nav class="foot-links">
+          <a href="https://github.com/dsaad68/zilense">GitHub</a>
+          <a href="privacy">Privacy</a>
+          <a href="https://github.com/dsaad68/zilense/blob/main/THIRD-PARTY-NOTICES.md">Third-party notices</a>
+        </nav>
+      </div>
+      <p class="foot-attr">Open source under the MIT License. Dictionary data: CC-CEDICT (CC BY-SA 4.0) ·
+        stroke data: makemeahanzi · examples: Tatoeba · fonts: Noto SC / Source Serif 4 (OFL).</p>
+      <p class="foot-vibe">Vibe coded by a <a href="https://verybad.engineer/">verybad.engineer</a>
+        <span class="foot-sep">•</span> 99% Claude, 1% actual skill</p>
     </footer>
 
   </div>

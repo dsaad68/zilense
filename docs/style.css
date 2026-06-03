@@ -99,10 +99,27 @@ a:hover { text-decoration: underline; }
 
 /* ---- footer ---- */
 .foot {
-  margin: 56px 0 40px; padding-top: 20px; border-top: 1px solid var(--line);
+  margin: 64px 0 48px; padding-top: 26px; border-top: 1px solid var(--line);
   font-family: var(--font-ui); font-size: 13px; color: var(--ink3); line-height: 1.7;
 }
-.foot a { color: var(--ink2); }
+.foot a { color: var(--ink2); text-decoration: none; transition: color .15s; }
+.foot a:hover { color: var(--accent); }
+.foot-top {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px 28px;
+  flex-wrap: wrap; margin-bottom: 18px;
+}
+.foot-brand { display: flex; align-items: center; gap: 10px; }
+.foot-brand img { border-radius: 7px; }
+.foot-name { font-family: var(--font-en); font-weight: 700; font-size: 17px; color: var(--ink); }
+.foot-links { display: flex; gap: 22px; flex-wrap: wrap; }
+.foot-links a { font-weight: 600; }
+.foot-attr { margin: 0; max-width: 680px; }
+.foot-vibe {
+  margin: 16px 0 0; padding-top: 16px; border-top: 1px solid var(--line);
+  font-size: 12.5px; color: var(--ink3);
+}
+.foot-vibe a { font-weight: 600; color: var(--accent); }
+.foot-vibe .foot-sep { margin: 0 4px; color: var(--line2); }
 
 /* ========================================================================
    SHOWCASE MOCKUPS, HTML stand-ins for screenshots. Scoped under .bw
@@ -247,7 +264,7 @@ a:hover { text-decoration: underline; }
 .ui .entry { padding: 18px 16px 22px; }
 .ui .entry-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
 .ui .hanzi-big { font-family: var(--font-han); font-size: 54px; font-weight: 700; line-height: 1;
-  color: var(--ink); letter-spacing: 2px; }
+  color: var(--ink); letter-spacing: 2px; white-space: nowrap; flex: 0 0 auto; }
 .ui .entry-actions { display: flex; gap: 4px; padding-top: 4px; color: var(--ink2); }
 .ui .pinyin-row { margin-top: 12px; font-size: 21px; font-weight: 500; font-family: var(--font-han); }
 .ui .meta-row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
@@ -301,8 +318,8 @@ a:hover { text-decoration: underline; }
 
 /* familiarity control (New / Learning / Known) + Progress filter pills */
 .ui .fam-head { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
-.ui .fam-seg { display: flex; gap: 3px; flex-wrap: wrap; justify-content: flex-end; }
-.ui .fam-seg button { display: inline-flex; align-items: center; gap: 5px; font-family: var(--font-ui);
+.ui .fam-seg { display: flex; gap: 3px; flex-wrap: nowrap; justify-content: flex-end; }
+.ui .fam-seg button { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; font-family: var(--font-ui);
   font-size: 11.5px; font-weight: 600; color: var(--ink3); background: transparent; border: none;
   padding: 4px 9px; border-radius: 7px; cursor: pointer; }
 .ui .fam-seg button.fam-new.on { color: var(--fam-new); background: color-mix(in srgb, var(--fam-new) 16%, transparent); }
@@ -456,3 +473,9 @@ a:hover { text-decoration: underline; }
 .fc-wrong { color: var(--accent); background: var(--accent-soft); }
 .fc-ok { color: var(--t2); background: rgba(63, 125, 79, .12); }
 .fc-count { margin-left: auto; font-family: var(--font-ui); font-size: 12px; color: var(--ink3); }
+
+/* "Experimental" tag — shown beside a feature heading that's still in flux */
+.tag-exp { display: inline-block; vertical-align: middle; position: relative; top: -3px; margin-left: 10px;
+  font-family: var(--font-ui); font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase;
+  color: var(--t1); background: rgba(169, 120, 26, .12); border: 1px solid rgba(169, 120, 26, .35);
+  border-radius: 999px; padding: 3px 9px; }
