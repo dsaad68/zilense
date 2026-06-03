@@ -25,7 +25,7 @@ export function ProgressView({ familiarity, onNavigate }) {
   if (!words.length) {
     return (
       <div className="empty">
-        <div className="empty-mark" lang="zh">译</div>
+        <div className="empty-mark" lang="zh">字</div>
         <div className="empty-title">No words tracked yet</div>
         <div className="empty-sub">Hover or look up words as you read — they’ll collect here, grouped by how well you know them.</div>
       </div>

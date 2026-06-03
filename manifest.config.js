@@ -6,7 +6,7 @@ export default defineManifest({
   name: 'Zilense - Chinese Dictionary',
   version: pkg.version,
   description: pkg.description,
-  author: { email: 'dsaad68@gmail.com' },
+  author: { email: 'me@verybad.engineer' },
   homepage_url: 'https://zilense.com',
   // Side Panel API needs Chrome 114+, and opening the panel from a content-script
   // user gesture (pin-to-open) is reliable from Chrome 116+.

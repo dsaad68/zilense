@@ -255,7 +255,7 @@ export default function App() {
           </div>
         ) : !ready ? (
           <div className="empty">
-            <div className="empty-mark" lang="zh">译</div>
+            <div className="empty-mark" lang="zh">字</div>
             <div className="empty-title">Loading dictionary…</div>
             <div className="empty-sub">Indexing CC-CEDICT — just a moment.</div>
           </div>
@@ -303,7 +303,7 @@ export default function App() {
           </div>
         ) : (
           <div className="empty">
-            <div className="empty-mark" lang="zh">译</div>
+            <div className="empty-mark" lang="zh">字</div>
             <div className="empty-title">Hover a character to begin</div>
             <div className="empty-sub">
               Move your cursor over any Chinese character on the page and its meaning appears here instantly.

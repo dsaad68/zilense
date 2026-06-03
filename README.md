@@ -87,7 +87,7 @@ npm run test:e2e     # Playwright smoke test (loads dist/ in Chromium; build fir
 | Flashcards page | `src/flashcards/` (`index.html`, `flashcards.js` deck/round/setup logic + custom deck dropdown, `progress.js` local per-device progress, `flashcards.css`); HSK decks are built entirely from the bundled HSK lists (one card per sense, scope = just/​up-to a level), starred decks from saved words; `src/lib/anki.js` (pure TSV formatter) |
 | On-page lookup | `src/content/content.js` (hover + click-to-pin + select), `content.css` |
 | Background | `src/background/service-worker.js` (panel open + context menu) |
-| Tests | `test/*.test.mjs` (`npm test`, Node's built-in runner: dict-core, pinyin, content-core, manifest, storage-helpers, reader-stash, anki, cedpane, familiarity, grammar, hsk-data, meanings, word-family; DOM logic, reader-extract, word-walk, via happy-dom); `e2e/*.spec.js` (`npm run test:e2e`, Playwright extension tests: `panel.spec.js` side-panel smoke test, `reader.spec.js` Reader pin-to-panel + forged-message hardening, `flashcards.spec.js` study-an-HSK-deck smoke test) |
+| Tests | `test/*.test.mjs` (`npm test`, Node's built-in runner: dict-core, pinyin, content-core, manifest, storage-helpers, reader-stash, anki, cedpane, familiarity, grammar, hsk-data, meanings, word-family; DOM logic, reader-extract, word-walk, via happy-dom); `e2e/*.spec.js` (`npm run test:e2e`, Playwright extension tests: `panel.spec.js` side-panel smoke test, `popup.spec.js` toolbar-popup smoke test, `reader.spec.js` Reader pin-to-panel + forged-message hardening, `flashcards.spec.js` study-an-HSK-deck smoke test + setup scope/pinyin/POS toggles) |
 
 ## Known limitations / next steps
 
