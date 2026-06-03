@@ -895,7 +895,13 @@ h1 {
 
 /* ─── Home screen · round setup ────────────────────────────────── */
 
-/* Single editorial setup panel · sections divided by hairlines */
+/* Compact sectioned setup panel · tiny section headers + tight single-line rows,
+   following the side panel's set-title / set-row pattern. */
+/* The setup column is capped to a focused width (matching the intro text) so the
+   compact rows don't strand a huge empty right half on wide screens. */
+.setup-panel, .stats, .start-row, .data-row {
+  max-width: 720px;
+}
 .setup-panel {
   background: var(--ivory);
   border: .5px solid var(--border);
@@ -903,32 +909,30 @@ h1 {
   margin-bottom: var(--space-block);
   overflow: hidden;
 }
-.setup-row {
-  display: grid;
-  grid-template-columns: 240px 1fr;
-  gap: 24px;
-  padding: 18px 24px;
-  align-items: center;
-  border-bottom: .5px solid var(--hairline);
-}
-.setup-row:last-child { border-bottom: 0; }
-.setup-row-label .lbl {
+.setup-section { padding: 8px 18px 11px; border-bottom: .5px solid var(--hairline); }
+.setup-section:last-child { border-bottom: 0; }
+.set-head {
   font-family: var(--display);
-  font-size: 12px; font-weight: 700;
+  font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.12em;
+  color: var(--mute);
+  margin: 4px 0 4px;
+}
+/* Fixed label column + left-aligned controls: every control starts at the same x,
+   so they read as one tidy column instead of floating to the far right edge. */
+.srow {
+  display: grid; grid-template-columns: 180px 1fr; align-items: center;
+  gap: 18px; padding: 5px 0; min-height: 36px;
+}
+.srow-label { display: flex; flex-direction: column; gap: 1px; }
+.srow-label .l {
+  font-family: var(--display);
+  font-size: 13px; font-weight: 600;
   color: var(--near-black);
   letter-spacing: -0.01em;
-  margin-bottom: 3px;
 }
-.setup-row-label .hint {
-  font-size: 12px;
-  color: var(--mute);
-  line-height: 1.45;
-  font-family: var(--body);
-}
-.setup-row-control {
-  display: flex; flex-direction: column; gap: 10px;
-  align-items: flex-start;
-}
+.srow-hint { font-family: var(--body); font-size: 11px; color: var(--mute); line-height: 1.3; }
+.srow-control { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-start; }
 
 /* Segmented pill · sliding indicator behind the labels.
    The ::before is positioned via four CSS custom props that JS updates
@@ -978,12 +982,13 @@ h1 {
   z-index: 1;          /* sit above the indicator */
   display: inline-flex; align-items: center;
   font-family: var(--display);
-  font-size: 12px; font-weight: 600;
+  font-size: 11.5px; font-weight: 600;
   color: var(--olive);
   letter-spacing: 0.02em;
-  padding: 7px 14px;
+  padding: 5px 10px;
   border-radius: 2px;
   cursor: pointer;
+  white-space: nowrap;
   transition: color .22s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .seg-pill label:hover { color: var(--brand); }
@@ -1054,7 +1059,7 @@ h1 {
 }
 .size-row .size-chip,
 .size-row input[type="number"] {
-  height: 32px;
+  height: 28px;
   box-sizing: border-box;
   border: .5px solid var(--border);
   border-radius: var(--radius-sm);
@@ -1065,11 +1070,11 @@ h1 {
   align-items: center;
   justify-content: center;
   font-family: var(--display);
-  font-size: 12px; font-weight: 700;
+  font-size: 11.5px; font-weight: 700;
   color: var(--olive);
   letter-spacing: 0.04em;
-  padding: 0 14px;
-  min-width: 44px;
+  padding: 0 11px;
+  min-width: 38px;
   cursor: pointer;
   font-variant-numeric: tabular-nums;
   transform-origin: center;
@@ -1088,11 +1093,11 @@ h1 {
   color: var(--brand); border-color: var(--brand-pale);
 }
 .size-row input[type="number"] {
-  width: 96px;
+  width: 78px;
   font-family: var(--mono);
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1;
-  padding: 0 12px;
+  padding: 0 10px;
   color: var(--near-black);
   outline: none;
   /* Hide native number-input spinners — chevrons add visual noise we don't need */
@@ -1674,10 +1679,10 @@ h1 {
 
 /* Setup + results · stack on narrow screens */
 @media (max-width: 720px) {
-  .setup-row {
+  .srow {
     grid-template-columns: 1fr;
-    gap: 10px;
-    padding: 16px 18px;
+    align-items: stretch;
+    gap: 8px;
   }
   /* Seg-pills become a full-width grid on mobile so 3- and 4-option pills
      don't wrap awkwardly inside their rounded container. */

@@ -52,130 +52,117 @@
       <div class="stat"><span class="v" id="hs-acc">— %</span><div class="l">Accuracy</div></div>
     </section>
 
-    <!-- Round configuration · single editorial panel -->
+    <!-- Round configuration · compact sectioned panel (side-panel pattern) -->
     <div class="setup-panel">
 
-      <!-- Deck -->
-      <div class="setup-row">
-        <div class="setup-row-label">
-          <div class="lbl">Deck</div>
-          <div class="hint" id="deck-hint">Your starred words, or an HSK level</div>
-        </div>
-        <div class="setup-row-control deck-row-control">
-          <!-- Custom dropdown (replaces the native <select> so the open menu is themed) -->
-          <div class="dropdown" id="deck-dd">
-            <button type="button" class="dropdown-btn" id="deck-dd-btn" aria-haspopup="listbox" aria-expanded="false" aria-label="Deck">
-              <span id="deck-dd-label">★ Starred words</span>
-              <svg class="dropdown-chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-            </button>
-            <ul class="dropdown-menu" id="deck-dd-menu" role="listbox" tabindex="-1" aria-label="Deck">
-              <li class="dropdown-opt" role="option" data-value="starred" aria-selected="true">★ Starred words</li>
-              <li class="dropdown-opt" role="option" data-value="hsk1">HSK 1</li>
-              <li class="dropdown-opt" role="option" data-value="hsk2">HSK 2</li>
-              <li class="dropdown-opt" role="option" data-value="hsk3">HSK 3</li>
-              <li class="dropdown-opt" role="option" data-value="hsk4">HSK 4</li>
-              <li class="dropdown-opt" role="option" data-value="hsk5">HSK 5</li>
-              <li class="dropdown-opt" role="option" data-value="hsk6">HSK 6</li>
-              <li class="dropdown-opt" role="option" data-value="hsk7">HSK 7–9</li>
-            </ul>
-          </div>
-          <!-- Level scope: shown beside the deck, only when an HSK level is selected -->
-          <div class="seg-pill" id="scope-control" role="radiogroup" aria-label="Level scope" hidden>
-            <label><input type="radio" name="scope" value="exact" checked><span>Just this level</span></label>
-            <label><input type="radio" name="scope" value="cumulative"><span>Up to this level</span></label>
-          </div>
-        </div>
-      </div>
+      <!-- ░ DECK ░ -->
+      <div class="setup-section">
+        <div class="set-head">Deck</div>
 
-      <!-- Source pool -->
-      <div class="setup-row">
-        <div class="setup-row-label">
-          <div class="lbl">Source pool</div>
-          <div class="hint" id="pool-count">— words available</div>
+        <div class="srow">
+          <div class="srow-label"><span class="l">Deck</span><span class="srow-hint" id="deck-hint">starred or HSK</span></div>
+          <div class="srow-control deck-row-control">
+            <!-- Custom dropdown (themed replacement for the native <select>) -->
+            <div class="dropdown" id="deck-dd">
+              <button type="button" class="dropdown-btn" id="deck-dd-btn" aria-haspopup="listbox" aria-expanded="false" aria-label="Deck">
+                <span id="deck-dd-label">★ Starred words</span>
+                <svg class="dropdown-chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+              </button>
+              <ul class="dropdown-menu" id="deck-dd-menu" role="listbox" tabindex="-1" aria-label="Deck">
+                <li class="dropdown-opt" role="option" data-value="starred" aria-selected="true">★ Starred words</li>
+                <li class="dropdown-opt" role="option" data-value="hsk1">HSK 1</li>
+                <li class="dropdown-opt" role="option" data-value="hsk2">HSK 2</li>
+                <li class="dropdown-opt" role="option" data-value="hsk3">HSK 3</li>
+                <li class="dropdown-opt" role="option" data-value="hsk4">HSK 4</li>
+                <li class="dropdown-opt" role="option" data-value="hsk5">HSK 5</li>
+                <li class="dropdown-opt" role="option" data-value="hsk6">HSK 6</li>
+                <li class="dropdown-opt" role="option" data-value="hsk7">HSK 7–9</li>
+              </ul>
+            </div>
+            <!-- Level scope: shown only when an HSK level is selected -->
+            <div class="seg-pill" id="scope-control" role="radiogroup" aria-label="Level scope" hidden>
+              <label><input type="radio" name="scope" value="exact" checked><span>Just level</span></label>
+              <label><input type="radio" name="scope" value="cumulative"><span>Up to</span></label>
+            </div>
+          </div>
         </div>
-        <div class="setup-row-control">
-          <div class="seg-pill" role="radiogroup" aria-label="Source pool">
-            <label><input type="radio" name="source" value="all" checked><span>All</span></label>
-            <label><input type="radio" name="source" value="unseen"><span>Unseen</span></label>
-            <label><input type="radio" name="source" value="wrong-recent"><span>Wrong · last 3</span></label>
-            <label><input type="radio" name="source" value="wrong-ever"><span>Wrong · ever</span></label>
+
+        <div class="srow">
+          <div class="srow-label"><span class="l">Source</span><span class="srow-hint" id="pool-count">— available</span></div>
+          <div class="srow-control">
+            <div class="seg-pill" role="radiogroup" aria-label="Source pool">
+              <label><input type="radio" name="source" value="all" checked><span>All</span></label>
+              <label><input type="radio" name="source" value="unseen"><span>Unseen</span></label>
+              <label><input type="radio" name="source" value="wrong-recent"><span>Wrong·3</span></label>
+              <label><input type="radio" name="source" value="wrong-ever"><span>Wrong·ever</span></label>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Round size -->
-      <div class="setup-row">
-        <div class="setup-row-label">
-          <div class="lbl">Round size</div>
-          <div class="hint">If the pool is smaller, uses what's available</div>
+      <!-- ░ ROUND ░ -->
+      <div class="setup-section">
+        <div class="set-head">Round</div>
+
+        <div class="srow">
+          <div class="srow-label"><span class="l">Size</span></div>
+          <div class="srow-control">
+            <div class="size-row" role="radiogroup" aria-label="Round size">
+              <span class="size-chip" data-size="10"  aria-pressed="false">10</span>
+              <span class="size-chip" data-size="20"  aria-pressed="true">20</span>
+              <span class="size-chip" data-size="30"  aria-pressed="false">30</span>
+              <span class="size-chip" data-size="50"  aria-pressed="false">50</span>
+              <span class="size-chip" data-size="all" aria-pressed="false">All</span>
+              <input type="number" id="size-custom" min="1" max="9999" placeholder="Custom" aria-label="Custom round size">
+            </div>
+          </div>
         </div>
-        <div class="setup-row-control">
-          <div class="size-row" role="radiogroup" aria-label="Round size">
-            <span class="size-chip" data-size="10"  aria-pressed="false">10</span>
-            <span class="size-chip" data-size="20"  aria-pressed="true">20</span>
-            <span class="size-chip" data-size="30"  aria-pressed="false">30</span>
-            <span class="size-chip" data-size="50"  aria-pressed="false">50</span>
-            <span class="size-chip" data-size="all" aria-pressed="false">All</span>
-            <input type="number" id="size-custom" min="1" max="9999" placeholder="Custom" aria-label="Custom round size">
+
+        <div class="srow">
+          <div class="srow-label"><span class="l">Order</span></div>
+          <div class="srow-control">
+            <div class="seg-pill" role="radiogroup" aria-label="Order">
+              <label><input type="radio" name="order" value="random" checked><span>Random</span></label>
+              <label><input type="radio" name="order" value="sequential"><span>Sequential</span></label>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Question side -->
-      <div class="setup-row">
-        <div class="setup-row-label">
-          <div class="lbl">Question side</div>
-          <div class="hint">Which side leads</div>
-        </div>
-        <div class="setup-row-control">
-          <div class="seg-pill" role="radiogroup" aria-label="Question side">
-            <label><input type="radio" name="qmode" value="character" checked><span>Character → meaning</span></label>
-            <label><input type="radio" name="qmode" value="meaning"><span>Meaning → character</span></label>
+      <!-- ░ QUESTION ░ -->
+      <div class="setup-section">
+        <div class="set-head">Question</div>
+
+        <div class="srow">
+          <div class="srow-label"><span class="l">Side</span></div>
+          <div class="srow-control">
+            <div class="seg-pill" role="radiogroup" aria-label="Question side">
+              <label><input type="radio" name="qmode" value="character" checked><span>Char → meaning</span></label>
+              <label><input type="radio" name="qmode" value="meaning"><span>Meaning → char</span></label>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- Order -->
-      <div class="setup-row">
-        <div class="setup-row-label">
-          <div class="lbl">Order</div>
-          <div class="hint">Random shuffles each round</div>
-        </div>
-        <div class="setup-row-control">
-          <div class="seg-pill" role="radiogroup" aria-label="Order">
-            <label><input type="radio" name="order" value="random" checked><span>Random</span></label>
-            <label><input type="radio" name="order" value="sequential"><span>Sequential</span></label>
+        <div class="srow">
+          <div class="srow-label"><span class="l">Pinyin</span><span class="srow-hint">hidden in meaning → char</span></div>
+          <div class="srow-control">
+            <label class="toggle-switch">
+              <input type="checkbox" id="setup-pinyin" checked>
+              <span class="track"></span>
+              <span class="text">On top</span>
+            </label>
           </div>
         </div>
-      </div>
 
-      <!-- Pinyin -->
-      <div class="setup-row">
-        <div class="setup-row-label">
-          <div class="lbl">Pinyin</div>
-          <div class="hint">Hidden in "meaning → character" so you don't see the answer</div>
-        </div>
-        <div class="setup-row-control">
-          <label class="toggle-switch">
-            <input type="checkbox" id="setup-pinyin" checked>
-            <span class="track"></span>
-            <span class="text">Show on top</span>
-          </label>
-        </div>
-      </div>
-
-      <!-- Part of speech -->
-      <div class="setup-row">
-        <div class="setup-row-label">
-          <div class="lbl">Part of speech</div>
-          <div class="hint">Show the grammatical type (verb, noun…) with the meaning</div>
-        </div>
-        <div class="setup-row-control">
-          <label class="toggle-switch">
-            <input type="checkbox" id="setup-pos">
-            <span class="track"></span>
-            <span class="text">Show POS</span>
-          </label>
+        <div class="srow">
+          <div class="srow-label"><span class="l">Part of speech</span><span class="srow-hint">grammatical type</span></div>
+          <div class="srow-control">
+            <label class="toggle-switch">
+              <input type="checkbox" id="setup-pos">
+              <span class="track"></span>
+              <span class="text">Show</span>
+            </label>
+          </div>
         </div>
       </div>
 
