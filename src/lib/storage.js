@@ -22,6 +22,7 @@ export const DEFAULT_SETTINGS = {
   pinKey: 'p', // press this key while hovering a word to pin it (works on links)
   hskFirst: false, // show the official HSK gloss above the CC-CEDICT defs
   hskColorByLevel: false, // "highlight HSK ≤ N": color matches by band vs one color
+  showFamiliarity: true, // show the New/Learning/Known control + Progress tab
   dark: false,
 }
 

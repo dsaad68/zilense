@@ -11,6 +11,7 @@ import { IconBtn } from './components/atoms.jsx'
 import { EntryView } from './components/EntryView.jsx'
 import { ResultRow } from './components/ResultRow.jsx'
 import { SavedView } from './components/SavedView.jsx'
+import { ProgressView } from './components/ProgressView.jsx'
 import { HistoryView } from './components/HistoryView.jsx'
 import { SettingsMenu } from './components/SettingsMenu.jsx'
 
@@ -215,6 +216,11 @@ export default function App() {
         <button className={'tab' + (tab === 'saved' ? ' on' : '')} onClick={() => setTab('saved')}>
           Saved {saved.length > 0 && <span className="tabcount">{saved.length}</span>}
         </button>
+        {settings.showFamiliarity && (
+          <button className={'tab' + (tab === 'progress' ? ' on' : '')} onClick={() => setTab('progress')}>
+            Progress
+          </button>
+        )}
         <button className={'tab' + (tab === 'history' ? ' on' : '')} onClick={() => setTab('history')}>
           History
         </button>
@@ -237,7 +243,10 @@ export default function App() {
             <div className="empty-sub">Indexing CC-CEDICT — just a moment.</div>
           </div>
         ) : tab === 'saved' ? (
-          <SavedView saved={saved} onNavigate={navigate} onToggleSave={toggleSave} />
+          <SavedView saved={saved} familiarity={familiarity} showFamiliarity={settings.showFamiliarity}
+            onNavigate={navigate} onToggleSave={toggleSave} />
+        ) : tab === 'progress' && settings.showFamiliarity ? (
+          <ProgressView familiarity={familiarity} onNavigate={navigate} />
         ) : tab === 'history' ? (
           <HistoryView history={history} onNavigate={navigate} onClear={() => setHistory([])} />
         ) : query ? (
@@ -258,7 +267,8 @@ export default function App() {
         ) : entry ? (
           <EntryView entry={entry} dark={dark} onNavigate={navigate}
             isSaved={saved.includes(entry.q)} onToggleSave={toggleSave}
-            fam={getFamiliarity(familiarity, entry.q)} onSetFamiliarity={setFam}
+            fam={getFamiliarity(familiarity, entry.q)}
+            onSetFamiliarity={settings.showFamiliarity ? setFam : null}
             showTrad={settings.showTrad} hskFirst={settings.hskFirst}
             onBack={backStack.length ? goBack : null} />
         ) : phrase ? (

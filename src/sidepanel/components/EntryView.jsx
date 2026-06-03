@@ -117,33 +117,35 @@ export function EntryView({ entry, dark, onNavigate, isSaved, onToggleSave, onBa
             <span className="hanzi-trad" lang="zh" title="Traditional form">{entry.trad}</span>
           )}
         </div>
-        <div className="entry-actions">
-          {canSpeak && (
-            <IconBtn title="Pronounce (Mandarin)" onClick={() => speak(entry.q)}>{Svg.speaker}</IconBtn>
+        <div className="entry-head-right">
+          <div className="entry-actions">
+            {canSpeak && (
+              <IconBtn title="Pronounce (Mandarin)" onClick={() => speak(entry.q)}>{Svg.speaker}</IconBtn>
+            )}
+            <IconBtn title={isSaved ? 'Saved' : 'Save to deck'} active={isSaved} onClick={() => onToggleSave(entry.q)}>
+              {isSaved ? Svg.starFill : Svg.starOutline}
+            </IconBtn>
+          </div>
+          {onSetFamiliarity && (
+            <div className="fam-head">
+              <div className="segmini fam-seg" role="group" aria-label="Familiarity">
+                {FAM_OPTIONS.map(([val, label]) => (
+                  <button key={val} className={'fam-' + val + (fam.state === val ? ' on' : '')}
+                    aria-pressed={fam.state === val} onClick={() => onSetFamiliarity(entry.q, val)}>
+                    {fam.state === val && <span className="fam-dot" aria-hidden="true" />}
+                    {label}
+                  </button>
+                ))}
+              </div>
+              {fam.seen > 0 && <span className="fam-seen">seen {fam.seen}×</span>}
+            </div>
           )}
-          <IconBtn title={isSaved ? 'Saved' : 'Save to deck'} active={isSaved} onClick={() => onToggleSave(entry.q)}>
-            {isSaved ? Svg.starFill : Svg.starOutline}
-          </IconBtn>
         </div>
       </div>
 
       <div className="pinyin-row">
         <ToneText pinyin={entry.pinyin} size={22} />
       </div>
-
-      {onSetFamiliarity && (
-        <div className="fam-row">
-          <div className="segmini fam-seg" role="group" aria-label="Familiarity">
-            {FAM_OPTIONS.map(([val, label]) => (
-              <button key={val} className={fam.state === val ? 'on' : ''}
-                aria-pressed={fam.state === val} onClick={() => onSetFamiliarity(entry.q, val)}>
-                {label}
-              </button>
-            ))}
-          </div>
-          {fam.seen > 0 && <span className="fam-seen">seen {fam.seen}×</span>}
-        </div>
-      )}
 
       {hasMeta && (
         <div className="meta-row">

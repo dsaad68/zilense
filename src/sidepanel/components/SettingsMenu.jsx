@@ -64,6 +64,15 @@ export function SettingsMenu({ settings, onSetting, onClose }) {
         </div>
 
         <div className="set-row">
+          <span className="set-label">Familiarity tags</span>
+          <button className={'switch' + (settings.showFamiliarity ? ' on' : '')}
+            role="switch" aria-checked={settings.showFamiliarity}
+            onClick={() => onSetting('showFamiliarity', !settings.showFamiliarity)}>
+            <span className="knob" />
+          </button>
+        </div>
+
+        <div className="set-row">
           <span className="set-label">Show HSK meaning first</span>
           <button className={'switch' + (settings.hskFirst ? ' on' : '')}
             role="switch" aria-checked={settings.hskFirst}
