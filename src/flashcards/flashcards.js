@@ -104,25 +104,30 @@ function dateStr() { return new Date().toISOString().slice(0, 10) }
 // A card is { id, w, p, m }: id (== the word) keys progress; w/p/m drive the UI.
 let ALL = [] // the current deck
 
-// turn a simplified word into a card by looking it up in the dictionary
-function toCard(w) {
+// turn a simplified word into a card by looking it up in the dictionary. For an
+// HSK-band deck, prefer the meaning(s) from that band's vocab list (a word can sit
+// in several bands with a different gloss in each), falling back to the generic
+// dictionary definition when the word carries no HSK sense at that band.
+function toCard(w, band) {
   const e = lookup(w)
-  return {
-    id: w,
-    w,
-    p: e ? e.pinyin : '',
-    m: e ? (e.defs || []).slice(0, 2).join('; ') : '',
+  let m = ''
+  if (band && e && e.hskSenses) {
+    const label = band === 7 ? '7-9' : String(band)
+    const defs = e.hskSenses.filter((s) => String(s.lvl) === label).map((s) => s.def).filter(Boolean)
+    m = defs.slice(0, 2).join('; ')
   }
+  if (!m) m = e ? (e.defs || []).slice(0, 2).join('; ') : ''
+  return { id: w, w, p: e ? e.pinyin : '', m }
 }
 
 // build the deck for a deck-select value: 'starred' or 'hsk1'..'hsk7' (7 ⇒ 7–9)
 async function buildDeck(deckId) {
   if (deckId === 'starred') {
     const { saved } = await loadState()
-    return saved.map(toCard)
+    return saved.map((w) => toCard(w))
   }
   const band = Number(String(deckId).replace('hsk', '')) || 1
-  return hskWordsAtBand(band).map(([w]) => toCard(w))
+  return hskWordsAtBand(band).map(([w]) => toCard(w, band))
 }
 
 async function selectDeck(deckId) {

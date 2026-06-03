@@ -283,6 +283,10 @@ function ensurePopup() {
     '.hsk{display:flex;gap:6px;align-items:baseline;margin-top:3px;color:var(--p-ink2,#6b6258)}' +
     '.hsk .tag{flex:none;font-size:9px;font-weight:700;letter-spacing:.04em;white-space:nowrap;' +
     'color:var(--mydict-accent,#c8443a);border:1px solid var(--mydict-accent,#c8443a);border-radius:4px;padding:1px 5px}' +
+    // part-of-speech, serif italic + gray like the side panel (only on multi-sense
+    // rows); serif stack mirrors the panel's --font-en
+    '.hsk .pos{flex:none;font-family:"Source Serif 4",Georgia,"Times New Roman",serif;' +
+    'font-style:italic;color:var(--p-ink3,#9a9082)}' +
     // divider before whichever section comes second (CC-CEDICT defs or HSK glosses)
     '.divide{margin-top:7px;padding-top:7px;border-top:1px solid var(--p-border,#d8ccb5)}'
   popupCard = document.createElement('div')
@@ -340,9 +344,14 @@ function showPopup(x, y, resp) {
     const tag = document.createElement('span'); tag.className = 'tag'; tag.textContent = 'HSK ' + s.lvl
     if (s.lvl === prevLvl) tag.style.visibility = 'hidden'
     prevLvl = s.lvl
-    const txt = document.createElement('span')
-    txt.textContent = (multi && s.pos ? '[' + s.pos + '] ' : '') + s.def
-    row.append(tag, txt)
+    row.append(tag)
+    // multi-sense rows show the POS first, italic + gray, like the side panel
+    if (multi && s.pos) {
+      const pos = document.createElement('span'); pos.className = 'pos'; pos.textContent = s.pos
+      row.append(pos)
+    }
+    const txt = document.createElement('span'); txt.textContent = s.def
+    row.append(txt)
     return row
   })
 

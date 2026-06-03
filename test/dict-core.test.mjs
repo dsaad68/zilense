@@ -336,19 +336,33 @@ test('paragraph segmentation: greedy segmentLongest + lookup loop (the worker sh
   assert.ok(out.find((o) => o.t === '喜欢').py.startsWith('xǐ'), '喜欢 pinyin is tone-marked')
 })
 
-test('hskWordsAtBand: returns exactly one band (not cumulative), powers the per-level decks', () => {
+test('hskWordsAtBand: a word counts for every band it has a sense at (not cumulative)', () => {
   const b3 = hskWordsAtBand(DB, 3)
   assert.ok(b3.length > 0, 'HSK band 3 is non-empty')
   for (const [w, rank] of b3) {
     assert.equal(rank, 3)
-    assert.equal(hskRank(DB.hsk[w]), 3, `${w} is actually a band-3 word`)
+    // membership is by sense level now, not the primary (lowest) band: every
+    // returned word carries an actual band-3 HSK sense
+    const ss = DB.hskSenses[w]
+    assert.ok(ss && ss.some((s) => hskRank(s.lvl) === 3), `${w} has a band-3 HSK sense`)
   }
-  // band 1 is the lowest band, so "at band 1" equals "up to band 1"
+  // band 1 is the lowest band: a word with a level-1 sense necessarily has level 1
+  // as its primary, so "at band 1" still equals "up to band 1"
   assert.equal(hskWordsAtBand(DB, 1).length, hskWordsUpTo(DB, 1).length)
+  // a word listed at more than one level appears in each of those band decks
+  const multi = Object.keys(DB.hskSenses).find((w) => {
+    const ranks = new Set(DB.hskSenses[w].map((s) => hskRank(s.lvl)))
+    return ranks.size > 1
+  })
+  if (multi) {
+    for (const r of new Set(DB.hskSenses[multi].map((s) => hskRank(s.lvl)))) {
+      assert.ok(hskWordsAtBand(DB, r).some(([w]) => w === multi), `${multi} appears in band ${r}`)
+    }
+  }
   // band 7 captures the advanced 7–9 set, stored as the string "7-9"
   const b7 = hskWordsAtBand(DB, 7)
   assert.ok(b7.length > 0, 'HSK 7–9 band is non-empty')
-  for (const [w] of b7) assert.equal(DB.hsk[w], '7-9')
+  for (const [w] of b7) assert.ok(DB.hskSenses[w].some((s) => s.lvl === '7-9'))
   // guard: no band/zero input returns nothing
   assert.deepEqual(hskWordsAtBand(DB, 0), [])
 })

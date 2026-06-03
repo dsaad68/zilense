@@ -199,15 +199,25 @@ export function hskWordsUpTo(db, maxRank) {
   return out
 }
 
-/* hskWordsAtBand(db, band) — every HSK word in exactly ONE band, as [word, rank]
-   pairs (band 1–6, or 7 for the advanced 7–9 set). Unlike hskWordsUpTo this is
-   not cumulative — it powers the flashcards "study HSK level N" decks, where each
-   level is its own deck rather than everything up to N. */
+/* hskWordsAtBand(db, band) — every HSK word that belongs to a given band, as
+   [word, rank] pairs (band 1–6, or 7 for the advanced 7–9 set). Unlike hskWordsUpTo
+   this is not cumulative — it powers the flashcards "study HSK level N" decks, where
+   each level is its own deck rather than everything up to N. A word counts for a
+   band if ANY of its HSK senses sit at that band, so a word the lists place at more
+   than one level (e.g. a word in both the HSK-2 and HSK-3 vocab files) appears in
+   each of those decks. Falls back to the primary hsk map when senses are absent
+   (e.g. the worker's light { hsk } shape). */
 export function hskWordsAtBand(db, band) {
   const out = []
   if (!db || !db.hsk || !band) return out
+  const senses = db.hskSenses || {}
   for (const word of Object.keys(db.hsk)) {
-    if (hskRank(db.hsk[word]) === band) out.push([word, band])
+    const ss = senses[word]
+    if (ss && ss.length) {
+      if (ss.some((s) => hskRank(s.lvl) === band)) out.push([word, band])
+    } else if (hskRank(db.hsk[word]) === band) {
+      out.push([word, band])
+    }
   }
   return out
 }
