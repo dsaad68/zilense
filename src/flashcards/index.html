@@ -4,6 +4,10 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Flashcards · Zilense</title>
+<!-- Reuse the side panel's self-hosted Noto Sans SC (vendored by
+     `npm run fetch:fonts`) so Chinese renders reliably + offline, regardless of
+     the user's system fonts — same approach the reader page uses. -->
+<link rel="stylesheet" href="../sidepanel/fonts.css">
 <link rel="stylesheet" href="./flashcards.css">
 <script>
 // Anti-flash theme: apply the page's saved theme before first paint. The
