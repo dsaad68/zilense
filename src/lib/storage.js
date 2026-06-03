@@ -90,6 +90,23 @@ export function pushHistory(history, q, t) {
    loadFamiliarity / saveFamiliarity wrap chrome.storage.local. */
 export const FAMILIARITY_STATES = ['new', 'learning', 'known']
 export const DEFAULT_FAMILIARITY = { state: 'new', seen: 0, lastSeen: 0 }
+// keep the auto-tracked map bounded so it can't grow without limit; words the
+// user has explicitly tagged (learning / known) are never pruned, only the
+// untagged 'new' auto-records, dropping the least-recently-seen first.
+export const FAMILIARITY_MAX = 500
+
+function pruneFamiliarity(map) {
+  const keys = Object.keys(map)
+  if (keys.length <= FAMILIARITY_MAX) return map
+  const removable = keys
+    .filter((k) => map[k].state === 'new')
+    .sort((a, b) => (map[a].lastSeen || 0) - (map[b].lastSeen || 0))
+  const drop = Math.min(keys.length - FAMILIARITY_MAX, removable.length)
+  if (drop <= 0) return map
+  const pruned = { ...map }
+  for (let i = 0; i < drop; i++) delete pruned[removable[i]]
+  return pruned
+}
 
 // coerce any stored (or missing / corrupted) record into a valid one
 function normFamiliarity(rec) {
@@ -120,7 +137,8 @@ export function setFamiliarityState(map, word, state) {
 export function bumpFamiliarity(map, word, now) {
   if (!word) return map
   const cur = getFamiliarity(map, word)
-  return { ...(map || {}), [word]: { ...cur, seen: cur.seen + 1, lastSeen: now || 0 } }
+  const next = { ...(map || {}), [word]: { ...cur, seen: cur.seen + 1, lastSeen: now || 0 } }
+  return pruneFamiliarity(next)
 }
 
 export async function loadFamiliarity() {

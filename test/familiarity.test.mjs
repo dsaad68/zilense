@@ -7,6 +7,7 @@ import {
   loadFamiliarity,
   saveFamiliarity,
   DEFAULT_FAMILIARITY,
+  FAMILIARITY_MAX,
 } from '../src/lib/storage.js'
 
 const FAMILIARITY_KEY = 'mydict.familiarity'
@@ -62,6 +63,31 @@ test('bumpFamiliarity: never auto-promotes a user-set state', () => {
   assert.equal(map['学习'].state, 'known', 'lookups must not change the state the user chose')
   assert.equal(map['学习'].seen, 2)
   assert.equal(map['学习'].lastSeen, 6)
+})
+
+test('bumpFamiliarity: caps the map, evicting the least-recently-seen "new" words first', () => {
+  // fill exactly to the cap with auto-tracked 'new' records (oldest = w0)
+  const map = {}
+  for (let i = 0; i < FAMILIARITY_MAX; i++) map['w' + i] = { state: 'new', seen: 1, lastSeen: i + 1 }
+  // one more deliberate lookup pushes over the cap
+  const next = bumpFamiliarity(map, '新词', FAMILIARITY_MAX + 100)
+  assert.equal(Object.keys(next).length, FAMILIARITY_MAX, 'size stays bounded at the cap')
+  assert.ok(next['新词'], 'the just-seen word is kept')
+  assert.ok(!next['w0'], 'the least-recently-seen "new" word is evicted')
+  assert.ok(next['w1'] && next['w' + (FAMILIARITY_MAX - 1)], 'more recent "new" words are kept')
+  assert.equal(map['w0'].lastSeen, 1, 'input map is not mutated')
+})
+
+test('bumpFamiliarity: never evicts user-tagged (learning/known) words, even the oldest', () => {
+  const map = {
+    keepLearning: { state: 'learning', seen: 1, lastSeen: 0 }, // oldest of all, but tagged
+    keepKnown: { state: 'known', seen: 1, lastSeen: 1 },
+  }
+  for (let i = 0; i < FAMILIARITY_MAX; i++) map['n' + i] = { state: 'new', seen: 1, lastSeen: i + 10 }
+  const next = bumpFamiliarity(map, '触发', 99999) // now well over the cap
+  assert.ok(next.keepLearning, 'a tagged "learning" word survives pruning')
+  assert.ok(next.keepKnown, 'a tagged "known" word survives pruning')
+  assert.equal(Object.keys(next).length, FAMILIARITY_MAX, 'only untagged "new" words are evicted')
 })
 
 test('setFamiliarityState: sets state, keeps seen/lastSeen, coerces unknown -> new, is pure', () => {

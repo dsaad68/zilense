@@ -35,6 +35,10 @@ export default function App() {
   const [familiarity, setFamiliarity] = useState({}) // mydict.familiarity: word -> {state,seen,lastSeen}
   const [settings, setSettings] = useState(DEFAULT_SETTINGS)
   const [hydrated, setHydrated] = useState(false)
+  // was the currently-shown entry reached by a deliberate action (select /
+  // context-menu / search / navigate) rather than a passive hover? Only
+  // deliberate lookups feed familiarity tracking.
+  const deliberate = useRef(false)
   const dark = settings.dark
 
   // load dictionary + persisted state once
@@ -64,6 +68,7 @@ export default function App() {
       const q = await takePendingLookup()
       if (!alive) return
       if (q) {
+        deliberate.current = true // a pinned/context-menu lookup is deliberate
         setEntryQ(q); setQuery(''); setTab('dict')
         hist = pushHistory(hist, q.trim(), Date.now())
       }
@@ -77,12 +82,19 @@ export default function App() {
   useEffect(() => { if (hydrated) saveSaved(saved) }, [saved, hydrated])
   useEffect(() => { if (hydrated) saveSettings(settings) }, [settings, hydrated])
   useEffect(() => { if (hydrated) saveHistory(history) }, [history, hydrated])
-  useEffect(() => { if (hydrated) saveFamiliarity(familiarity) }, [familiarity, hydrated])
+  // debounced: coalesce rapid familiarity bumps into one write
+  useEffect(() => {
+    if (!hydrated) return
+    const id = setTimeout(() => saveFamiliarity(familiarity), 400)
+    return () => clearTimeout(id)
+  }, [familiarity, hydrated])
 
   // record a DELIBERATE lookup (selection / context-menu / in-panel navigation —
   // never transient hover) into recent history, newest first
-  const recordHistory = (q) =>
+  const recordHistory = (q) => {
+    deliberate.current = true
     setHistory((h) => pushHistory(h, (q || '').trim(), Date.now()))
+  }
 
   // live lookups pushed from the content script / context menu
   useEffect(() => {
@@ -101,6 +113,7 @@ export default function App() {
       // works with the panel closed) and pushes the result here to DISPLAY only —
       // no history, since hover is transient.
       if (msg.type === 'show' && typeof msg.q === 'string') {
+        deliberate.current = false // hover is passive — don't let it bump familiarity
         show(msg.q)
         return
       }
@@ -140,12 +153,16 @@ export default function App() {
   const entry = ready && entryQ ? lookup(entryQ) : null
   const results = useMemo(() => (ready && debounced ? searchEntries(debounced) : []), [ready, debounced])
 
-  // auto-signal: every time a real entry is shown (hover / select / search /
-  // navigate) bump its seen-count. Keyed on the resolved headword so it fires
-  // once per distinct word, not on every render, and never auto-promotes state.
+  // auto-signal: bump a word's seen-count when the user DELIBERATELY opens it
+  // (select / context-menu / search / navigate) — never on passive hover — and
+  // only while familiarity tracking is enabled, so a disabled feature records
+  // nothing. Keyed on the resolved headword; the deliberate flag is consumed so
+  // it fires once per intentional lookup, not on every render.
   useEffect(() => {
-    if (hydrated && entry) setFamiliarity((f) => bumpFamiliarity(f, entry.q, Date.now()))
-  }, [entry ? entry.q : null, hydrated])
+    if (!hydrated || !entry || !settings.showFamiliarity || !deliberate.current) return
+    deliberate.current = false
+    setFamiliarity((f) => bumpFamiliarity(f, entry.q, Date.now()))
+  }, [entry ? entry.q : null, hydrated, settings.showFamiliarity])
 
   // phrase fallback: a selected run that isn't itself an entry (e.g. a short
   // sentence) is segmented into known words so the lookup isn't a dead end
