@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  <url>
+    <loc>https://verybad.app/</loc>
+    <lastmod>2026-05-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://verybad.app/icon.svg</image:loc>
+      <image:title>HSK-1 Vocabulary Trainer</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://verybad.app/cheatsheet.html</loc>
+    <lastmod>2026-05-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://verybad.app/cheatsheet/direction.png</image:loc>
+      <image:title>HSK-1 Directions Cheatsheet</image:title>
+      <image:caption>East, west, left, right, in front of, behind — orienting in space.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://verybad.app/cheatsheet/wh-how-questions.png</image:loc>
+      <image:title>HSK-1 Question Words Cheatsheet</image:title>
+      <image:caption>Who, what, where, when, why, how — the WH and 怎么 paradigm.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://verybad.app/cheatsheet/reading-time.png</image:loc>
+      <image:title>HSK-1 Reading the Clock Cheatsheet</image:title>
+      <image:caption>点, 分, 半, 刻 — the four parts of telling time.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://verybad.app/cheatsheet/reading-date.png</image:loc>
+      <image:title>HSK-1 Reading Dates Cheatsheet</image:title>
+      <image:caption>Year, month, day, weekday — and how 号 swaps in for 日 in speech.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://verybad.app/cheatsheet/couting-10000.png</image:loc>
+      <image:title>HSK-1 Counting to 10,000 Cheatsheet</image:title>
+      <image:caption>Tens, hundreds, thousands, and the jump to 万.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://verybad.app/cheatsheet/time-day.png</image:loc>
+      <image:title>HSK-1 Times of Day Cheatsheet</image:title>
+      <image:caption>早上, 中午, 下午, 晚上 — naming the blocks of the day.</image:caption>
+    </image:image>
+  </url>
+</urlset>

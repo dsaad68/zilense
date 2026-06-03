@@ -1,0 +1,1044 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+<!-- ─── SEO ────────────────────────────────────────────────────────── -->
+<title>HSK-1 Flashcards · Free Mandarin Vocabulary Trainer · 300 Words</title>
+<meta name="description" content="Free HSK-1 flashcard trainer with all 300 official Mandarin vocabulary words. Character → meaning, pinyin support, missed-word filtering, offline-ready PWA. No signup, no account — your progress lives on your device.">
+<meta name="keywords" content="HSK 1, HSK-1, HSK level 1, Mandarin flashcards, Chinese vocabulary, Chinese flashcards, HSK trainer, free HSK 1, spaced repetition, pinyin, simplified Chinese, learn Chinese, Mandarin vocabulary list, HSK 1 word list, 300 HSK 1 words">
+<meta name="author" content="Daniel Saad">
+<meta name="robots" content="index, follow">
+<meta name="googlebot" content="index, follow">
+<link rel="canonical" href="https://verybad.app/">
+
+<!-- ─── Open Graph · Facebook, LinkedIn, Slack, Discord ────────────── -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="HSK-1 Vocabulary Trainer">
+<meta property="og:title" content="HSK-1 Flashcards · Free Mandarin Vocabulary Trainer">
+<meta property="og:description" content="All 300 HSK-1 words, one round at a time. Pinyin, missed-word filtering, offline-ready PWA. No account, no signup.">
+<meta property="og:url" content="https://verybad.app/">
+<meta property="og:image" content="https://verybad.app/icon.svg">
+<meta property="og:image:alt" content="HSK-1 vocabulary trainer icon — the character 学">
+<meta property="og:locale" content="en_US">
+<meta property="og:locale:alternate" content="zh_CN">
+
+<!-- ─── Twitter Card ───────────────────────────────────────────────── -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="HSK-1 Flashcards · Free Mandarin Vocabulary Trainer">
+<meta name="twitter:description" content="All 300 HSK-1 words, one round at a time. Pinyin, missed-word filtering, offline-ready PWA.">
+<meta name="twitter:image" content="https://verybad.app/icon.svg">
+<meta name="twitter:image:alt" content="HSK-1 vocabulary trainer icon — the character 学">
+
+<!-- ─── PWA + icons ────────────────────────────────────────────────── -->
+<meta name="theme-color" content="#324C62">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="HSK-1 Trainer">
+<meta name="application-name" content="HSK-1 Trainer">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="apple-touch-icon" href="icon.svg">
+
+<!-- ─── JSON-LD · WebApplication structured data ──────────────────── -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "HSK-1 Vocabulary Trainer",
+  "alternateName": "HSK-1 Flashcards",
+  "description": "Free HSK-1 flashcard trainer with all 300 official Mandarin vocabulary words. Character to meaning, pinyin support, missed-word filtering, offline-ready PWA. No signup required.",
+  "url": "https://verybad.app/",
+  "image": "https://verybad.app/icon.svg",
+  "applicationCategory": "EducationalApplication",
+  "applicationSubCategory": "Language Learning",
+  "operatingSystem": "Any (web browser)",
+  "browserRequirements": "Requires JavaScript and localStorage.",
+  "isAccessibleForFree": true,
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "inLanguage": ["en", "zh-CN"],
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "student"
+  },
+  "educationalLevel": "Beginner",
+  "teaches": "HSK 1 Mandarin Chinese vocabulary (300 words)",
+  "author": {
+    "@type": "Person",
+    "name": "Daniel Saad",
+    "url": "https://verybad.engineer/"
+  }
+}
+</script>
+<link rel="preconnect" href="https://api.fontshare.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;500;600&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap">
+<link rel="stylesheet" href="flashcard.css">
+<script>
+(function () {
+  try {
+    var saved = localStorage.getItem('vbs-theme');
+    if (saved === 'dark') document.documentElement.dataset.theme = 'dark';
+  } catch (e) {}
+})();
+// Register the service worker for offline-capable PWA install.  Wrapped
+// in feature-detect + try/catch so non-supporting browsers (or http://
+// hosts that disallow SW) just degrade silently to the live network.
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('service-worker.js').catch(function () {});
+  });
+}
+</script>
+</head>
+<body>
+<button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+  <span class="icon" aria-hidden="true">
+    <svg class="ico-sun"  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+    <svg class="ico-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
+  </span><span class="label">Light</span>
+</button>
+
+<div class="app">
+
+  <!-- ════════════════════════════════════════════════════════════
+       SCREEN 1 · LOGIN
+       ════════════════════════════════════════════════════════════ -->
+  <section class="screen" id="screen-login">
+    <div class="topbar">
+      <div class="brand-mark">HSK-1 · vocabulary trainer</div>
+    </div>
+    <div class="login-wrap">
+      <div class="login-intro">
+        <h1><span class="zh">学而时习之</span> <span class="en">— learn it, then review it.</span></h1>
+        <p class="lead">Here's your recovery key — five Mandarin syllables, yours to keep. Save it somewhere safe; it's the only way back to your progress. No email, no password, no account.</p>
+        <a class="intro-link" href="cheatsheet.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2"/><path d="M9 13h6"/><path d="M9 17h3"/></svg>
+          <span>Browse the cheatsheets</span>
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        </a>
+      </div>
+
+      <div class="login-card">
+        <div class="user-list" id="known-users-wrap" hidden>
+          <span class="lbl">Continue as</span>
+          <div class="users" id="known-users"></div>
+          <div class="login-divider"><span>or new</span></div>
+        </div>
+
+        <form id="login-form" class="login-form">
+          <div class="field">
+            <span class="lbl" id="passphrase-label">Your recovery key</span>
+            <div class="passphrase-row">
+              <output class="passphrase-display" id="username" aria-labelledby="passphrase-label" tabindex="0"></output>
+              <button class="btn subtle pp-action" type="button" id="regen-btn" title="Generate a new key" aria-label="Generate a new key">↻</button>
+            </div>
+          </div>
+          <p class="passphrase-warn">
+            <strong>Save this key.</strong> It's how you'll come back to your progress. There's no email, no account — if you lose this key, you lose the data tied to it.
+          </p>
+          <button class="btn solid lg" type="submit">Copy and continue →</button>
+        </form>
+
+        <p class="login-hint">Five random Mandarin syllables. Tap ↻ for a different one.</p>
+
+        <div class="login-restore">
+          <div class="login-divider"><span>or restore</span></div>
+          <form id="restore-form" class="login-form">
+            <div class="field">
+              <label for="restore-key">Already have a key?</label>
+              <input type="text" id="restore-key" placeholder="paste-your-five-syllables" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+            </div>
+            <button class="btn lg" type="submit">Restore progress →</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════
+       SCREEN 2 · HOME / ROUND SETUP
+       ════════════════════════════════════════════════════════════ -->
+  <section class="screen" id="screen-home">
+    <div class="topbar">
+      <div class="brand-mark"><span class="brand-mark-title">HSK-1 · vocabulary trainer</span><span class="brand-mark-sep" aria-hidden="true">·</span><code id="who-name">user</code></div>
+      <button class="switch" type="button" id="switch-user">Switch user →</button>
+    </div>
+    <h1>Set up a round.</h1>
+    <p class="lead">Pick a source pool, a size, and how the question is presented. Your stats below — keep going from where you left off, or start a fresh round.</p>
+
+    <!-- Live stats for this user -->
+    <section class="stats" id="home-stats">
+      <div class="stat hero"><span class="v" id="hs-seen">0</span><div class="l">Reviewed</div></div>
+      <div class="stat ok"><span class="v" id="hs-correct">0</span><div class="l">Correct</div></div>
+      <div class="stat wrong"><span class="v" id="hs-wrong">0</span><div class="l">Wrong</div></div>
+      <div class="stat unseen"><span class="v" id="hs-unseen">300</span><div class="l">Unseen</div></div>
+      <div class="stat"><span class="v" id="hs-acc">— %</span><div class="l">Accuracy</div></div>
+    </section>
+
+    <!-- Round configuration · single editorial panel -->
+    <div class="setup-panel">
+
+      <!-- Source pool -->
+      <div class="setup-row">
+        <div class="setup-row-label">
+          <div class="lbl">Source pool</div>
+          <div class="hint" id="pool-count">300 words available</div>
+        </div>
+        <div class="setup-row-control">
+          <div class="seg-pill" role="radiogroup" aria-label="Source pool">
+            <label><input type="radio" name="source" value="all" checked><span>All 300</span></label>
+            <label><input type="radio" name="source" value="unseen"><span>Unseen</span></label>
+            <label><input type="radio" name="source" value="wrong-recent"><span>Wrong · last 3</span></label>
+            <label><input type="radio" name="source" value="wrong-ever"><span>Wrong · ever</span></label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Round size -->
+      <div class="setup-row">
+        <div class="setup-row-label">
+          <div class="lbl">Round size</div>
+          <div class="hint">If the pool is smaller, uses what's available</div>
+        </div>
+        <div class="setup-row-control">
+          <div class="size-row" role="radiogroup" aria-label="Round size">
+            <span class="size-chip" data-size="10"  aria-pressed="false">10</span>
+            <span class="size-chip" data-size="20"  aria-pressed="true">20</span>
+            <span class="size-chip" data-size="30"  aria-pressed="false">30</span>
+            <span class="size-chip" data-size="50"  aria-pressed="false">50</span>
+            <span class="size-chip" data-size="all" aria-pressed="false">All</span>
+            <input type="number" id="size-custom" min="1" max="300" placeholder="Custom" aria-label="Custom round size">
+          </div>
+        </div>
+      </div>
+
+      <!-- Question side -->
+      <div class="setup-row">
+        <div class="setup-row-label">
+          <div class="lbl">Question side</div>
+          <div class="hint">Which side leads</div>
+        </div>
+        <div class="setup-row-control">
+          <div class="seg-pill" role="radiogroup" aria-label="Question side">
+            <label><input type="radio" name="qmode" value="character" checked><span>Character → meaning</span></label>
+            <label><input type="radio" name="qmode" value="meaning"><span>Meaning → character</span></label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order -->
+      <div class="setup-row">
+        <div class="setup-row-label">
+          <div class="lbl">Order</div>
+          <div class="hint">Random shuffles each round</div>
+        </div>
+        <div class="setup-row-control">
+          <div class="seg-pill" role="radiogroup" aria-label="Order">
+            <label><input type="radio" name="order" value="random" checked><span>Random</span></label>
+            <label><input type="radio" name="order" value="sequential"><span>Sequential</span></label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pinyin -->
+      <div class="setup-row">
+        <div class="setup-row-label">
+          <div class="lbl">Pinyin</div>
+          <div class="hint">Hidden in "meaning → character" so you don't see the answer</div>
+        </div>
+        <div class="setup-row-control">
+          <label class="toggle-switch">
+            <input type="checkbox" id="setup-pinyin" checked>
+            <span class="track"></span>
+            <span class="text">Show on top</span>
+          </label>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="start-row">
+      <span class="summary" id="round-summary">— 20 cards · all words · random · character → meaning</span>
+      <button class="btn solid lg" id="start-btn" type="button">Start round →</button>
+    </div>
+
+    <!-- Data row · backup / restore / reset for the current user -->
+    <details class="data-row">
+      <summary>
+        <div class="data-row-label">
+          <span class="lbl">Your progress</span>
+          <span class="sep" aria-hidden="true">•</span>
+          <span class="hint">Backup, restore, or reset — all stored on this device</span>
+        </div>
+        <span class="data-row-chevron" aria-hidden="true"></span>
+      </summary>
+      <div class="data-row-actions">
+        <button class="btn subtle" id="export-btn" type="button">Export JSON</button>
+        <button class="btn subtle" id="import-btn" type="button">Import JSON</button>
+        <input type="file" id="import-input" accept=".json,application/json" hidden>
+        <button class="btn subtle danger-text" id="reset-btn" type="button">Reset progress</button>
+      </div>
+    </details>
+
+    <div class="foot">
+      <span class="left">Vibe coded by a <a href="https://verybad.engineer/" target="_blank" rel="noopener">verybad.engineer</a> · 99% Claude, 1% actual skill</span>
+      <a class="cheatsheet-link" href="cheatsheet.html">→&nbsp;Cheatsheets</a>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════
+       SCREEN 3 · ROUND IN PROGRESS
+       ════════════════════════════════════════════════════════════ -->
+  <section class="screen" id="screen-round">
+    <div class="topbar">
+      <div class="brand-mark"><span class="brand-mark-title">Round · <span id="round-meta">— cards</span></span><span class="brand-mark-sep" aria-hidden="true">·</span><code id="round-who">user</code></div>
+      <button class="switch" type="button" id="abandon-btn">End round →</button>
+    </div>
+
+    <div class="card" id="card" role="button" aria-label="Flashcard — click or press space to reveal">
+      <div class="card-flipper">
+
+        <!-- Front face · question -->
+        <div class="card-face card-front">
+          <div class="card-top">
+            <div class="result none"></div>
+            <div class="pinyin">—</div>
+            <div class="progress">— / —</div>
+          </div>
+          <div class="card-body">
+            <div class="q-character" id="q-text-char" hidden></div>
+            <div class="q-meaning" id="q-text-mean" hidden></div>
+          </div>
+          <div class="card-foot">
+            <span class="card-counter">Card 1</span>
+            <span class="hint">Tap or press space to reveal</span>
+          </div>
+        </div>
+
+        <!-- Back face · answer (mark buttons live in the nav row below) -->
+        <div class="card-face card-back">
+          <div class="card-top">
+            <div class="result none"></div>
+            <div class="pinyin">—</div>
+            <div class="progress">— / —</div>
+          </div>
+          <div class="card-body">
+            <div class="answer" id="answer">
+              <div class="a-character" id="a-char"></div>
+              <div class="a-pinyin" id="a-pinyin"></div>
+              <div class="a-meaning" id="a-mean"></div>
+            </div>
+          </div>
+          <div class="card-foot">
+            <span class="card-counter">Card 1</span>
+            <span class="hint">Tap or press space to reveal</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="nav">
+      <div class="nav-buttons">
+        <!-- Flipper · rotates in 3D on the card's .revealed state, mirroring
+             the card's own flip. Front face = Reveal, back face = mark pair. -->
+        <div class="nav-flipper">
+          <!-- Question-state · front face -->
+          <button class="btn solid nav-q" id="reveal-btn" type="button">Reveal</button>
+          <!-- Revealed-state · back face -->
+          <div class="nav-a-group">
+            <button class="btn mark-wrong nav-a" id="btn-wrong" type="button" title="Press shift+space or backspace">
+              <svg class="ico" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+              Missed it
+            </button>
+            <button class="btn mark-correct nav-a" id="btn-correct" type="button" title="Press space">
+              <svg class="ico" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>
+              Got it
+            </button>
+          </div>
+        </div>
+      </div>
+      <span class="keys"><kbd>space</kbd> reveal / got it · <kbd>shift</kbd>+<kbd>space</kbd> or <kbd>backspace</kbd> missed it</span>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════
+       SCREEN 4 · RESULTS
+       ════════════════════════════════════════════════════════════ -->
+  <section class="screen" id="screen-results">
+    <div class="topbar">
+      <div class="brand-mark">Round complete · <code id="results-who">user</code></div>
+      <button class="switch" type="button" id="home-btn">← Home</button>
+    </div>
+
+    <div class="results-hero">
+      <div class="score">
+        <span id="r-correct">0</span><span class="of">/</span><span id="r-total">0</span>
+        <span class="pct" id="r-pct">— %</span>
+      </div>
+      <h2 id="r-headline">Nice work.</h2>
+      <p id="r-subhead">— of the round were correct on the first pass.</p>
+    </div>
+
+    <div class="results-grid">
+      <div class="results-list ok">
+        <span class="lbl">Got it</span>
+        <ul id="r-ok-list"></ul>
+        <div class="empty" id="r-ok-empty" hidden>None this round.</div>
+      </div>
+      <div class="results-list wrong">
+        <span class="lbl">Missed</span>
+        <ul id="r-wrong-list"></ul>
+        <div class="empty" id="r-wrong-empty" hidden>None — clean round.</div>
+      </div>
+    </div>
+
+    <div class="results-actions">
+      <button class="btn solid" id="again-btn" type="button">Replay missed only</button>
+      <button class="btn" id="new-btn" type="button">New round</button>
+      <button class="btn subtle" id="results-home-btn" type="button">← Home</button>
+    </div>
+
+    <div class="foot">
+      <span class="left">Vibe coded by a <a href="https://verybad.engineer/" target="_blank" rel="noopener">verybad.engineer</a> · 99% Claude, 1% actual skill</span>
+      <a class="cheatsheet-link" href="cheatsheet.html">→&nbsp;Cheatsheets</a>
+    </div>
+  </section>
+
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="data.js"></script>
+<script src="users.js"></script>
+<script>
+// ─── Theme toggle ───────────────────────────────────────────────
+function toggleTheme() {
+  var html = document.documentElement;
+  var dark = html.dataset.theme === 'dark';
+  if (dark) {
+    delete html.dataset.theme;
+    try { localStorage.setItem('vbs-theme', 'light'); } catch (e) {}
+  } else {
+    html.dataset.theme = 'dark';
+    try { localStorage.setItem('vbs-theme', 'dark'); } catch (e) {}
+  }
+  updateToggleLabel();
+}
+function updateToggleLabel() {
+  var dark = document.documentElement.dataset.theme === 'dark';
+  document.querySelectorAll('.theme-toggle .label').forEach(function (el) {
+    el.textContent = dark ? 'Dark' : 'Light';
+  });
+}
+document.addEventListener('DOMContentLoaded', updateToggleLabel);
+
+// ─── Screen routing ─────────────────────────────────────────────
+function show(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  // Recompute sliding indicators on the now-visible screen.  Two RAFs
+  // because some browsers need a paint after the display flip before
+  // offsetLeft / offsetWidth are accurate.
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      document.querySelectorAll('.screen.active .seg-pill').forEach(updateSegIndicator);
+    });
+  });
+}
+
+// ─── Sliding seg-pill indicator ─────────────────────────────────
+function updateSegIndicator(seg) {
+  const checked = seg.querySelector('input[type="radio"]:checked');
+  if (!checked) { seg.dataset.ready = 'false'; return; }
+  const label = checked.closest('label');
+  if (!label || label.offsetWidth === 0) { seg.dataset.ready = 'false'; return; }
+  seg.style.setProperty('--ind-top',    label.offsetTop + 'px');
+  seg.style.setProperty('--ind-left',   label.offsetLeft + 'px');
+  seg.style.setProperty('--ind-width',  label.offsetWidth + 'px');
+  seg.style.setProperty('--ind-height', label.offsetHeight + 'px');
+  seg.dataset.ready = 'true';
+}
+function initSegIndicators() {
+  document.querySelectorAll('.seg-pill').forEach(seg => {
+    seg.dataset.ready = 'false';
+    seg.querySelectorAll('input[type="radio"]').forEach(input => {
+      input.addEventListener('change', () => updateSegIndicator(seg));
+    });
+    updateSegIndicator(seg);
+  });
+}
+let segResizeTimer = 0;
+addEventListener('resize', () => {
+  clearTimeout(segResizeTimer);
+  segResizeTimer = setTimeout(() => {
+    document.querySelectorAll('.seg-pill').forEach(updateSegIndicator);
+  }, 60);
+});
+document.addEventListener('DOMContentLoaded', initSegIndicators);
+
+// ─── Toast ──────────────────────────────────────────────────────
+let toastTimer = 0;
+function toast(msg, kind) {
+  const el = document.getElementById('toast');
+  el.className = 'toast show' + (kind ? ' ' + kind : '');
+  el.textContent = msg;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 1100);
+}
+
+const ALL = window.HSK1.slice();
+
+// ============================================================
+// SCREEN 1 · LOGIN
+// ============================================================
+function renderKnownUsers() {
+  const users = UserStats.list();
+  const wrap = document.getElementById('known-users-wrap');
+  const list = document.getElementById('known-users');
+  list.innerHTML = '';
+  if (users.length === 0) { wrap.hidden = true; return; }
+  wrap.hidden = false;
+  users.forEach(u => {
+    const chip = document.createElement('button');
+    chip.type = 'button';
+    chip.className = 'user-chip';
+    chip.innerHTML = `<span>${u.name}</span><span class="meta">${u.seen} seen</span><span class="del" title="Forget this user">×</span>`;
+    chip.querySelector('.del').addEventListener('click', e => {
+      e.stopPropagation();
+      if (confirm(`Forget user "${u.name}" and all their progress?`)) {
+        UserStats.deleteUser(u.name);
+        renderKnownUsers();
+      }
+    });
+    chip.addEventListener('click', () => loginAs(u.name));
+    list.appendChild(chip);
+  });
+}
+
+function loginAs(name) {
+  name = String(name || '').trim();
+  if (!name) return;
+  UserStats.setUser(name);
+  goHome();
+}
+
+document.getElementById('login-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const value = document.getElementById('username').textContent.trim();
+  if (!value) return;
+  // Copy the recovery key to clipboard before signing in.  Failures are
+  // non-fatal — the user still gets in, just without the auto-copy.
+  try { await navigator.clipboard.writeText(value); }
+  catch (err) {
+    try {
+      const range = document.createRange();
+      range.selectNodeContents(document.getElementById('username'));
+      const sel = window.getSelection();
+      sel.removeAllRanges(); sel.addRange(range);
+      document.execCommand('copy');
+      sel.removeAllRanges();
+    } catch (e2) {}
+  }
+  loginAs(value);
+});
+
+// ─── Passphrase generator ────────────────────────────────────────
+// Five random pinyin syllables (tones stripped for typeability) joined
+// by dashes. Pulled from the HSK-1 dataset so the key feels themed.
+let _pyPool = null;
+function pinyinPool() {
+  if (_pyPool) return _pyPool;
+  const set = new Set();
+  for (const w of window.HSK1) {
+    const sylls = String(w.p || '').split(/\s+/).filter(Boolean);
+    for (const s of sylls) {
+      const plain = s.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      if (plain.length >= 2) set.add(plain);
+    }
+  }
+  _pyPool = Array.from(set);
+  return _pyPool;
+}
+function generatePassphrase() {
+  const pool = pinyinPool();
+  const out = [];
+  for (let i = 0; i < 5; i++) {
+    out.push(pool[Math.floor(Math.random() * pool.length)]);
+  }
+  return out.join('-');
+}
+function fillPassphrase() {
+  document.getElementById('username').textContent = generatePassphrase();
+}
+document.getElementById('regen-btn').addEventListener('click', fillPassphrase);
+
+// Restore form · for returning users who already have a key from a
+// previous session and want to bring their progress to this device.
+document.getElementById('restore-form').addEventListener('submit', e => {
+  e.preventDefault();
+  const value = document.getElementById('restore-key').value
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, '-');   // tolerate spaces between syllables
+  if (!value) return;
+  loginAs(value);
+});
+
+// ============================================================
+// SCREEN 2 · HOME / SETUP
+// ============================================================
+const setup = {
+  source: 'all',          // 'all' | 'wrong-recent' | 'wrong-ever' | 'unseen'
+  size: 20,               // number | 'all'
+  qmode: 'character',
+  pinyin: true,
+  order: 'random',
+};
+
+function refreshHomeStats() {
+  const s = UserStats.stats(ALL);
+  document.getElementById('hs-seen').textContent    = s.seen;
+  document.getElementById('hs-correct').textContent = s.correct;
+  document.getElementById('hs-wrong').textContent   = s.wrong;
+  document.getElementById('hs-unseen').textContent  = s.unseen;
+  document.getElementById('hs-acc').textContent     = s.reviews ? s.accuracy + ' %' : '— %';
+}
+
+function effectiveSourceType() {
+  // setup.source is now a flat enum that maps directly to UserStats.filter()
+  return setup.source;
+}
+
+function poolSize() {
+  return UserStats.filter(ALL, effectiveSourceType()).length;
+}
+
+function refreshPoolHelp() {
+  const n = poolSize();
+  const t = effectiveSourceType();
+  const labels = {
+    'all':          'words available',
+    'unseen':       'unseen words available',
+    'wrong-recent': 'recently missed available',
+    'wrong-ever':   'ever-missed available',
+  };
+  document.getElementById('pool-count').textContent = `${n} ${labels[t] || 'words available'}`;
+  refreshSummary();
+}
+
+function refreshSummary() {
+  const n = poolSize();
+  const sizeShown = (setup.size === 'all') ? n : Math.min(setup.size, n);
+  const direction = setup.qmode === 'character' ? 'character → meaning' : 'meaning → character';
+  const orderTxt  = setup.order === 'random' ? 'random' : 'sequential';
+  const poolNice = {
+    'all':          'all 300 words',
+    'unseen':       'unseen words',
+    'wrong-recent': 'recently wrong',
+    'wrong-ever':   'ever wrong',
+  }[effectiveSourceType()] || 'all';
+  const pinyinTxt = (setup.qmode === 'character' && setup.pinyin) ? ' · pinyin on top' : '';
+  const html = `<strong>${sizeShown} cards</strong> from <strong>${poolNice}</strong> · ${orderTxt} order · ${direction}${pinyinTxt}`;
+  document.getElementById('round-summary').innerHTML = html;
+  // Disable start when pool is empty
+  document.getElementById('start-btn').disabled = (n === 0);
+}
+
+function goHome() {
+  show('home');
+  document.getElementById('who-name').textContent = UserStats.getUser();
+  refreshHomeStats();
+  refreshPoolHelp();
+}
+
+// Source pool radios · flat enum, no nested sub-state
+document.querySelectorAll('input[name="source"]').forEach(r => {
+  r.addEventListener('change', () => {
+    setup.source = r.value;
+    refreshPoolHelp();
+  });
+});
+// Size chips
+document.querySelectorAll('.size-chip').forEach(c => {
+  c.addEventListener('click', () => {
+    document.querySelectorAll('.size-chip').forEach(x => x.setAttribute('aria-pressed', 'false'));
+    c.setAttribute('aria-pressed', 'true');
+    document.getElementById('size-custom').value = '';
+    setup.size = c.dataset.size === 'all' ? 'all' : parseInt(c.dataset.size, 10);
+    refreshSummary();
+  });
+});
+document.getElementById('size-custom').addEventListener('input', e => {
+  const n = parseInt(e.target.value, 10);
+  if (Number.isFinite(n) && n > 0) {
+    document.querySelectorAll('.size-chip').forEach(x => x.setAttribute('aria-pressed', 'false'));
+    setup.size = Math.min(300, n);
+  }
+  refreshSummary();
+});
+// Question mode
+document.querySelectorAll('input[name="qmode"]').forEach(r => {
+  r.addEventListener('change', () => { setup.qmode = r.value; refreshSummary(); });
+});
+// Order
+document.querySelectorAll('input[name="order"]').forEach(r => {
+  r.addEventListener('change', () => { setup.order = r.value; refreshSummary(); });
+});
+// Pinyin
+document.getElementById('setup-pinyin').addEventListener('change', e => {
+  setup.pinyin = e.target.checked; refreshSummary();
+});
+// Start round
+document.getElementById('start-btn').addEventListener('click', () => startRound());
+document.getElementById('switch-user').addEventListener('click', () => {
+  UserStats.logout();
+  renderKnownUsers();
+  fillPassphrase();
+  show('login');
+});
+
+// ─── Data row · export / import / reset ─────────────────────────
+document.getElementById('export-btn').addEventListener('click', () => {
+  const json = UserStats.exportJson();
+  const blob = new Blob([json], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `hsk1-${UserStats.getUser()}-${new Date().toISOString().slice(0,10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 0);
+  toast('Progress exported', 'ok');
+});
+
+document.getElementById('import-btn').addEventListener('click', () => {
+  document.getElementById('import-input').click();
+});
+document.getElementById('import-input').addEventListener('change', async e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const text = await file.text();
+  e.target.value = '';   // allow re-importing the same file
+  if (!confirm(`Importing will replace progress for "${UserStats.getUser()}". Continue?`)) return;
+  const result = UserStats.importJson(text);
+  if (result.ok) {
+    toast(`Imported ${result.count} cards`, 'ok');
+    refreshHomeStats();
+    refreshPoolHelp();
+  } else {
+    toast('Import failed: ' + result.error, 'wrong');
+  }
+});
+
+document.getElementById('reset-btn').addEventListener('click', () => {
+  if (!confirm(`Reset all progress for "${UserStats.getUser()}"? This cannot be undone.`)) return;
+  UserStats.reset();
+  refreshHomeStats();
+  refreshPoolHelp();
+  toast('Progress reset', '');
+});
+
+// ============================================================
+// SCREEN 3 · ROUND
+// ============================================================
+const round = {
+  cards: [],
+  index: 0,
+  marks: [],     // parallel array, one slot per card: 'correct' | 'wrong' | undefined
+  revealed: false,
+};
+
+function startRound(customCards) {
+  const cards = customCards || UserStats.buildRound(ALL, {
+    source: effectiveSourceType(),
+    size: setup.size === 'all' ? null : setup.size,
+    order: setup.order,
+  });
+  if (cards.length === 0) {
+    toast('Pool is empty — pick a different source', 'wrong');
+    return;
+  }
+  round.cards = cards;
+  round.index = 0;
+  round.marks = new Array(cards.length);
+  round.revealed = false;
+  document.getElementById('round-who').textContent = UserStats.getUser();
+  document.getElementById('round-meta').textContent = `${cards.length} cards · ${effectiveSourceType().replace('-', ' ')}`;
+  show('round');
+  renderRound();
+}
+
+// Helper · update text on every element matching a selector (used for
+// the card-top / card-foot pieces that appear on both flip faces)
+function setAll(selector, text) {
+  document.querySelectorAll(selector).forEach(el => { el.textContent = text; });
+}
+
+function renderRound() {
+  const card = round.cards[round.index];
+  const root = document.getElementById('card');
+
+  // Last-result badge · same on both faces
+  const stat = UserStats.get(card);
+  const totalMarks = stat.correct + stat.wrong;
+  let resCls = 'none', resText = '';
+  if (totalMarks > 0) {
+    resCls  = stat.lastResult === 'wrong' ? 'wrong' : 'correct';
+    resText = `${stat.correct}✓ ${stat.wrong}✗`;
+  }
+  document.querySelectorAll('.card .result').forEach(el => {
+    el.classList.remove('none', 'correct', 'wrong');
+    el.classList.add(resCls);
+    el.textContent = resText;
+  });
+
+  // Pinyin on top · character mode + toggle on, same on both faces
+  const showPinyinTop = setup.qmode === 'character' && setup.pinyin;
+  document.querySelectorAll('.card .pinyin').forEach(el => {
+    el.textContent = card.p || '';
+    el.classList.toggle('hidden', !showPinyinTop);
+  });
+
+  // Front face · question
+  const qChar = document.getElementById('q-text-char');
+  const qMean = document.getElementById('q-text-mean');
+  if (setup.qmode === 'character') {
+    qChar.textContent = card.w; qChar.hidden = false; qMean.hidden = true;
+  } else {
+    qMean.textContent = card.m; qMean.hidden = false; qChar.hidden = true;
+  }
+
+  // Back face · answer fields. With the 3D flip, the front face (with
+  // the question) is rotated away when revealed, so the back needs to
+  // carry the full info: character + pinyin + meaning. The only thing
+  // we hide is the inline pinyin when the same value already shows in
+  // the back's card-top (avoids a duplicated pinyin line).
+  document.getElementById('a-char').textContent   = card.w;
+  document.getElementById('a-pinyin').textContent = card.p || '';
+  document.getElementById('a-mean').textContent   = card.m;
+  document.getElementById('a-char').style.display   = '';
+  document.getElementById('a-mean').style.display   = '';
+  document.getElementById('a-pinyin').style.display = showPinyinTop ? 'none' : '';
+
+  // Progress + counter · same on both faces
+  setAll('.card .progress', `${round.index + 1} / ${round.cards.length}`);
+  setAll('.card .card-counter', `Card ${round.index + 1}`);
+
+  // Hint · same on both faces, but front shows "tap to reveal" and back
+  // shows "got it / missed it" when revealed-but-unmarked
+  // Hint · only shown after the user has marked the card, to point
+  // them at the next-card key. Reveal/mark instructions are already
+  // visible in the keys row below the card.
+  const marked = round.marks[round.index];
+  let hint = '';
+  if (marked === 'correct')      hint = 'Marked Got it ✓ — press space for next';
+  else if (marked === 'wrong')   hint = 'Marked Missed it ✗ — press space for next';
+  setAll('.card .hint', hint);
+
+  root.classList.toggle('revealed', round.revealed);
+  document.getElementById('reveal-btn').textContent = round.revealed ? 'Hide' : 'Reveal';
+
+}
+
+function reveal() { round.revealed = true; renderRound(); }
+function toggleReveal() { round.revealed = !round.revealed; renderRound(); }
+
+// Transition between cards without playing the flip animation — the back
+// face has already been swapped to the new card's answer, and we don't
+// want that to flash into view while the rotation completes.
+function snapToNewCard(updateState) {
+  const cardEl = document.getElementById('card');
+  cardEl.classList.add('no-flip');
+  updateState();
+  round.revealed = false;
+  renderRound();
+  // Two RAFs · the first lets the no-flip transform settle, the second
+  // re-enables the flip transition for the upcoming reveal.
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      cardEl.classList.remove('no-flip');
+    });
+  });
+}
+function nextCard() {
+  if (round.index >= round.cards.length - 1) {
+    return finishRound();
+  }
+  // Revealed card → play the flip-back animation while swapping the
+  // question content mid-flip.  We add .flipping-next so the rotation
+  // uses a symmetric ease-in-out (instead of the default spring bezier),
+  // which puts the card *exactly* at 90° (edge-on, invisible) at the
+  // 350 ms midpoint — the only moment the content swap is hidden from
+  // view.  The class is removed after the rotation completes so the
+  // next reveal goes back to the spring settle.
+  if (round.revealed) {
+    const cardEl = document.getElementById('card');
+    cardEl.classList.add('flipping-next');
+    round.revealed = false;
+    cardEl.classList.remove('revealed');
+    // Sync the button label immediately — the .nav-q button becomes
+    // visible the instant .revealed is removed, but renderRound() (which
+    // resets the text to "Reveal") doesn't run until the 350 ms swap.
+    // Without this it flashes the stale "Hide" label during the flip.
+    document.getElementById('reveal-btn').textContent = 'Reveal';
+    setTimeout(() => {
+      round.index++;
+      renderRound();
+    }, 350);
+    setTimeout(() => {
+      cardEl.classList.remove('flipping-next');
+    }, 750);
+  } else {
+    snapToNewCard(() => { round.index++; });
+  }
+}
+function prevCard() {
+  if (round.index > 0) {
+    snapToNewCard(() => { round.index--; });
+  }
+}
+function markCard(result, advance) {
+  // If this card was already marked in this round, just nudge the user forward
+  if (round.marks[round.index]) {
+    toast('Already marked — press → for next', '');
+    return;
+  }
+  // Reveal first if needed — pressing ↑/↓ should always show the meaning before marking
+  if (!round.revealed) {
+    round.revealed = true;
+  }
+  const card = round.cards[round.index];
+  UserStats.mark(card, result);
+  round.marks[round.index] = result;
+  toast(result === 'correct' ? 'Got it ✓' : 'Missed it ✗', result === 'correct' ? 'ok' : 'wrong');
+  renderRound();
+  // Auto-advance · only when triggered by a click/tap.  Keyboard users
+  // stay on the back face and press space when they want to move on.
+  if (advance) setTimeout(nextCard, 450);
+}
+
+document.getElementById('card').addEventListener('click', e => {
+  if (e.target.closest('button')) return;
+  toggleReveal();
+});
+document.getElementById('reveal-btn').addEventListener('click', e => { e.stopPropagation(); toggleReveal(); });
+document.getElementById('btn-correct').addEventListener('click', e => { e.stopPropagation(); markCard('correct', true); });
+document.getElementById('btn-wrong').addEventListener('click',   e => { e.stopPropagation(); markCard('wrong', true); });
+document.getElementById('abandon-btn').addEventListener('click', () => finishRound());
+
+addEventListener('keydown', e => {
+  if (e.target.matches('input, textarea')) return;
+  const onRound = document.getElementById('screen-round').classList.contains('active');
+  if (!onRound) return;
+  // space (with shift) · missed it · auto-reveals if still on the question
+  if ((e.key === ' ' || e.code === 'Space') && e.shiftKey) {
+    e.preventDefault();
+    markCard('wrong');
+  }
+  // space · the workhorse · reveal → got it → advance
+  else if (e.key === ' ' || e.code === 'Space') {
+    e.preventDefault();
+    if (!round.revealed) reveal();
+    else if (!round.marks[round.index]) markCard('correct');
+    else nextCard();
+  }
+  // backspace · also marks missed it
+  else if (e.key === 'Backspace') {
+    e.preventDefault();
+    markCard('wrong');
+  }
+});
+
+// ============================================================
+// SCREEN 4 · RESULTS
+// ============================================================
+function finishRound() {
+  const okList    = [];
+  const wrongList = [];
+  round.cards.forEach((c, i) => {
+    if (round.marks[i] === 'correct') okList.push(c);
+    else if (round.marks[i] === 'wrong') wrongList.push(c);
+  });
+  const marked = okList.length + wrongList.length;
+  const pct = marked ? Math.round((100 * okList.length) / marked) : 0;
+
+  document.getElementById('results-who').textContent = UserStats.getUser();
+  document.getElementById('r-correct').textContent = okList.length;
+  document.getElementById('r-total').textContent   = round.cards.length;
+  document.getElementById('r-pct').textContent     = marked ? pct + ' %' : '— %';
+
+  // Headline + subhead based on score
+  let headline = 'Nice work.';
+  if (marked === 0) headline = 'Round abandoned.';
+  else if (pct >= 90) headline = 'Excellent.';
+  else if (pct >= 75) headline = 'Solid run.';
+  else if (pct >= 50) headline = 'Keep going.';
+  else if (pct > 0)   headline = 'These need another pass.';
+  document.getElementById('r-headline').textContent = headline;
+  document.getElementById('r-subhead').textContent  =
+    marked === 0 ? 'No marks recorded this round.'
+                 : `${okList.length} of ${marked} marked cards correct on this pass.`;
+
+  // Lists
+  function renderList(elId, emptyId, items) {
+    const ul = document.getElementById(elId);
+    const empty = document.getElementById(emptyId);
+    ul.innerHTML = '';
+    if (items.length === 0) { ul.hidden = true; empty.hidden = false; return; }
+    ul.hidden = false; empty.hidden = true;
+    items.forEach(c => {
+      const li = document.createElement('li');
+      li.innerHTML = `<span class="id">#${String(c.id).padStart(3, '0')}</span>
+                      <span class="word">${c.w}<span class="py">${c.p || ''}</span></span>
+                      <span class="meaning">${c.m || ''}</span>`;
+      ul.appendChild(li);
+    });
+  }
+  renderList('r-ok-list',    'r-ok-empty',    okList);
+  renderList('r-wrong-list', 'r-wrong-empty', wrongList);
+
+  // Disable "Replay missed only" if there are no missed
+  document.getElementById('again-btn').disabled = wrongList.length === 0;
+
+  // Stash for "Replay missed only"
+  round._wrongSet = wrongList;
+
+  show('results');
+}
+
+document.getElementById('again-btn').addEventListener('click', () => {
+  if (!round._wrongSet || round._wrongSet.length === 0) return;
+  startRound(round._wrongSet.slice());
+});
+document.getElementById('new-btn').addEventListener('click',          () => goHome());
+document.getElementById('home-btn').addEventListener('click',         () => goHome());
+document.getElementById('results-home-btn').addEventListener('click', () => goHome());
+
+// ============================================================
+// BOOT
+// ============================================================
+(function boot() {
+  const last = UserStats.getCurrentUser();
+  if (last && UserStats.has(last)) {
+    UserStats.setUser(last);
+    goHome();
+  } else {
+    renderKnownUsers();
+    fillPassphrase();   // auto-suggest a recovery key for new visitors
+    show('login');
+  }
+})();
+</script>
+</body>
+</html>
