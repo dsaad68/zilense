@@ -96,22 +96,13 @@ const SEG_YIELD_EVERY = 20 // paragraphs between event-loop yields
 
 const yieldToLoop = () => new Promise((r) => setTimeout(r, 0))
 
+// one paragraph -> word/char/punct tokens with tone-marked pinyin. The tokenizer
+// itself lives in dict-core (segmentText) so the reader path here and the on-video
+// subtitle overlay share one tested implementation; we just pass the reader's
+// security caps (bounded code-point window, hard length cap on the web-accessible
+// reader payload).
 function segmentPara(db, p) {
-  const out = []
-  const cps = [...String(p)].slice(0, SEG_MAX_CP) // code points, astral-safe + capped
-  let i = 0
-  while (i < cps.length) {
-    const ch = cps[i]
-    if (!core.HAN.test(ch)) { out.push({ t: ch, kind: 'punct' }); i++; continue }
-    // segmentLongest reads at most SEG_WINDOW leading code points, so only join
-    // that window instead of the whole remaining paragraph (the O(n²) hot path)
-    const seg = core.segmentLongest(db, cps.slice(i, i + SEG_WINDOW).join(''))
-    const word = seg ? seg.word : ch
-    const e = core.lookup(db, word)
-    out.push({ t: word, kind: [...word].length > 1 ? 'word' : 'char', py: e ? e.pinyin : '' })
-    i += seg ? seg.len : 1
-  }
-  return out
+  return core.segmentText(db, p, { window: SEG_WINDOW, maxCP: SEG_MAX_CP })
 }
 
 // Reader article hand-off: the content script extracts the article and

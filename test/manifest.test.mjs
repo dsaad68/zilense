@@ -39,6 +39,28 @@ test('manifest: content script runs in all frames (iframe lookup)', () => {
   assert.equal(cs.all_frames, true, 'all_frames must be true so iframes are covered')
 })
 
+test('manifest: dual-subtitles MAIN-world hook is a SEPARATE, youtube-scoped entry', () => {
+  // the subtitle feature's Phase 2 track discovery runs in YouTube's page context
+  // (MAIN world). It must be an ADDED content script (not the broad one at [0]) so
+  // the all-urls lookup script is unaffected, scoped to youtube, and never <all_urls>.
+  const hook = (m.content_scripts || []).find(
+    (cs) => cs.world === 'MAIN' && (cs.js || []).some((p) => p.includes('yt-hook')))
+  assert.ok(hook, 'a MAIN-world yt-hook content script is registered')
+  assert.ok(!hook.matches.includes('<all_urls>'), 'the hook must NOT match <all_urls>')
+  assert.ok(hook.matches.every((h) => /youtube(-nocookie)?\.com/.test(h)), 'hook scoped to youtube only')
+  assert.notEqual(m.content_scripts[0], hook, 'the broad lookup script stays first')
+})
+
+test('manifest: dual subtitles add NO host permission (same-origin fetch only)', () => {
+  // Phase 2 fetches timedtext same-origin on youtube.com from the content script, so
+  // host_permissions must be UNCHANGED — exactly the panel's two fetch targets.
+  assert.deepEqual(
+    [...m.host_permissions].sort(),
+    ['https://cdn.jsdelivr.net/*', 'https://tatoeba.org/*'],
+    'no youtube (or any new) host permission was added',
+  )
+})
+
 test('manifest: reader page is web-accessible (the content script injects it as an iframe)', () => {
   const war = m.web_accessible_resources || []
   const resources = war.flatMap((w) => w.resources || [])

@@ -66,8 +66,9 @@ npm run test:e2e     # Playwright smoke test (loads dist/ in Chromium; build fir
 | Dictionary logic | `src/lib/dict-core.js` (pure lookup/search/segment, unit-tested), `src/lib/dict.js` (loads the index, wraps core), `src/lib/pinyin.js`, `src/lib/storage.js`, `src/lib/examples.js` (Tatoeba) |
 | Side panel UI | `src/sidepanel/` (`App.jsx` + `components/`, `panel.css`) |
 | On-page lookup | `src/content/content.js` (hover + click-to-pin + select), `content.css` |
+| Dual subtitles + pinyin | `src/content/subs/` (loaded on demand by `content.js`, OFF by default): `index.js` gate, `engine.js` runtime, `platforms.js` adapters (YouTube, Coursera), `overlay.js` ruby overlay + word lookup, `subs-core.js` pure tokens/cues/track helpers, `yt-hook.js` MAIN-world caption-track reader. Settings under `mydict.subs`, toggled from the toolbar popup. Phase 1 annotates the shown track with pinyin + clickable words; Phase 2 shows two real YouTube tracks at once (same-origin `timedtext`, no new permission, no machine translation unless opted in) |
 | Background | `src/background/service-worker.js` (panel open + context menu) |
-| Tests | `test/*.test.mjs` (`npm test`, Node's built-in runner: dict-core, pinyin, content-core, manifest, storage-helpers, reader-stash; DOM logic, reader-extract, word-walk, via happy-dom); `e2e/*.spec.js` (`npm run test:e2e`, Playwright extension tests: `panel.spec.js` side-panel smoke test, `reader.spec.js` Reader pin-to-panel + forged-message hardening) |
+| Tests | `test/*.test.mjs` (`npm test`, Node's built-in runner: dict-core, pinyin, content-core, manifest, storage-helpers, reader-stash, subs-core; DOM logic, reader-extract, word-walk, subs-overlay, via happy-dom); `e2e/*.spec.js` (`npm run test:e2e`, Playwright extension tests: `panel.spec.js` side-panel smoke test, `reader.spec.js` Reader pin-to-panel + forged-message hardening) |
 
 ## Known limitations / next steps
 

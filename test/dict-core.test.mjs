@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'node:path'
-import { lookup, segmentLongest, searchEntries, compMeaning, buildIndex, hskWordsUpTo } from '../src/lib/dict-core.js'
+import { lookup, segmentLongest, searchEntries, compMeaning, buildIndex, hskWordsUpTo, segmentText } from '../src/lib/dict-core.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 let DB, INDEX
@@ -334,4 +334,36 @@ test('paragraph segmentation: greedy segmentLongest + lookup loop (the worker sh
   assert.ok(out.some((o) => o.t === '喜欢'), '喜欢 is segmented as one word, not two chars')
   assert.ok(out.every((o) => o.py && o.py.length), 'every token resolves to non-empty pinyin')
   assert.ok(out.find((o) => o.t === '喜欢').py.startsWith('xǐ'), '喜欢 pinyin is tone-marked')
+})
+
+test('segmentText: the shared tokenizer (worker reader path + subtitle overlay)', () => {
+  // segmentText now backs both the service worker's `segment` handler and the
+  // on-video subtitle overlay; it must produce the same word/char/punct tokens
+  // with tone-marked pinyin that the hand-rolled loop above does.
+  const toks = segmentText(DB, '我喜欢喝茶')
+  assert.equal(toks.map((t) => t.t).join(''), '我喜欢喝茶', 'tokens reconstruct the input')
+  const xihuan = toks.find((t) => t.t === '喜欢')
+  assert.ok(xihuan && xihuan.kind === 'word', '喜欢 is one word token')
+  assert.ok(xihuan.py.startsWith('xǐ'), '喜欢 pinyin is tone-marked')
+  assert.ok(toks.every((t) => t.kind === 'word' || t.kind === 'char'), 'pure-Han line has no punct')
+})
+
+test('segmentText: mixed Chinese/Latin and punctuation pass non-Han through as punct', () => {
+  const toks = segmentText(DB, '你好, OK!')
+  // the Chinese word is segmented and rubied; every non-Han code point (comma,
+  // space, latin letters, !) becomes its own punct token
+  const nihao = toks.find((t) => t.t === '你好')
+  assert.ok(nihao && nihao.kind === 'word' && nihao.py.includes('hǎo'), '你好 segmented with pinyin')
+  for (const ch of [',', ' ', 'O', 'K', '!']) {
+    assert.ok(toks.some((t) => t.kind === 'punct' && t.t === ch), `"${ch}" is a punct token`)
+  }
+  assert.equal(toks.map((t) => t.t).join(''), '你好, OK!', 'tokens reconstruct the original line')
+})
+
+test('segmentText: empty / no-db / window + cap bounds', () => {
+  assert.deepEqual(segmentText(DB, ''), [])
+  assert.deepEqual(segmentText(null, '你好'), [])
+  // maxCP truncates the input (the reader passes a hard cap for its web-accessible
+  // payload); only the first code point survives here
+  assert.deepEqual(segmentText(DB, '你好', { maxCP: 1 }).map((t) => t.t).join(''), '你')
 })

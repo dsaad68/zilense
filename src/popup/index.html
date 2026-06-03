@@ -40,6 +40,25 @@
       <div class="rule"></div>
 
       <div class="row">
+        <span class="set-label">
+          Subtitles (pinyin + lookup)
+          <span class="sub">on supported video sites</span>
+        </span>
+        <button id="subs-toggle" class="switch" role="switch" aria-checked="false">
+          <span class="knob"></span>
+        </button>
+      </div>
+
+      <div class="row" id="subs-pinyin-row">
+        <span class="set-label">Subtitle pinyin</span>
+        <button id="subs-pinyin" class="switch" role="switch" aria-checked="false">
+          <span class="knob"></span>
+        </button>
+      </div>
+
+      <div class="rule"></div>
+
+      <div class="row">
         <span class="set-label">Highlight HSK ≤</span>
         <select id="hsk-level" class="picker" aria-label="Highlight HSK level">
           <option value="0">Off</option>

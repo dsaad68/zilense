@@ -9,6 +9,7 @@ const HISTORY_KEY = 'mydict.history'
 const DISABLED_KEY = 'mydict.disabledSites'
 const PENDING_KEY = 'mydict.pendingLookup'
 const READER_KEY = 'mydict.reader'
+const SUBS_KEY = 'mydict.subs'
 
 const HISTORY_MAX = 100 // cap recent lookups so the list stays bounded
 
@@ -167,6 +168,49 @@ export async function saveReaderPrefs(patch) {
   try { current = JSON.parse(localStorage.getItem(READER_KEY) || '{}') } catch {}
   const merged = { ...READER_DEFAULTS, ...current, ...patch }
   try { localStorage.setItem(READER_KEY, JSON.stringify(merged)) } catch {}
+  return merged
+}
+
+/* Dual-subtitle preferences. The on-video subtitle overlay (pinyin + clickable
+   words, and the two-track view) is OFF by default and independently toggleable
+   from the dictionary itself, so it lives under its own mydict.subs key rather
+   than mixing into mydict.settings. Same read-modify-write merge as the reader so
+   toggling one control never clobbers another. `lang1`/`lang2` hold the two
+   chosen caption language codes for the Phase 2 dual-track view (empty = auto:
+   the displayed track for line 1, none for line 2). */
+export const SUBS_DEFAULTS = {
+  enabled: false, // master switch for the whole subtitle feature
+  pinyin: true, // ruby pinyin above the Chinese line
+  tones: true, // color the pinyin by tone
+  dual: true, // when two tracks are available, show both stacked
+  lang1: '', // preferred language code for the top (annotated) line
+  lang2: '', // preferred language code for the bottom line
+  allowAuto: false, // allow YouTube's own machine auto-translation as a track
+}
+
+export async function loadSubsPrefs() {
+  if (hasChrome) {
+    const got = await getLocal([SUBS_KEY])
+    return { ...SUBS_DEFAULTS, ...(got[SUBS_KEY] || {}) }
+  }
+  try {
+    return { ...SUBS_DEFAULTS, ...JSON.parse(localStorage.getItem(SUBS_KEY) || '{}') }
+  } catch {
+    return { ...SUBS_DEFAULTS }
+  }
+}
+
+export async function saveSubsPrefs(patch) {
+  if (hasChrome) {
+    const got = await getLocal([SUBS_KEY])
+    const merged = { ...SUBS_DEFAULTS, ...(got[SUBS_KEY] || {}), ...patch }
+    await setLocal({ [SUBS_KEY]: merged })
+    return merged
+  }
+  let current = {}
+  try { current = JSON.parse(localStorage.getItem(SUBS_KEY) || '{}') } catch {}
+  const merged = { ...SUBS_DEFAULTS, ...current, ...patch }
+  try { localStorage.setItem(SUBS_KEY, JSON.stringify(merged)) } catch {}
   return merged
 }
 

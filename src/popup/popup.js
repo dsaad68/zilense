@@ -12,6 +12,8 @@ import {
   loadDisabledSites,
   saveDisabledSites,
   toggleSite,
+  loadSubsPrefs,
+  saveSubsPrefs,
 } from '../lib/storage.js'
 
 const $ = (id) => document.getElementById(id)
@@ -84,6 +86,33 @@ async function init() {
     siteBtn.style.opacity = '.4'
     siteBtn.style.cursor = 'default'
   }
+
+  // Subtitles (pinyin + lookup) — the on-video overlay. Master toggle + a pinyin
+  // sub-toggle, persisted under mydict.subs (read live by the content script). The
+  // pinyin row dims when the feature is off, mirroring the reader's dependent rows.
+  const subs = await loadSubsPrefs()
+  const subsBtn = $('subs-toggle')
+  const subsPyBtn = $('subs-pinyin')
+  const subsPyRow = $('subs-pinyin-row')
+  let subsOn = !!subs.enabled
+  let subsPinyin = subs.pinyin !== false
+  const reflectSubs = () => {
+    setSwitch(subsBtn, subsOn)
+    setSwitch(subsPyBtn, subsPinyin)
+    subsPyRow.style.opacity = subsOn ? '1' : '.4'
+    subsPyRow.style.pointerEvents = subsOn ? 'auto' : 'none'
+  }
+  reflectSubs()
+  subsBtn.addEventListener('click', () => {
+    subsOn = !subsOn
+    reflectSubs()
+    saveSubsPrefs({ enabled: subsOn })
+  })
+  subsPyBtn.addEventListener('click', () => {
+    subsPinyin = !subsPinyin
+    setSwitch(subsPyBtn, subsPinyin)
+    saveSubsPrefs({ pinyin: subsPinyin })
+  })
 
   // Highlight HSK ≤ N — a one-shot action on the active tab's content script.
   const levelSel = $('hsk-level')
