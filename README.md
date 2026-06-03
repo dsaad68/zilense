@@ -15,7 +15,8 @@ instantly, with tone-colored pinyin, search, stroke order, and a saved deck.
 Recreated from a Claude Design prototype as a real extension with
 **Vite + React + CRXJS**, backed by
 **CC-CEDICT** (~121k entries) via the [`cc-cedict`](https://github.com/edvardsr/cc-cedict)
-package.
+package, plus **CedPane** (~74k public-domain names and proper nouns) merged in at
+build time so people, places, and brands resolve too.
 
 ## Develop / build
 
@@ -62,7 +63,7 @@ npm run test:e2e     # Playwright smoke test (loads dist/ in Chromium; build fir
 | Area | File(s) |
 |------|---------|
 | Manifest (MV3) | `manifest.config.js` (CRXJS), `vite.config.js` |
-| Data pipelines | `assets/scripts/build-dict.mjs` → `src/data/cedict.json` (entries + traditional↔simplified maps + merged HSK/POS/char data); `assets/scripts/convert-chars.mjs` → `assets/char-data/char-data.json` (radical/components/strokes, from makemeahanzi); `assets/scripts/fetch-fonts.mjs` → `src/sidepanel/fonts/` + `fonts.css` (vendored Google Fonts). `assets/scripts/convert-hsk.mjs` (`npm run convert:hsk`) → `assets/hsk-vocab/hsk-data.json` (HSK level + POS + official gloss, parsed from the committed `.xls` lists). All build/data scripts live under `assets/`. |
+| Data pipelines | `assets/scripts/build-dict.mjs` → `src/data/cedict.json` (CC-CEDICT entries + traditional↔simplified maps + merged HSK/POS/char data + merged **CedPane** names/proper nouns); CedPane is fetched once at build time and cached, committed, as `assets/cedpane/cedpane.json` so later builds/tests are deterministic and offline. `assets/scripts/convert-chars.mjs` → `assets/char-data/char-data.json` (radical/components/strokes, from makemeahanzi); `assets/scripts/fetch-fonts.mjs` → `src/sidepanel/fonts/` + `fonts.css` (vendored Google Fonts). `assets/scripts/convert-hsk.mjs` (`npm run convert:hsk`) → `assets/hsk-vocab/hsk-data.json` (HSK level + POS + official gloss, parsed from the committed `.xls` lists). All build/data scripts live under `assets/`. |
 | Dictionary logic | `src/lib/dict-core.js` (pure lookup/search/segment, unit-tested), `src/lib/dict.js` (loads the index, wraps core), `src/lib/pinyin.js`, `src/lib/storage.js`, `src/lib/examples.js` (Tatoeba) |
 | Side panel UI | `src/sidepanel/` (`App.jsx` + `components/`, `panel.css`) |
 | On-page lookup | `src/content/content.js` (hover + click-to-pin + select), `content.css` |
@@ -86,6 +87,14 @@ npm run test:e2e     # Playwright smoke test (loads dist/ in Chromium; build fir
   traditional input resolves. Still missing: word **frequency** (a level proxy
   is used in ranking) and bundled audio (pronunciation uses the browser's TTS).
   The derived JSON is committed, so the build needs no source files.
+- **Names & proper nouns** come from **CedPane** (public domain), merged into
+  `cedict.json` at build time and tagged as proper nouns. To keep a name homograph
+  from beating the everyday word, proper nouns are ranked below ordinary/HSK words
+  in search and the word family unless the query is an exact full match (`dict-core.js`).
+  Adding ~74k name entries grows `cedict.json` from ~14 MB to ~20 MB (gzip ~7 MB);
+  it is still loaded once, on demand, by the service worker and the panel. CedPane's
+  already-tone-marked pinyin is shown as-is but is not yet indexed for toneless
+  (ASCII) pinyin search, so names are found by characters or English, not by `pinyin`.
 - **Permissions**: `host_permissions` is scoped to the two services the panel
   fetches from (`tatoeba.org`, `cdn.jsdelivr.net`); page injection for hover
   lookup comes from `content_scripts` matches, which needs no host permission.
@@ -104,7 +113,8 @@ npm run test:e2e     # Playwright smoke test (loads dist/ in Chromium; build fir
   the dictionary JSON.
 - **Licensing**: the application code is **MIT** ([`LICENSE`](./LICENSE)). Bundled
   and fetched third-party data, fonts, and libraries keep their own licenses,
-  **CC-CEDICT** (CC BY-SA 4.0, attribution + share-alike), **makemeahanzi**
+  **CC-CEDICT** (CC BY-SA 4.0, attribution + share-alike), **CedPane** (public
+  domain / Unlicense), **makemeahanzi**
   (Arphic Public License + LGPL), **Noto SC / Source Serif 4** (SIL OFL 1.1),
   **Tatoeba** (CC BY 2.0 FR), Readability (Apache-2.0), React (MIT). Full
   attribution is in [`THIRD-PARTY-NOTICES.md`](./THIRD-PARTY-NOTICES.md), which

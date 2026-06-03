@@ -59,8 +59,9 @@ is factual and matches the shipped code (`manifest.config.js`, `src/`) and the
 > example-sentences or stroke-order section for a specific word. See the privacy
 > policy for details.
 >
-> Dictionary data: CC-CEDICT (CC BY-SA 4.0). Built with open data and fonts;
-> full attribution is included with the extension.
+> Dictionary data: CC-CEDICT (CC BY-SA 4.0), with names and proper nouns from
+> CedPane (public domain). Built with open data and fonts; full attribution is
+> included with the extension.
 
 ---
 
@@ -137,10 +138,10 @@ Answers for the "Privacy practices" tab.
 >    script). These are fetched on demand for a specific looked-up word and are
 >    data, not code; they are not eval'd or executed.
 >
-> 2. **Bundle size.** The package includes the full CC-CEDICT dictionary
->    (`cedict.json`, ~13 MB) so lookups work offline and privately. It is loaded
->    by the service worker on demand. This is data the extension's core function
->    depends on, not unused payload.
+> 2. **Bundle size.** The package includes the full CC-CEDICT dictionary plus
+>    CedPane name/proper-noun additions (`cedict.json`, ~20 MB) so lookups work
+>    offline and privately. It is loaded by the service worker on demand. This is
+>    data the extension's core function depends on, not unused payload.
 >
 > 3. **`<all_urls>` content script** is required for on-page hover/selection
 >    lookup (see the permission justification above). It only detects the
@@ -148,9 +149,9 @@ Answers for the "Privacy practices" tab.
 >    it does not exfiltrate page content.
 >
 > 4. **Open data & attribution.** Dictionary, character, and font data are open
->    (CC-CEDICT under CC BY-SA 4.0, makemeahanzi, Noto/Source Serif under the
->    SIL OFL). Full attribution ships in the package as `THIRD-PARTY-NOTICES.md`
->    and is linked from the in-app Settings.
+>    (CC-CEDICT under CC BY-SA 4.0, CedPane in the public domain, makemeahanzi,
+>    Noto/Source Serif under the SIL OFL). Full attribution ships in the package
+>    as `THIRD-PARTY-NOTICES.md` and is linked from the in-app Settings.
 
 ---
 

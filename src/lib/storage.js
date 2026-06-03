@@ -9,6 +9,7 @@ const HISTORY_KEY = 'mydict.history'
 const DISABLED_KEY = 'mydict.disabledSites'
 const PENDING_KEY = 'mydict.pendingLookup'
 const READER_KEY = 'mydict.reader'
+const FAMILIARITY_KEY = 'mydict.familiarity'
 
 const HISTORY_MAX = 100 // cap recent lookups so the list stays bounded
 
@@ -74,6 +75,70 @@ export function pushHistory(history, q, t) {
   if (!q) return history
   const rest = history.filter((h) => h.q !== q)
   return [{ q, t: t || 0 }, ...rest].slice(0, HISTORY_MAX)
+}
+
+/* Familiarity tracking. A separate mydict.* map, keyed by headword (the same `q`
+   the saved deck uses), recording how well the user knows each word:
+     mydict.familiarity = { "<word>": { state, seen, lastSeen }, … }
+   `state` is 'new' | 'learning' | 'known' (the user sets it); `seen` is an
+   auto-incrementing lookup counter; `lastSeen` is an epoch-ms timestamp. Absent
+   words default to 'new' WITHOUT being written, so the map only ever holds words
+   the user has actually touched, and an older install with no map just reads as
+   all-new. The pure helpers (get / set / bump) operate on an in-memory map and
+   return a new one, so they're unit-testable like toggleSite / pushHistory;
+   loadFamiliarity / saveFamiliarity wrap chrome.storage.local. */
+export const FAMILIARITY_STATES = ['new', 'learning', 'known']
+export const DEFAULT_FAMILIARITY = { state: 'new', seen: 0, lastSeen: 0 }
+
+// coerce any stored (or missing / corrupted) record into a valid one
+function normFamiliarity(rec) {
+  const state = rec && FAMILIARITY_STATES.includes(rec.state) ? rec.state : 'new'
+  const seen = rec && Number.isFinite(rec.seen) && rec.seen > 0 ? Math.floor(rec.seen) : 0
+  const lastSeen = rec && Number.isFinite(rec.lastSeen) && rec.lastSeen > 0 ? rec.lastSeen : 0
+  return { state, seen, lastSeen }
+}
+
+/* the familiarity record for a word: an absent or malformed entry falls back to
+   the default ('new', never seen) without mutating the map. */
+export function getFamiliarity(map, word) {
+  return normFamiliarity(map ? map[word] : null)
+}
+
+/* set a word's state ('new' | 'learning' | 'known'); seen / lastSeen are kept.
+   Pure: returns a new map. An unknown state is coerced to 'new'. */
+export function setFamiliarityState(map, word, state) {
+  if (!word) return map
+  const next = FAMILIARITY_STATES.includes(state) ? state : 'new'
+  const cur = getFamiliarity(map, word)
+  return { ...(map || {}), [word]: { ...cur, state: next } }
+}
+
+/* record one lookup of a word: increment `seen` and stamp `lastSeen`, preserving
+   the user-set state (this NEVER auto-promotes to 'known'). Pure: returns a new
+   map. `now` is an epoch-ms timestamp. */
+export function bumpFamiliarity(map, word, now) {
+  if (!word) return map
+  const cur = getFamiliarity(map, word)
+  return { ...(map || {}), [word]: { ...cur, seen: cur.seen + 1, lastSeen: now || 0 } }
+}
+
+export async function loadFamiliarity() {
+  if (hasChrome) {
+    const got = await getLocal([FAMILIARITY_KEY])
+    const v = got[FAMILIARITY_KEY]
+    return v && typeof v === 'object' && !Array.isArray(v) ? v : {}
+  }
+  try {
+    const v = JSON.parse(localStorage.getItem(FAMILIARITY_KEY) || '{}')
+    return v && typeof v === 'object' && !Array.isArray(v) ? v : {}
+  } catch {
+    return {}
+  }
+}
+
+export async function saveFamiliarity(map) {
+  if (hasChrome) return setLocal({ [FAMILIARITY_KEY]: map })
+  try { localStorage.setItem(FAMILIARITY_KEY, JSON.stringify(map)) } catch {}
 }
 
 /* Per-site hover disable. The toolbar popup adds/removes the current hostname

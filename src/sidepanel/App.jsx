@@ -4,7 +4,8 @@
    (hover a character / select a word on any page). */
 import React, { useState, useEffect, useRef, useMemo } from 'react'
 import { loadDict, lookup, searchEntries, segmentLongest } from '../lib/dict.js'
-import { loadState, saveSaved, saveSettings, saveHistory, pushHistory, takePendingLookup, DEFAULT_SETTINGS } from '../lib/storage.js'
+import { loadState, saveSaved, saveSettings, saveHistory, pushHistory, takePendingLookup, DEFAULT_SETTINGS,
+  loadFamiliarity, saveFamiliarity, bumpFamiliarity, setFamiliarityState, getFamiliarity } from '../lib/storage.js'
 import { Svg } from './components/icons.jsx'
 import { IconBtn } from './components/atoms.jsx'
 import { EntryView } from './components/EntryView.jsx'
@@ -30,6 +31,7 @@ export default function App() {
   const [showSettings, setShowSettings] = useState(false)
   const [saved, setSaved] = useState([])
   const [history, setHistory] = useState([])
+  const [familiarity, setFamiliarity] = useState({}) // mydict.familiarity: word -> {state,seen,lastSeen}
   const [settings, setSettings] = useState(DEFAULT_SETTINGS)
   const [hydrated, setHydrated] = useState(false)
   const dark = settings.dark
@@ -52,10 +54,11 @@ export default function App() {
     // race it. Doing both in one chain means the late loadState() can't overwrite
     // the pending word's history entry.
     ;(async () => {
-      const s = await loadState()
+      const [s, fam] = await Promise.all([loadState(), loadFamiliarity()])
       if (!alive) return
       setSaved(s.saved)
       setSettings(s.settings)
+      setFamiliarity(fam)
       let hist = s.history
       const q = await takePendingLookup()
       if (!alive) return
@@ -73,6 +76,7 @@ export default function App() {
   useEffect(() => { if (hydrated) saveSaved(saved) }, [saved, hydrated])
   useEffect(() => { if (hydrated) saveSettings(settings) }, [settings, hydrated])
   useEffect(() => { if (hydrated) saveHistory(history) }, [history, hydrated])
+  useEffect(() => { if (hydrated) saveFamiliarity(familiarity) }, [familiarity, hydrated])
 
   // record a DELIBERATE lookup (selection / context-menu / in-panel navigation —
   // never transient hover) into recent history, newest first
@@ -129,9 +133,18 @@ export default function App() {
 
   const setSetting = (k, v) => setSettings((s) => ({ ...s, [k]: v }))
   const toggleSave = (q) => setSaved((s) => (s.includes(q) ? s.filter((x) => x !== q) : [q, ...s]))
+  // the user sets a word's familiarity state (New / Learning / Known)
+  const setFam = (q, state) => setFamiliarity((f) => setFamiliarityState(f, q, state))
 
   const entry = ready && entryQ ? lookup(entryQ) : null
   const results = useMemo(() => (ready && debounced ? searchEntries(debounced) : []), [ready, debounced])
+
+  // auto-signal: every time a real entry is shown (hover / select / search /
+  // navigate) bump its seen-count. Keyed on the resolved headword so it fires
+  // once per distinct word, not on every render, and never auto-promotes state.
+  useEffect(() => {
+    if (hydrated && entry) setFamiliarity((f) => bumpFamiliarity(f, entry.q, Date.now()))
+  }, [entry ? entry.q : null, hydrated])
 
   // phrase fallback: a selected run that isn't itself an entry (e.g. a short
   // sentence) is segmented into known words so the lookup isn't a dead end
@@ -245,6 +258,7 @@ export default function App() {
         ) : entry ? (
           <EntryView entry={entry} dark={dark} onNavigate={navigate}
             isSaved={saved.includes(entry.q)} onToggleSave={toggleSave}
+            fam={getFamiliarity(familiarity, entry.q)} onSetFamiliarity={setFam}
             showTrad={settings.showTrad} hskFirst={settings.hskFirst}
             onBack={backStack.length ? goBack : null} />
         ) : phrase ? (
