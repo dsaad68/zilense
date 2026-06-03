@@ -179,8 +179,12 @@ async function buildDeck(deckId) {
     const picked = senses[w].filter((s) =>
       setup.scope === 'cumulative' ? senseRank(s) <= band : String(s.lvl) === exactLabel
     )
-    const ambig = picked.length > 1
-    picked.forEach((s, i) => cards.push(senseCard(w, s, ambig ? i : null, ambig)))
+    // multiCard → the word yields >1 card (needs unique ids). posAmbig → those
+    // cards differ in POS, so showing the POS on the front actually disambiguates
+    // which meaning is being asked (花 verb/noun yes; 得 particle/particle no).
+    const multiCard = picked.length > 1
+    const posAmbig = new Set(picked.map((s) => s.pos || '')).size > 1
+    picked.forEach((s, i) => cards.push(senseCard(w, s, multiCard ? i : null, posAmbig)))
   }
   return cards
 }

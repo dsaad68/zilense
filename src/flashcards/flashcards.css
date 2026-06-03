@@ -452,8 +452,10 @@ h1 {
   margin-right: 8px;
 }
 .q-meaning .card-pos { font-size: 0.7em; }
-/* POS under the character on the question face (multi-meaning words) */
-.q-char-pos { display: block; margin: 8px 0 0; margin-right: 0; font-size: 16px; }
+/* POS under the character on the question face (POS-ambiguous words only).
+   :not([hidden]) so the `hidden` attribute still wins — a bare `display: block`
+   would override it and show the POS on every card. */
+.q-char-pos:not([hidden]) { display: block; margin: 8px 0 0; margin-right: 0; font-size: 16px; }
 
 .pos-pill,
 .lvl-pill {
