@@ -71,17 +71,29 @@
           <div class="lbl">Deck</div>
           <div class="hint" id="deck-hint">Your starred words, or an HSK level</div>
         </div>
-        <div class="setup-row-control">
-          <select id="deck-select" class="deck-select" aria-label="Deck">
-            <option value="starred">★ Starred words</option>
-            <option value="hsk1">HSK 1</option>
-            <option value="hsk2">HSK 2</option>
-            <option value="hsk3">HSK 3</option>
-            <option value="hsk4">HSK 4</option>
-            <option value="hsk5">HSK 5</option>
-            <option value="hsk6">HSK 6</option>
-            <option value="hsk7">HSK 7–9</option>
-          </select>
+        <div class="setup-row-control deck-row-control">
+          <!-- Custom dropdown (replaces the native <select> so the open menu is themed) -->
+          <div class="dropdown" id="deck-dd">
+            <button type="button" class="dropdown-btn" id="deck-dd-btn" aria-haspopup="listbox" aria-expanded="false" aria-label="Deck">
+              <span id="deck-dd-label">★ Starred words</span>
+              <svg class="dropdown-chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <ul class="dropdown-menu" id="deck-dd-menu" role="listbox" tabindex="-1" aria-label="Deck">
+              <li class="dropdown-opt" role="option" data-value="starred" aria-selected="true">★ Starred words</li>
+              <li class="dropdown-opt" role="option" data-value="hsk1">HSK 1</li>
+              <li class="dropdown-opt" role="option" data-value="hsk2">HSK 2</li>
+              <li class="dropdown-opt" role="option" data-value="hsk3">HSK 3</li>
+              <li class="dropdown-opt" role="option" data-value="hsk4">HSK 4</li>
+              <li class="dropdown-opt" role="option" data-value="hsk5">HSK 5</li>
+              <li class="dropdown-opt" role="option" data-value="hsk6">HSK 6</li>
+              <li class="dropdown-opt" role="option" data-value="hsk7">HSK 7–9</li>
+            </ul>
+          </div>
+          <!-- Level scope: shown beside the deck, only when an HSK level is selected -->
+          <div class="seg-pill" id="scope-control" role="radiogroup" aria-label="Level scope" hidden>
+            <label><input type="radio" name="scope" value="exact" checked><span>Just this level</span></label>
+            <label><input type="radio" name="scope" value="cumulative"><span>Up to this level</span></label>
+          </div>
         </div>
       </div>
 

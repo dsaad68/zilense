@@ -8,7 +8,7 @@
        login.
    The round + results UI/logic is unchanged: cards are { id, w, p, m }. */
 
-import { loadDict, lookup, hskWordsAtBand } from '../lib/dict.js'
+import { loadDict, lookup, hskWordsAtBand, hskWordsUpTo } from '../lib/dict.js'
 import { loadState } from '../lib/storage.js'
 import { toAnkiTsv } from '../lib/anki.js'
 import * as Progress from './progress.js'
@@ -120,18 +120,24 @@ function toCard(w, band) {
   return { id: w, w, p: e ? e.pinyin : '', m }
 }
 
-// build the deck for a deck-select value: 'starred' or 'hsk1'..'hsk7' (7 ⇒ 7–9)
+// build the deck for a deck value: 'starred' or 'hsk1'..'hsk7' (7 ⇒ 7–9).
+// For HSK decks `setup.scope` picks 'exact' (just this level) or 'cumulative'
+// (everything up to it); each card shows the meaning from its own band.
 async function buildDeck(deckId) {
   if (deckId === 'starred') {
     const { saved } = await loadState()
     return saved.map((w) => toCard(w))
   }
   const band = Number(String(deckId).replace('hsk', '')) || 1
-  return hskWordsAtBand(band).map(([w]) => toCard(w, band))
+  const pairs = setup.scope === 'cumulative' ? hskWordsUpTo(band) : hskWordsAtBand(band)
+  // each pair is [word, rank]; use that word's own band for its card meaning
+  return pairs.map(([w, rank]) => toCard(w, rank))
 }
 
 async function selectDeck(deckId) {
   setup.deck = deckId
+  // the level-scope choice only applies to HSK decks
+  document.getElementById('scope-control').hidden = deckId === 'starred'
   ALL = await buildDeck(deckId)
   goHome()
 }
@@ -146,7 +152,8 @@ function refreshDeckHint() {
       ? `${ALL.length} starred word${ALL.length > 1 ? 's' : ''}`
       : 'No starred words yet — star words in the dictionary, or pick an HSK level'
   } else {
-    el.textContent = `${ALL.length} words in HSK ${deckBandLabel()}`
+    const scope = setup.scope === 'cumulative' ? `up to HSK ${deckBandLabel()}` : `HSK ${deckBandLabel()}`
+    el.textContent = `${ALL.length} words ${setup.scope === 'cumulative' ? '' : 'in '}${scope}`
   }
 }
 
@@ -155,6 +162,7 @@ function refreshDeckHint() {
 // ============================================================
 const setup = {
   deck: 'starred',
+  scope: 'exact', // 'exact' (just this level) | 'cumulative' (up to this level) — HSK decks only
   source: 'all', // 'all' | 'unseen' | 'wrong-recent' | 'wrong-ever'
   size: 20, // number | 'all'
   qmode: 'character',
@@ -204,8 +212,63 @@ function goHome() {
   refreshPoolHelp()
 }
 
-// Deck
-document.getElementById('deck-select').addEventListener('change', (e) => selectDeck(e.target.value))
+// Deck — custom dropdown (themed replacement for the native <select>)
+function initDeckDropdown() {
+  const dd = document.getElementById('deck-dd')
+  const btn = document.getElementById('deck-dd-btn')
+  const menu = document.getElementById('deck-dd-menu')
+  const labelEl = document.getElementById('deck-dd-label')
+  const opts = [...menu.querySelectorAll('.dropdown-opt')]
+  let activeIdx = 0
+
+  function setActive(i) {
+    activeIdx = (i + opts.length) % opts.length
+    opts.forEach((o, j) => o.classList.toggle('active', j === activeIdx))
+    opts[activeIdx].scrollIntoView({ block: 'nearest' })
+  }
+  function isOpen() { return menu.classList.contains('open') }
+  function open() {
+    menu.classList.add('open'); btn.setAttribute('aria-expanded', 'true')
+    const sel = opts.findIndex((o) => o.getAttribute('aria-selected') === 'true')
+    setActive(sel < 0 ? 0 : sel)
+    menu.focus()
+    document.addEventListener('pointerdown', onDocDown, true)
+  }
+  function close() {
+    menu.classList.remove('open'); btn.setAttribute('aria-expanded', 'false')
+    document.removeEventListener('pointerdown', onDocDown, true)
+  }
+  function onDocDown(e) { if (!dd.contains(e.target)) close() }
+  function choose(opt) {
+    opts.forEach((o) => o.setAttribute('aria-selected', String(o === opt)))
+    labelEl.textContent = opt.textContent
+    close(); btn.focus()
+    selectDeck(opt.dataset.value)
+  }
+
+  btn.addEventListener('click', () => (isOpen() ? close() : open()))
+  btn.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open() }
+  })
+  opts.forEach((o) => o.addEventListener('click', () => choose(o)))
+  menu.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { close(); btn.focus() }
+    else if (e.key === 'ArrowDown') { e.preventDefault(); setActive(activeIdx + 1) }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); setActive(activeIdx - 1) }
+    else if (e.key === 'Home') { e.preventDefault(); setActive(0) }
+    else if (e.key === 'End') { e.preventDefault(); setActive(opts.length - 1) }
+    else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); choose(opts[activeIdx]) }
+  })
+}
+initDeckDropdown()
+// Level scope (HSK decks): rebuild the deck for the new exact/cumulative choice
+document.querySelectorAll('input[name="scope"]').forEach((r) => {
+  r.addEventListener('change', async () => {
+    setup.scope = r.value
+    ALL = await buildDeck(setup.deck)
+    goHome()
+  })
+})
 // Source pool radios
 document.querySelectorAll('input[name="source"]').forEach((r) => {
   r.addEventListener('change', () => { setup.source = r.value; refreshPoolHelp() })
@@ -526,5 +589,6 @@ updateToggleLabel()
     }
   } catch (e) {}
   initSegIndicators()
-  await selectDeck(document.getElementById('deck-select').value)
+  const initialOpt = document.querySelector('#deck-dd-menu .dropdown-opt[aria-selected="true"]')
+  await selectDeck(initialOpt ? initialOpt.dataset.value : 'starred')
 })()

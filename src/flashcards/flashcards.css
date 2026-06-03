@@ -1710,7 +1710,14 @@ h1 {
 }
 
 /* ─── Deck picker · native <select> dressed to match the setup panel ──── */
-.deck-select {
+/* Deck row: dropdown and the level-scope pill sit side by side */
+.deck-row-control { flex-direction: row; align-items: center; flex-wrap: wrap; gap: 12px; }
+
+/* Custom dropdown — a themed replacement for the native <select> so the open
+   menu matches the app instead of the OS popup. */
+.dropdown { position: relative; }
+.dropdown-btn {
+  display: inline-flex; align-items: center; justify-content: space-between; gap: 12px;
   font-family: var(--display);
   font-size: 13px;
   font-weight: 600;
@@ -1718,16 +1725,40 @@ h1 {
   background-color: var(--parchment);
   border: .5px solid var(--border);
   border-radius: var(--radius-sm);
-  padding: 9px 36px 9px 13px;
-  cursor: pointer;
-  -webkit-appearance: none;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238a8178' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 13px center;
+  padding: 9px 13px;
   min-width: 210px;
+  cursor: pointer;
   transition: border-color .12s ease, background-color .12s ease;
 }
-.deck-select:hover { border-color: var(--brand); }
-.deck-select:focus { outline: none; border-color: var(--brand); }
-.deck-select:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+.dropdown-btn:hover { border-color: var(--brand); }
+.dropdown-btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+.dropdown-chev { color: #8a8178; flex: none; transition: transform .18s ease; }
+.dropdown-btn[aria-expanded="true"] .dropdown-chev { transform: rotate(180deg); }
+
+.dropdown-menu {
+  position: absolute; top: calc(100% + 6px); left: 0; z-index: 60;
+  min-width: 100%; margin: 0; padding: 5px; list-style: none;
+  background: var(--ivory);
+  border: .5px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 10px 30px rgba(20, 20, 19, .16), 0 2px 6px rgba(20, 20, 19, .08);
+  visibility: hidden; opacity: 0; transform: translateY(-4px);
+  transition: opacity .14s ease, transform .14s ease, visibility .14s;
+}
+.dropdown-menu.open { visibility: visible; opacity: 1; transform: translateY(0); }
+.dropdown-opt {
+  position: relative;
+  font-family: var(--display); font-size: 13px; font-weight: 500;
+  color: var(--dark-warm);
+  padding: 8px 14px 8px 30px;
+  border-radius: var(--radius-sm);
+  cursor: pointer; white-space: nowrap;
+}
+.dropdown-opt:hover, .dropdown-opt.active { background: var(--sand); }
+.dropdown-opt[aria-selected="true"] { color: var(--near-black); font-weight: 700; }
+.dropdown-opt[aria-selected="true"]::before {
+  content: ""; position: absolute; left: 12px; top: 50%;
+  width: 5px; height: 9px;
+  border: solid var(--brand); border-width: 0 2px 2px 0;
+  transform: translateY(-65%) rotate(45deg);
+}

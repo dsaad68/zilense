@@ -55,6 +55,10 @@ export function hskWordsAtBand(band) {
   return DB ? core.hskWordsAtBand(DB, band) : []
 }
 
+export function hskWordsUpTo(maxRank) {
+  return DB ? core.hskWordsUpTo(DB, maxRank) : []
+}
+
 export function compMeaning(c) {
   return DB ? core.compMeaning(DB, c) : ''
 }
