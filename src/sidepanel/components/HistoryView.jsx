@@ -2,13 +2,14 @@
    entry; a Clear button empties the list. Mirrors SavedView's structure. */
 import React from 'react'
 import { lookup } from '../../lib/dict.js'
+import { Svg } from './icons.jsx'
 import { ToneText } from './atoms.jsx'
 
 export function HistoryView({ history, onNavigate, onClear }) {
   if (!history.length) {
     return (
       <div className="empty">
-        <div className="empty-mark">↺</div>
+        <div className="empty-mark empty-mark-icon">{Svg.clock}</div>
         <div className="empty-title">No recent lookups</div>
         <div className="empty-sub">Words you select or open appear here for quick re-opening.</div>
       </div>
