@@ -27,6 +27,18 @@ and libraries — **not** the application code.
   the dictionary data and any adaptation of it remain under CC BY-SA 4.0. CC BY-SA
   4.0 §3(a) expressly permits providing the license by hyperlink, as done here.
 
+### CedPane
+- **Used for:** a second dictionary source covering names and proper nouns (people,
+  places, brands, etc.) so those resolve alongside CC-CEDICT. Fetched at build time
+  and merged into `src/data/cedict.json` by `assets/scripts/build-dict.mjs`, where
+  each entry is tagged as a proper noun (and ranked below everyday words).
+- **Source / attribution:** CedPane (Chinese-English Dictionary Public-domain
+  Additions for Names Etc) by Silas S. Brown — <https://github.com/ssb22/CedPane>
+  and <https://ssb22.user.srcf.net/cedpane/>.
+- **License:** released into the **public domain** (the Unlicense) — the verbatim
+  dedication that ships with the project is in
+  [`licenses/cedpane-LICENSE.txt`](./licenses/cedpane-LICENSE.txt).
+
 ### HSK 3.0 word lists
 - **Used for:** HSK level, part-of-speech, and official English gloss
   (`assets/hsk-vocab/hsk-data.json`, merged into `cedict.json`).

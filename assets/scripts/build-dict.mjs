@@ -32,6 +32,64 @@ const outFile = resolve(outDir, 'cedict.json')
 // "highlight HSK ≤ N" path can load it WITHOUT parsing the full ~14 MB cedict.json
 const hskOutFile = resolve(outDir, 'hsk-words.json')
 
+// CedPane (names & proper nouns by Silas S. Brown, public domain) is a SECOND
+// dictionary source merged in below. It is fetched ONCE at build time and cached
+// as a compact JSON that is committed, so every later build/test is deterministic
+// and needs no network (just like the committed makemeahanzi-derived char data).
+// No runtime fetch and no new host permission are involved.
+const cedpaneCacheFile = resolve(root, 'assets/cedpane/cedpane.json')
+const CEDPANE_URL = 'https://raw.githubusercontent.com/ssb22/CedPane/master/cedpane.tsv'
+
+// Parse CedPane's tab-separated source (columns: Word, Simplified, Traditional,
+// Pinyin, Yale, IPA) into compact [simp, trad, pinyin, def] records, dropping the
+// Cantonese-Yale and English-IPA columns we don't use. `trad` is '' when it equals
+// the simplified form (matching how CC-CEDICT senses omit an identical trad). The
+// pinyin is already tone-marked (CedPane ships diacritics, not numbered pinyin).
+// Sorted so the cache — and therefore the merge — is deterministic and re-runnable.
+function parseCedpane(tsv) {
+  const out = []
+  const lines = tsv.split('\n')
+  for (let i = 1; i < lines.length; i++) { // row 0 is the column header
+    const ln = lines[i]
+    if (!ln) continue
+    const col = ln.split('\t')
+    const def = (col[0] || '').trim()
+    const simp = (col[1] || '').trim()
+    const trad = (col[2] || '').trim()
+    const pinyin = (col[3] || '').trim()
+    if (!simp || !def || !pinyin) continue
+    out.push([simp, trad && trad !== simp ? trad : '', pinyin, def])
+  }
+  out.sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : a[3] < b[3] ? -1 : a[3] > b[3] ? 1 : 0))
+  return out
+}
+
+// Load the CedPane records: prefer the committed cache (offline, deterministic);
+// only when it is absent do we do a one-time BUILD-TIME download and write the
+// cache. A missing source (no cache + no network) is non-fatal — the build still
+// produces a valid CC-CEDICT-only index, exactly like the HSK/char data paths.
+async function loadCedpaneRecords() {
+  try {
+    const cached = JSON.parse(await readFile(cedpaneCacheFile, 'utf8'))
+    if (Array.isArray(cached.entries)) return cached.entries
+  } catch {}
+  try {
+    const res = await fetch(CEDPANE_URL)
+    if (!res.ok) throw new Error('HTTP ' + res.status)
+    const records = parseCedpane(await res.text())
+    await mkdir(dirname(cedpaneCacheFile), { recursive: true })
+    await writeFile(
+      cedpaneCacheFile,
+      JSON.stringify({ source: 'CedPane', url: CEDPANE_URL, license: 'Public domain (Unlicense)', count: records.length, entries: records })
+    )
+    console.log(`[build-dict] fetched CedPane (${records.length} records) -> ${cedpaneCacheFile}`)
+    return records
+  } catch (e) {
+    console.warn('[build-dict] CedPane source unavailable (no cache + fetch failed) — skipping proper-noun merge: ' + e.message)
+    return []
+  }
+}
+
 async function main() {
   try {
     await access(dataSrc)
@@ -92,6 +150,32 @@ async function main() {
     else entries[simplified] = [sense]
   }
 
+  // ---- CedPane proper nouns (names, places, brands) -----------------------
+  // Merge CedPane as a second source, but ONLY for simplified forms CC-CEDICT
+  // does not already cover, and never for a form that is already someone's
+  // traditional source — so every existing simplified AND traditional lookup is
+  // byte-for-byte unchanged. Each merged sense gets a proper-noun flag (1 at
+  // index 4: [pinyin, defs, measures, trad, proper]); dict-core reads that flag
+  // to keep names from outranking everyday words (a name homograph never beats
+  // the common word). A few CedPane forms collide with CC-CEDICT and are skipped.
+  const cedpane = await loadCedpaneRecords()
+  const cedpaneKeys = new Set()
+  let cedpaneSenses = 0
+  for (const [simp, trad, pinyin, def] of cedpane) {
+    if (entries[simp] && !cedpaneKeys.has(simp)) continue // CC-CEDICT simplified entry wins
+    if (tradToSimp[simp] && !cedpaneKeys.has(simp)) continue // don't shadow a trad->simp redirect
+    const sense = [pinyin, [def], 0, trad || 0, 1]
+    if (entries[simp]) entries[simp].push(sense) // another sense for a multi-reading name
+    else { entries[simp] = [sense]; cedpaneKeys.add(simp) }
+    cedpaneSenses++
+  }
+  // map each merged name's traditional form to its simplified key (first wins;
+  // never over an existing simplified entry or an existing mapping)
+  for (const [simp, trad] of cedpane) {
+    if (!trad || !cedpaneKeys.has(simp)) continue
+    if (!tradToSimp[trad] && !entries[trad]) tradToSimp[trad] = simp
+  }
+
   // never let a traditional form redirect away from a real simplified entry of
   // the same shape (some characters are both their own simplified entry and
   // another word's traditional source); lookups of those resolve to themselves.
@@ -112,6 +196,11 @@ async function main() {
     for (const [word, info] of Object.entries(all)) {
       if (!entries[word]) continue
       hsk[word] = info.lvl
+      // An HSK word is common vocabulary, not a name. If a word exists ONLY
+      // because of the CedPane merge, clear its proper-noun flag so search ranks
+      // it like any other HSK word instead of demoting it as a proper noun.
+      const senses = entries[word]
+      if (senses.every((s) => s[4] === 1)) for (const s of senses) s.length = 4
       if (info.pos) pos[word] = info.pos
       if (info.senses && info.senses.length) hskSenses[word] = info.senses
       hskCount++
@@ -137,15 +226,16 @@ async function main() {
   const count = Object.keys(entries).length
   const tradCount = Object.keys(tradToSimp).length
   await mkdir(outDir, { recursive: true })
-  await writeFile(outFile, JSON.stringify({ entries, tradToSimp, hsk, pos, hskSenses, chars, charGloss, count }))
+  await writeFile(outFile, JSON.stringify({ entries, tradToSimp, hsk, pos, hskSenses, chars, charGloss, count, cedpane: cedpaneKeys.size }))
   // also emit the HSK map on its own so the worker's highlight path stays light
   await writeFile(hskOutFile, JSON.stringify(hsk))
 
   console.log(
     `[build-dict] HSK level+POS attached to ${hskCount} entries; ${charCount} chars with decomposition\n` +
+    `[build-dict] CedPane proper nouns merged: ${cedpaneKeys.size} keys (${cedpaneSenses} senses)\n` +
     `[build-dict] ${tradCount} traditional forms mapped to simplified\n` +
     `[build-dict] wrote ${outFile}\n` +
-      `  ${all.length} CC-CEDICT lines -> ${count} simplified keys`
+      `  ${all.length} CC-CEDICT lines + CedPane -> ${count} simplified keys`
   )
 }
 

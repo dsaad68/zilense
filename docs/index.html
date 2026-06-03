@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Zilense, Chinese Dictionary for Chrome</title>
-  <meta name="description" content="Zilense is a Chrome side-panel Chinese dictionary: hover or select any hanzi for tone-colored pinyin, meaning, stroke order, examples, and a clean reader mode.">
+  <meta name="description" content="Zilense is a Chrome side-panel Chinese dictionary: hover or select any hanzi for tone-colored pinyin, meaning, stroke order, examples, names &amp; places, familiarity tracking, and a clean reader mode.">
   <link rel="icon" href="icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -290,6 +290,29 @@
         </div>
       </section>
 
+      <!-- proper nouns -->
+      <section class="feat rev">
+        <div class="feat-text">
+          <p class="eyebrow">Names, places &amp; brands</p>
+          <h2>Proper nouns resolve, too</h2>
+          <p>Beyond everyday words, Zilense merges in <strong>CedPane</strong> — about 74,000
+            public-domain names, places, and brands — so people, cities, companies, and countries
+            resolve instead of coming up blank, each clearly marked as a proper noun.</p>
+        </div>
+        <div class="feat-visual">
+          <div class="ui" style="width:320px">
+            <div class="entry-head"><div class="hanzi-big" lang="zh">北京</div></div>
+            <div class="pinyin-row" lang="zh"><span class="tone-3">běi</span> <span class="tone-1">jīng</span></div>
+            <div class="meta-row"><span class="proper-tag">proper noun</span><span class="pos">place</span></div>
+            <ol class="defs"><li>Beijing, capital of China</li></ol>
+            <div class="charcards" style="margin-top:14px">
+              <div class="charcard"><span class="cc-hanzi" lang="zh">北</span><span class="cc-body"><span class="cc-py" lang="zh"><span class="tone-3">běi</span></span><span class="cc-gloss">north</span></span><span class="cc-arrow"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span></div>
+              <div class="charcard"><span class="cc-hanzi" lang="zh">京</span><span class="cc-body"><span class="cc-py" lang="zh"><span class="tone-1">jīng</span></span><span class="cc-gloss">capital city</span></span><span class="cc-arrow"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- saved deck -->
       <section class="feat rev">
         <div class="feat-text">
@@ -303,6 +326,43 @@
             <div class="flash"><span class="f-hanzi" lang="zh">朋友</span><span><span class="cc-py" lang="zh"><span class="tone-2">péng</span> <span class="tone-5">you</span></span><div class="f-gloss">friend</div></span><span class="f-star">★</span></div>
             <div class="flash"><span class="f-hanzi" lang="zh">学习</span><span><span class="cc-py" lang="zh"><span class="tone-2">xué</span> <span class="tone-2">xí</span></span><div class="f-gloss">to study, to learn</div></span><span class="f-star">★</span></div>
             <div class="flash"><span class="f-hanzi" lang="zh">中文</span><span><span class="cc-py" lang="zh"><span class="tone-1">zhōng</span> <span class="tone-2">wén</span></span><div class="f-gloss">Chinese language</div></span><span class="f-star">★</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- familiarity / progress -->
+      <section class="feat">
+        <div class="feat-text">
+          <p class="eyebrow">Spaced for memory</p>
+          <h2>Track what you know</h2>
+          <p>Turn on familiarity tracking and tag each word <strong>New</strong>,
+            <strong>Learning</strong>, or <strong>Known</strong> right from its entry — Zilense also
+            counts how many times you've seen it.</p>
+          <p>A <strong>Progress</strong> tab gathers every word you've met, filterable by how well you
+            know it, and the same filter sorts your saved deck. It all stays on your device.</p>
+        </div>
+        <div class="feat-visual">
+          <div class="ui" style="width:330px">
+            <div class="entry-head">
+              <div class="hanzi-big" lang="zh">学习</div>
+              <div class="fam-head">
+                <div class="fam-seg">
+                  <button class="fam-new">New</button>
+                  <button class="fam-learning on"><span class="fam-dot"></span>Learning</button>
+                  <button class="fam-known">Known</button>
+                </div>
+                <span class="fam-seen">seen 6×</span>
+              </div>
+            </div>
+            <div class="pinyin-row" lang="zh"><span class="tone-2">xué</span> <span class="tone-2">xí</span></div>
+            <div class="group-label" style="margin-top:18px">Progress</div>
+            <div class="fam-filter">
+              <span class="fam-pill">All <span class="fam-pill-n">128</span></span>
+              <span class="fam-pill fam-pill-learning on"><span class="fam-dot fam-dot-learning"></span>Learning <span class="fam-pill-n">14</span></span>
+              <span class="fam-pill fam-pill-known"><span class="fam-dot fam-dot-known"></span>Known <span class="fam-pill-n">32</span></span>
+            </div>
+            <div class="flash"><span class="f-hanzi" lang="zh">学习</span><span><span class="cc-py" lang="zh"><span class="tone-2">xué</span> <span class="tone-2">xí</span></span><div class="f-gloss"><span class="fam-dot fam-dot-learning"></span>to study, to learn</div></span></div>
+            <div class="flash"><span class="f-hanzi" lang="zh">中文</span><span><span class="cc-py" lang="zh"><span class="tone-1">zhōng</span> <span class="tone-2">wén</span></span><div class="f-gloss"><span class="fam-dot fam-dot-known"></span>Chinese language</div></span></div>
           </div>
         </div>
       </section>
@@ -330,6 +390,7 @@
             </div>
             <div class="set-row"><span class="set-label">Chinese face</span><span class="segmini"><button class="on">Sans</button><button>Serif</button></span></div>
             <div class="set-row"><span class="set-label">Pinyin tone colors</span><button class="switch on" aria-label="Tone colors"><span class="knob"></span></button></div>
+            <div class="set-row"><span class="set-label">Familiarity tags</span><button class="switch on" aria-label="Familiarity tags"><span class="knob"></span></button></div>
             <div class="set-row"><span class="set-label">Dark mode</span><button class="switch" id="customize-dark" aria-label="Dark mode"><span class="knob"></span></button></div>
             <div class="set-row"><span class="set-label">Pin key (hover + press)</span><span class="keycap">p</span></div>
           </div>

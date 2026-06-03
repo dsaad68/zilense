@@ -64,6 +64,15 @@ export function SettingsMenu({ settings, onSetting, onClose }) {
         </div>
 
         <div className="set-row">
+          <span className="set-label">Familiarity tags</span>
+          <button className={'switch' + (settings.showFamiliarity ? ' on' : '')}
+            role="switch" aria-checked={settings.showFamiliarity}
+            onClick={() => onSetting('showFamiliarity', !settings.showFamiliarity)}>
+            <span className="knob" />
+          </button>
+        </div>
+
+        <div className="set-row">
           <span className="set-label">Show HSK meaning first</span>
           <button className={'switch' + (settings.hskFirst ? ' on' : '')}
             role="switch" aria-checked={settings.hskFirst}
@@ -86,8 +95,8 @@ export function SettingsMenu({ settings, onSetting, onClose }) {
         </p>
 
         <p className="set-privacy set-credits">
-          Data: CC-CEDICT (CC BY-SA 4.0) · makemeahanzi · Tatoeba · Fonts: Noto
-          SC / Source Serif 4 (OFL).{' '}
+          Data: CC-CEDICT (CC BY-SA 4.0) · CedPane (public domain) · makemeahanzi
+          · Tatoeba · Fonts: Noto SC / Source Serif 4 (OFL).{' '}
           <a className="set-licenses" target="_blank" rel="noreferrer"
             href={(typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.getURL)
               ? chrome.runtime.getURL('THIRD-PARTY-NOTICES.md')
