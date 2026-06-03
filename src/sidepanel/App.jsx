@@ -4,12 +4,14 @@
    (hover a character / select a word on any page). */
 import React, { useState, useEffect, useRef, useMemo } from 'react'
 import { loadDict, lookup, searchEntries, segmentLongest } from '../lib/dict.js'
-import { loadState, saveSaved, saveSettings, saveHistory, pushHistory, takePendingLookup, DEFAULT_SETTINGS } from '../lib/storage.js'
+import { loadState, saveSaved, saveSettings, saveHistory, pushHistory, takePendingLookup, DEFAULT_SETTINGS,
+  loadFamiliarity, saveFamiliarity, bumpFamiliarity, setFamiliarityState, getFamiliarity } from '../lib/storage.js'
 import { Svg } from './components/icons.jsx'
 import { IconBtn } from './components/atoms.jsx'
 import { EntryView } from './components/EntryView.jsx'
 import { ResultRow } from './components/ResultRow.jsx'
 import { SavedView } from './components/SavedView.jsx'
+import { ProgressView } from './components/ProgressView.jsx'
 import { HistoryView } from './components/HistoryView.jsx'
 import { SettingsMenu } from './components/SettingsMenu.jsx'
 
@@ -30,8 +32,13 @@ export default function App() {
   const [showSettings, setShowSettings] = useState(false)
   const [saved, setSaved] = useState([])
   const [history, setHistory] = useState([])
+  const [familiarity, setFamiliarity] = useState({}) // mydict.familiarity: word -> {state,seen,lastSeen}
   const [settings, setSettings] = useState(DEFAULT_SETTINGS)
   const [hydrated, setHydrated] = useState(false)
+  // was the currently-shown entry reached by a deliberate action (select /
+  // context-menu / search / navigate) rather than a passive hover? Only
+  // deliberate lookups feed familiarity tracking.
+  const deliberate = useRef(false)
   const dark = settings.dark
 
   // load dictionary + persisted state once
@@ -52,14 +59,16 @@ export default function App() {
     // race it. Doing both in one chain means the late loadState() can't overwrite
     // the pending word's history entry.
     ;(async () => {
-      const s = await loadState()
+      const [s, fam] = await Promise.all([loadState(), loadFamiliarity()])
       if (!alive) return
       setSaved(s.saved)
       setSettings(s.settings)
+      setFamiliarity(fam)
       let hist = s.history
       const q = await takePendingLookup()
       if (!alive) return
       if (q) {
+        deliberate.current = true // a pinned/context-menu lookup is deliberate
         setEntryQ(q); setQuery(''); setTab('dict')
         hist = pushHistory(hist, q.trim(), Date.now())
       }
@@ -73,11 +82,19 @@ export default function App() {
   useEffect(() => { if (hydrated) saveSaved(saved) }, [saved, hydrated])
   useEffect(() => { if (hydrated) saveSettings(settings) }, [settings, hydrated])
   useEffect(() => { if (hydrated) saveHistory(history) }, [history, hydrated])
+  // debounced: coalesce rapid familiarity bumps into one write
+  useEffect(() => {
+    if (!hydrated) return
+    const id = setTimeout(() => saveFamiliarity(familiarity), 400)
+    return () => clearTimeout(id)
+  }, [familiarity, hydrated])
 
   // record a DELIBERATE lookup (selection / context-menu / in-panel navigation —
   // never transient hover) into recent history, newest first
-  const recordHistory = (q) =>
+  const recordHistory = (q) => {
+    deliberate.current = true
     setHistory((h) => pushHistory(h, (q || '').trim(), Date.now()))
+  }
 
   // live lookups pushed from the content script / context menu
   useEffect(() => {
@@ -96,6 +113,7 @@ export default function App() {
       // works with the panel closed) and pushes the result here to DISPLAY only —
       // no history, since hover is transient.
       if (msg.type === 'show' && typeof msg.q === 'string') {
+        deliberate.current = false // hover is passive — don't let it bump familiarity
         show(msg.q)
         return
       }
@@ -129,9 +147,22 @@ export default function App() {
 
   const setSetting = (k, v) => setSettings((s) => ({ ...s, [k]: v }))
   const toggleSave = (q) => setSaved((s) => (s.includes(q) ? s.filter((x) => x !== q) : [q, ...s]))
+  // the user sets a word's familiarity state (New / Learning / Known)
+  const setFam = (q, state) => setFamiliarity((f) => setFamiliarityState(f, q, state))
 
   const entry = ready && entryQ ? lookup(entryQ) : null
   const results = useMemo(() => (ready && debounced ? searchEntries(debounced) : []), [ready, debounced])
+
+  // auto-signal: bump a word's seen-count when the user DELIBERATELY opens it
+  // (select / context-menu / search / navigate) — never on passive hover — and
+  // only while familiarity tracking is enabled, so a disabled feature records
+  // nothing. Keyed on the resolved headword; the deliberate flag is consumed so
+  // it fires once per intentional lookup, not on every render.
+  useEffect(() => {
+    if (!hydrated || !entry || !settings.showFamiliarity || !deliberate.current) return
+    deliberate.current = false
+    setFamiliarity((f) => bumpFamiliarity(f, entry.q, Date.now()))
+  }, [entry ? entry.q : null, hydrated, settings.showFamiliarity])
 
   // phrase fallback: a selected run that isn't itself an entry (e.g. a short
   // sentence) is segmented into known words so the lookup isn't a dead end
@@ -202,6 +233,11 @@ export default function App() {
         <button className={'tab' + (tab === 'saved' ? ' on' : '')} onClick={() => setTab('saved')}>
           Saved {saved.length > 0 && <span className="tabcount">{saved.length}</span>}
         </button>
+        {settings.showFamiliarity && (
+          <button className={'tab' + (tab === 'progress' ? ' on' : '')} onClick={() => setTab('progress')}>
+            Progress
+          </button>
+        )}
         <button className={'tab' + (tab === 'history' ? ' on' : '')} onClick={() => setTab('history')}>
           History
         </button>
@@ -224,7 +260,10 @@ export default function App() {
             <div className="empty-sub">Indexing CC-CEDICT — just a moment.</div>
           </div>
         ) : tab === 'saved' ? (
-          <SavedView saved={saved} onNavigate={navigate} onToggleSave={toggleSave} />
+          <SavedView saved={saved} familiarity={familiarity} showFamiliarity={settings.showFamiliarity}
+            onNavigate={navigate} onToggleSave={toggleSave} />
+        ) : tab === 'progress' && settings.showFamiliarity ? (
+          <ProgressView familiarity={familiarity} onNavigate={navigate} />
         ) : tab === 'history' ? (
           <HistoryView history={history} onNavigate={navigate} onClear={() => setHistory([])} />
         ) : query ? (
@@ -245,6 +284,8 @@ export default function App() {
         ) : entry ? (
           <EntryView entry={entry} dark={dark} onNavigate={navigate}
             isSaved={saved.includes(entry.q)} onToggleSave={toggleSave}
+            fam={getFamiliarity(familiarity, entry.q)}
+            onSetFamiliarity={settings.showFamiliarity ? setFam : null}
             showTrad={settings.showTrad} hskFirst={settings.hskFirst}
             onBack={backStack.length ? goBack : null} />
         ) : phrase ? (

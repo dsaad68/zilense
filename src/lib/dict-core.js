@@ -23,6 +23,18 @@ export function toSimp(db, q) {
   return (db && db.tradToSimp && db.tradToSimp[q]) || q
 }
 
+// A "proper noun" key is one whose every sense was merged from CedPane (build-dict
+// tags those senses with 1 at index 4: [pinyin, defs, measures, trad, proper]).
+// These are names / places / brands. Search and the word family demote them below
+// ordinary words unless the query is an exact full match, so a name homograph never
+// outranks the everyday word. A key with even one CC-CEDICT sense is NOT proper.
+export function isProperKey(db, key) {
+  const senses = db && db.entries && db.entries[key]
+  if (!senses || !senses.length) return false
+  for (const s of senses) if (s[4] !== 1) return false
+  return true
+}
+
 // a measure-word label is "汉字 pinyinNum" (e.g. "只 zhi1"); tone-mark the pinyin
 function measureToneMarks(m) {
   const sp = m.indexOf(' ')
@@ -121,6 +133,7 @@ export function lookup(db, q) {
     hsk: db.hsk ? db.hsk[q] : undefined,
     pos: db.pos ? db.pos[q] : undefined,
     hskSenses: db.hskSenses ? db.hskSenses[q] : undefined, // [{lvl,pos,def}] official HSK glosses
+    proper: isProperKey(db, q) || undefined, // a CedPane name/place/brand entry
 
     radical,
     components,
@@ -152,6 +165,7 @@ function preview(db, key) {
     pinyin: toDiacritics(primary[0]),
     defs: (primary[1] || []).slice(0, 2),
     hsk: db.hsk ? db.hsk[key] : undefined,
+    proper: isProperKey(db, key) || undefined,
   }
 }
 
@@ -277,10 +291,11 @@ export function wordsContainingChar(db, index, char, { exclude, limit = 30 } = {
   for (const key of keys) {
     if (key === char || key === exclude) continue
     if ([...key].length < 2) continue // words only, not the bare character
-    hits.push([hskPenalty(db, key), key.length, key])
+    // names containing this character sit below ordinary words in the family
+    hits.push([isProperKey(db, key) ? 1 : 0, hskPenalty(db, key), key.length, key])
   }
-  hits.sort((a, b) => a[0] - b[0] || a[1] - b[1] || (a[2] < b[2] ? -1 : 1))
-  return hits.slice(0, limit).map((h) => preview(db, h[2]))
+  hits.sort((a, b) => a[0] - b[0] || a[1] - b[1] || a[2] - b[2] || (a[3] < b[3] ? -1 : 1))
+  return hits.slice(0, limit).map((h) => preview(db, h[3]))
 }
 
 // collect every key whose token starts with `prefix` (binary-search the sorted
@@ -306,7 +321,10 @@ export function searchEntries(db, index, query, limit = 30) {
   const q = String(query).trim().toLowerCase()
   if (!q) return []
 
-  const hits = [] // [rank, hskPenalty, defLen, keyLen, key]
+  // [properPenalty, rank, hskPenalty, defLen, keyLen, key]. properPenalty leads so
+  // a proper noun (CedPane name) only competes with everyday words when it's an
+  // exact full match (rank 0); otherwise it sinks below every ordinary match.
+  const hits = []
 
   if (HAN.test(query)) {
     const raw = toSimp(db, query.trim()) // normalize a fully-traditional query
@@ -322,7 +340,8 @@ export function searchEntries(db, index, query, limit = 30) {
       for (const key of postings) {
         if (key.includes(raw)) {
           const rank = key === raw ? 0 : key.startsWith(raw) ? 1 : 2
-          hits.push([rank, hskPenalty(db, key), 0, key.length, key])
+          const pp = rank !== 0 && isProperKey(db, key) ? 1 : 0
+          hits.push([pp, rank, hskPenalty(db, key), 0, key.length, key])
         }
       }
     }
@@ -337,10 +356,13 @@ export function searchEntries(db, index, query, limit = 30) {
     collectPrefix(index.pinyinVocab, index.pinyinMap, qp, cand)
     for (const key of cand) {
       const m = matchRank(db, key, q, qp)
-      if (m) hits.push([m[0], hskPenalty(db, key), m[1], key.length, key])
+      if (m) {
+        const pp = m[0] !== 0 && isProperKey(db, key) ? 1 : 0
+        hits.push([pp, m[0], hskPenalty(db, key), m[1], key.length, key])
+      }
     }
   }
 
-  hits.sort((a, b) => a[0] - b[0] || a[1] - b[1] || a[2] - b[2] || a[3] - b[3])
-  return hits.slice(0, limit).map((h) => preview(db, h[4]))
+  hits.sort((a, b) => a[0] - b[0] || a[1] - b[1] || a[2] - b[2] || a[3] - b[3] || a[4] - b[4])
+  return hits.slice(0, limit).map((h) => preview(db, h[5]))
 }

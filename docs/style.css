@@ -118,6 +118,7 @@ a:hover { text-decoration: underline; }
   --ink: #2a2520; --ink2: #6b6258; --ink3: #9a9082; --line: #e3d9c6; --line2: #d8ccb5;
   --accent: #c8443a; --accent-ink: #fff; --accent-soft: rgba(200, 68, 58, .10);
   --t1: #a9781a; --t2: #3f7d4f; --t3: #2f6f8f; --t4: #c8443a; --t5: #9a8f7e;
+  --fam-new: #7c7468; --fam-learning: #a8761a; --fam-known: #3f7d4f;
   --font-han: "Noto Sans SC", sans-serif;
   color: var(--ink); font-family: var(--font-ui);
 }
@@ -126,6 +127,7 @@ a:hover { text-decoration: underline; }
   --ink: #ece3d2; --ink2: #b3a896; --ink3: #877d6d; --line: #393429; --line2: #453f33;
   --accent: #e0685c; --accent-ink: #211e19; --accent-soft: rgba(224, 104, 92, .15);
   --t1: #d8a93c; --t2: #74b886; --t3: #74b2d0; --t4: #e0685c; --t5: #a59a88;
+  --fam-new: #a59a88; --fam-learning: #d8a93c; --fam-known: #74b886;
 }
 .ui [lang="zh"], .bw [lang="zh"] { font-family: var(--font-han); }
 .ui .t1, .ui .tone-1 { color: var(--t1); } .ui .t2, .ui .tone-2 { color: var(--t2); }
@@ -290,6 +292,38 @@ a:hover { text-decoration: underline; }
 .ui .f-hanzi { font-family: var(--font-han); font-size: 28px; font-weight: 500; color: var(--ink); }
 .ui .f-gloss { font-family: var(--font-en); font-size: 14px; color: var(--ink2); }
 .ui .f-star { margin-left: auto; color: var(--accent); }
+
+/* proper-noun tag (CedPane names/places/brands) — a soft teal pill */
+.ui .proper-tag { display: inline-flex; align-items: center; gap: 5px; font-family: var(--font-ui);
+  font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--t3);
+  background: color-mix(in srgb, var(--t3) 13%, transparent); border-radius: 999px; padding: 4px 10px; }
+.ui .proper-tag::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+
+/* familiarity control (New / Learning / Known) + Progress filter pills */
+.ui .fam-head { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
+.ui .fam-seg { display: flex; gap: 3px; flex-wrap: wrap; justify-content: flex-end; }
+.ui .fam-seg button { display: inline-flex; align-items: center; gap: 5px; font-family: var(--font-ui);
+  font-size: 11.5px; font-weight: 600; color: var(--ink3); background: transparent; border: none;
+  padding: 4px 9px; border-radius: 7px; cursor: pointer; }
+.ui .fam-seg button.fam-new.on { color: var(--fam-new); background: color-mix(in srgb, var(--fam-new) 16%, transparent); }
+.ui .fam-seg button.fam-learning.on { color: var(--fam-learning); background: color-mix(in srgb, var(--fam-learning) 16%, transparent); }
+.ui .fam-seg button.fam-known.on { color: var(--fam-known); background: color-mix(in srgb, var(--fam-known) 18%, transparent); }
+.ui .fam-seg .fam-dot { width: 6px; height: 6px; background: currentColor; }
+.ui .fam-seen { font-family: var(--font-ui); font-size: 11px; color: var(--ink3); }
+.ui .fam-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; flex: none; }
+.ui .fam-dot-new { background: var(--fam-new); }
+.ui .fam-dot-learning { background: var(--fam-learning); }
+.ui .fam-dot-known { background: var(--fam-known); }
+.ui .fam-filter { display: flex; flex-wrap: wrap; gap: 6px; margin: 2px 0 12px; }
+.ui .fam-pill { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-ui);
+  font-size: 12px; font-weight: 600; color: var(--ink2); background: var(--card);
+  border: 1px solid var(--line2); border-radius: 999px; padding: 5px 11px; cursor: pointer; }
+.ui .fam-pill.on { background: var(--bg2); border-color: var(--ink3); color: var(--ink); }
+.ui .fam-pill-new.on { border-color: var(--fam-new); }
+.ui .fam-pill-learning.on { border-color: var(--fam-learning); }
+.ui .fam-pill-known.on { border-color: var(--fam-known); }
+.ui .fam-pill-n { font-size: 11px; font-weight: 700; color: var(--ink3); }
+.ui .f-gloss .fam-dot { margin-right: 5px; vertical-align: middle; }
 
 /* settings popover (customize demo) */
 .ui.settings-pop { background: var(--card); border: 1px solid var(--line2); border-radius: 14px;

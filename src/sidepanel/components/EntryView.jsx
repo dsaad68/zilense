@@ -11,6 +11,10 @@ import { ToneText, HSKBadge, Pos, IconBtn, speak, hasMandarinVoice } from './ato
 import { StrokeOrder } from './StrokeOrder.jsx'
 import { buildMeaningGroups } from '../meanings.js'
 
+// familiarity states in display order, with their button labels
+const FAM_OPTIONS = [['new', 'New'], ['learning', 'Learning'], ['known', 'Known']]
+const FAM_DEFAULT = { state: 'new', seen: 0, lastSeen: 0 }
+
 // Example sentences from Tatoeba — collapsed by default, fetched on first expand
 // (so hovering never triggers requests) and cached per word.
 function TatoebaExamples({ word }) {
@@ -66,7 +70,7 @@ function TatoebaExamples({ word }) {
   )
 }
 
-export function EntryView({ entry, dark, onNavigate, isSaved, onToggleSave, onBack, showTrad = true, hskFirst = false }) {
+export function EntryView({ entry, dark, onNavigate, isSaved, onToggleSave, onBack, showTrad = true, hskFirst = false, fam = FAM_DEFAULT, onSetFamiliarity }) {
   const [showChars, setShowChars] = useState(true)
   const [showStrokes, setShowStrokes] = useState(false)
   const [showFamily, setShowFamily] = useState(false)
@@ -99,7 +103,7 @@ export function EntryView({ entry, dark, onNavigate, isSaved, onToggleSave, onBa
   }, [])
 
   // coerce to a real boolean — `{0 && <jsx>}` would otherwise render a literal "0"
-  const hasMeta = !!(entry.hsk || entry.pos || entry.freq || (entry.measures && entry.measures.length))
+  const hasMeta = !!(entry.hsk || entry.pos || entry.freq || entry.proper || (entry.measures && entry.measures.length))
 
   return (
     <div className="entry">
@@ -113,13 +117,29 @@ export function EntryView({ entry, dark, onNavigate, isSaved, onToggleSave, onBa
             <span className="hanzi-trad" lang="zh" title="Traditional form">{entry.trad}</span>
           )}
         </div>
-        <div className="entry-actions">
-          {canSpeak && (
-            <IconBtn title="Pronounce (Mandarin)" onClick={() => speak(entry.q)}>{Svg.speaker}</IconBtn>
+        <div className="entry-head-right">
+          <div className="entry-actions">
+            {canSpeak && (
+              <IconBtn title="Pronounce (Mandarin)" onClick={() => speak(entry.q)}>{Svg.speaker}</IconBtn>
+            )}
+            <IconBtn title={isSaved ? 'Saved' : 'Save to deck'} active={isSaved} onClick={() => onToggleSave(entry.q)}>
+              {isSaved ? Svg.starFill : Svg.starOutline}
+            </IconBtn>
+          </div>
+          {onSetFamiliarity && (
+            <div className="fam-head">
+              <div className="segmini fam-seg" role="group" aria-label="Familiarity">
+                {FAM_OPTIONS.map(([val, label]) => (
+                  <button key={val} className={'fam-' + val + (fam.state === val ? ' on' : '')}
+                    aria-pressed={fam.state === val} onClick={() => onSetFamiliarity(entry.q, val)}>
+                    {fam.state === val && <span className="fam-dot" aria-hidden="true" />}
+                    {label}
+                  </button>
+                ))}
+              </div>
+              {fam.seen > 0 && <span className="fam-seen">seen {fam.seen}×</span>}
+            </div>
           )}
-          <IconBtn title={isSaved ? 'Saved' : 'Save to deck'} active={isSaved} onClick={() => onToggleSave(entry.q)}>
-            {isSaved ? Svg.starFill : Svg.starOutline}
-          </IconBtn>
         </div>
       </div>
 
@@ -129,6 +149,7 @@ export function EntryView({ entry, dark, onNavigate, isSaved, onToggleSave, onBa
 
       {hasMeta && (
         <div className="meta-row">
+          {entry.proper && <span className="proper-tag">proper noun</span>}
           {entry.hsk && <HSKBadge level={entry.hsk} />}
           {entry.pos && <Pos>{entry.pos}</Pos>}
           {entry.freq && <span className="freq">· {entry.freq}</span>}
