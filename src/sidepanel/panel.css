@@ -249,8 +249,9 @@ body {
   background: var(--card); border: 1px solid var(--line); border-radius: 11px; padding: 12px;
   cursor: pointer; transition: all .14s; font-family: var(--font-ui); }
 .charcard:hover { border-color: var(--accent); transform: translateX(2px); }
-.cc-hanzi { font-size: 34px; font-weight: 700; line-height: 1; color: var(--ink); width: 40px; text-align: center; }
-.cc-body { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.cc-hanzi { font-size: 34px; font-weight: 700; line-height: 1; color: var(--ink); min-width: 40px;
+  text-align: center; white-space: nowrap; flex: none; }
+.cc-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .cc-gloss { font-family: var(--font-en); font-size: 14.5px; color: var(--ink2); }
 .cc-arrow { color: var(--ink3); font-size: 22px; }
 
@@ -326,7 +327,8 @@ body {
 .result { width: 100%; display: flex; align-items: center; gap: 12px; text-align: left;
   background: none; border: none; border-radius: 10px; padding: 11px 10px; cursor: pointer; transition: background .12s; }
 .result:hover { background: var(--card); }
-.r-hanzi { font-family: var(--font-han); font-size: 28px; font-weight: 500; color: var(--ink); width: 56px; text-align: center; line-height: 1; }
+.r-hanzi { font-family: var(--font-han); font-size: 28px; font-weight: 500; color: var(--ink); min-width: 56px;
+  flex: none; white-space: nowrap; text-align: center; line-height: 1; }
 .r-body { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .r-top { display: flex; align-items: center; gap: 7px; font-weight: 500; }
 .r-star { color: var(--accent); display: flex; }
@@ -340,8 +342,9 @@ body {
 .flash-main { flex: 1; display: flex; align-items: center; gap: 14px; text-align: left;
   background: none; border: none; padding: 14px; cursor: pointer; transition: background .12s; }
 .flash-main:hover { background: var(--card2); }
-.f-hanzi { font-family: var(--font-han); font-size: 30px; font-weight: 500; color: var(--ink); line-height: 1; }
-.f-body { display: flex; flex-direction: column; gap: 2px; }
+.f-hanzi { font-family: var(--font-han); font-size: 30px; font-weight: 500; color: var(--ink); line-height: 1;
+  flex: none; white-space: nowrap; }
+.f-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .f-gloss { font-family: var(--font-en); font-size: 14.5px; color: var(--ink2); }
 .f-remove { width: 46px; border: none; border-left: 1px solid var(--line); background: none;
   color: var(--accent); cursor: pointer; display: grid; place-items: center; transition: background .12s; }
