@@ -1712,6 +1712,9 @@ h1 {
 /* ─── Deck picker · native <select> dressed to match the setup panel ──── */
 /* Deck row: dropdown and the level-scope pill sit side by side */
 .deck-row-control { flex-direction: row; align-items: center; flex-wrap: wrap; gap: 12px; }
+/* the scope pill is a .seg-pill (display:inline-flex), which would otherwise win
+   over the `hidden` attribute — honor hidden so it shows only for HSK decks */
+#scope-control[hidden] { display: none; }
 
 /* Custom dropdown — a themed replacement for the native <select> so the open
    menu matches the app instead of the OS popup. */
