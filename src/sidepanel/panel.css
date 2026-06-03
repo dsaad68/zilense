@@ -339,9 +339,10 @@ body {
 
 /* saved */
 .saved-list { padding: 12px 14px 40px; display: flex; flex-direction: column; gap: 9px; }
-/* Saved view owns the padding so its header (count + Study/Export) aligns exactly
-   like History's — the nested card list then resets its own padding. */
-.saved-view { padding: 12px 14px 40px; }
+/* Saved view owns the padding + the same 9px flex gap as History's list, so the
+   header (count + Study/Export) gets identical spacing above the first card. The
+   nested card list then resets its own padding. */
+.saved-view { padding: 12px 14px 40px; display: flex; flex-direction: column; gap: 9px; }
 .saved-view .saved-list { padding: 0; }
 /* One clean card surface (like History); the whole card highlights on hover so the
    star never reads as a separate compartment. */
