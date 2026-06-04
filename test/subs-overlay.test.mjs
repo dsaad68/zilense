@@ -92,6 +92,28 @@ test('the Chinese line is annotated by language, even when it is the bottom line
   assert.ok(l2.querySelector('.zr'), 'the bottom Chinese line carries ruby (pinyin columns)')
 })
 
+test('hover card shows the official HSK meaning for a subtitle word', async () => {
+  const requestSegment = async () => [{ t: '好', kind: 'word', py: 'hǎo' }]
+  const requestHover = async (word) => ({
+    word, pinyin: 'hǎo', defs: ['good'],
+    hskSenses: [{ lvl: '1', pos: 'adj', def: 'good; fine' }], // official HSK gloss
+  })
+  const ov = createOverlay({ requestSegment, requestHover, onPin: noop })
+  const root = closedRoot(ov.host)
+  ov.setLine1('好')
+  await tick()
+
+  const wspan = root.querySelector('.line.l1 .w')
+  assert.ok(wspan, 'the Chinese word rendered as a clickable span')
+  wspan.dispatchEvent(new Event('mouseenter')) // trigger the hover lookup
+  await tick()
+
+  const hskRow = root.querySelector('.card .hsk')
+  assert.ok(hskRow, 'the card carries an HSK gloss row')
+  assert.match(hskRow.textContent, /HSK 1/, 'shows the HSK level tag')
+  assert.match(hskRow.textContent, /good; fine/, 'shows the official HSK meaning')
+})
+
 test('setControls: ASR / auto-translation tracks are offered only when opted in', () => {
   const ov = createOverlay({ requestSegment: async () => [], requestHover: async () => null, onPin: noop })
   const root = closedRoot(ov.host)

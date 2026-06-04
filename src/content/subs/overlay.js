@@ -86,6 +86,13 @@ const STYLE = `
 .card .hpy{ font-size:13px; font-weight:600; color:#c8443a; }
 .card .hd{ color:#6b6258; display:flex; gap:5px; }
 .card .hd .n{ color:#9a9082; flex:none; font-variant-numeric:tabular-nums; }
+/* official HSK gloss rows (same look as the on-page hover popup): a level tag, an
+   optional part-of-speech on multi-sense words, then the meaning */
+.card .hsk{ color:#6b6258; display:flex; gap:6px; align-items:baseline; }
+.card .hsk .tag{ flex:none; font-size:9px; font-weight:700; letter-spacing:.04em; white-space:nowrap;
+  color:#c8443a; border:1px solid #c8443a; border-radius:4px; padding:1px 5px; }
+.card .hsk .pos{ flex:none; font-style:italic; color:#9a9082; }
+.card .divide{ margin-top:6px; padding-top:6px; border-top:1px solid #ece3d2; }
 /* settings affordance: a faint glyph button top-right that opens a small menu to
    choose the two languages, toggle pinyin, and opt in to auto-translation */
 .ctrl{ position:absolute; top:10px; right:12px; z-index:3; pointer-events:auto;
@@ -172,7 +179,8 @@ export function createOverlay({ requestSegment, requestHover, onPin }) {
   const s2 = { last: '', gen: 0 }
 
   const showCard = (resp, anchor) => {
-    if (!resp || !resp.word || !((resp.defs && resp.defs.length) || resp.pinyin)) { hideCard(); return }
+    const senses = (resp && resp.hskSenses && resp.hskSenses.length) ? resp.hskSenses : []
+    if (!resp || !resp.word || !((resp.defs && resp.defs.length) || senses.length || resp.pinyin)) { hideCard(); return }
     card.textContent = ''
     const head = document.createElement('div')
     const w = document.createElement('span'); w.className = 'hw'; w.lang = 'zh'; w.textContent = resp.word
@@ -183,6 +191,21 @@ export function createOverlay({ requestSegment, requestHover, onPin }) {
       const row = document.createElement('div'); row.className = 'hd'
       if (defs.length > 1) { const n = document.createElement('span'); n.className = 'n'; n.textContent = (i + 1) + '.'; row.appendChild(n) }
       const t = document.createElement('span'); t.textContent = d; row.appendChild(t)
+      card.appendChild(row)
+    })
+    // official HSK gloss(es) below the CC-CEDICT defs; the first row gets a divider
+    // when defs sit above it. Repeated same-level tags are hidden but keep their slot.
+    const hsk = senses.slice(0, 3)
+    const multi = hsk.length > 1
+    let prevLvl = null
+    hsk.forEach((s, i) => {
+      const row = document.createElement('div'); row.className = 'hsk' + (i === 0 && defs.length ? ' divide' : '')
+      const tag = document.createElement('span'); tag.className = 'tag'; tag.textContent = 'HSK ' + s.lvl
+      if (s.lvl === prevLvl) tag.style.visibility = 'hidden'
+      prevLvl = s.lvl
+      row.appendChild(tag)
+      if (multi && s.pos) { const pos = document.createElement('span'); pos.className = 'pos'; pos.textContent = s.pos; row.appendChild(pos) }
+      const t = document.createElement('span'); t.textContent = s.def; row.appendChild(t)
       card.appendChild(row)
     })
     card.style.display = 'block'
