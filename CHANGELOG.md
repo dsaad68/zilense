@@ -4,6 +4,32 @@ All notable changes to **Zilense** are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/), and the project follows
 [Semantic Versioning](https://semver.org/).
 
+## [1.9.0] — 2026-06-04
+
+### Added
+- **Dual subtitles (Phase 2).** On YouTube, Zilense can now show two real caption
+  tracks at once — the Chinese line annotated with pinyin + clickable words, a
+  second line beneath it — synced to the video clock from same-origin `timedtext`
+  (no new permission). A gear menu picks the top/bottom languages.
+- The Chinese line is annotated by language, so pinyin and word lookup follow the
+  Chinese track whether it is the top or the bottom line.
+
+### Changed
+- The single "allow auto" subtitle option is now two independent opt-ins —
+  **auto-captions** (YouTube's speech recognition) and **auto-translation** (its
+  machine translation). Both default off, so the picker offers human-authored
+  tracks only unless you opt in; existing settings are migrated automatically.
+
+### Fixed
+- Dual mode now activates only when **both** chosen tracks actually have cues; a
+  single failed fetch keeps the native captions instead of hiding them behind a
+  one-line overlay.
+- A subtitle line cleared during navigation can no longer be repainted by a late
+  in-flight segmentation reply.
+- When a caption track's signed URL goes stale across an in-page navigation, the
+  engine falls back to the timedtext URL the player itself fetched (matched by
+  language, same-origin).
+
 ## [1.8.5] — 2026-06-04
 
 ### Changed
