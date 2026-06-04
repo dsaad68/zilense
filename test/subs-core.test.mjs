@@ -132,6 +132,27 @@ test('pickTracks: prefers a human Chinese track for line 1, a different one for 
   assert.ok(line2 && line2.lang !== 'zh-Hans', 'a second, different track fills line 2')
 })
 
+test('pickTracks: dual fills both lines via auto-captions + auto-translation', () => {
+  // a typical Chinese video: only an auto-generated (ASR) Chinese track, plus the
+  // languages YouTube can machine-translate it into.
+  const tracks = [{ lang: 'zh-Hans', name: 'Chinese (auto)', kind: 'asr', baseUrl: 'BASE', translatable: true }]
+  const targets = [{ lang: 'en', name: 'English' }, { lang: 'es', name: 'Spanish' }]
+
+  // human-only default (no dual): the ASR track is excluded -> nothing to show
+  const off = pickTracks(tracks, {}, targets)
+  assert.equal(off.line1, null, 'ASR excluded without dual/allowAsr')
+
+  // dual on: Chinese (ASR) becomes the top line, English auto-translation the bottom
+  const on = pickTracks(tracks, { dual: true }, targets)
+  assert.equal(on.line1?.lang, 'zh-Hans', 'ASR Chinese fills the top line under dual')
+  assert.ok(on.line2 && on.line2.tlang === 'en', 'bottom line is an auto-translation into English')
+  assert.equal(on.line2.baseUrl, 'BASE', 'translation derives from the translatable source track')
+
+  // dual on + a chosen second language present as a target -> translate into it
+  const es = pickTracks(tracks, { dual: true, lang2: 'es' }, targets)
+  assert.equal(es.line2?.tlang, 'es', 'honors the chosen second language via translation')
+})
+
 test('pickTracks: the bottom line prefers English over other non-Chinese tracks', () => {
   // Chinese floats to the top; among the rest, English is the most useful gloss line
   // for a learner, so it wins the bottom line even when it is not listed first.

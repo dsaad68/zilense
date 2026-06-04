@@ -127,40 +127,59 @@ export function json3Url(baseUrl, tlang) {
   } catch (e) { return '' }
 }
 
-/* pickTracks(tracks, prefs) — choose the two caption tracks to show from the
-   list YouTube exposes. Each track: { lang, name, kind } where kind 'asr' marks
-   YouTube's auto-SPEECH-recognition track and `auto` marks its machine
-   auto-TRANSLATION (we tag those ourselves). prefs:
-   { lang1, lang2, allowAsr, allowAutoTranslation }.
+/* pickTracks(tracks, prefs, targets) — choose the two lines for the dual view from
+   the caption list YouTube exposes. Each track: { lang, name, kind, baseUrl,
+   translatable } where kind 'asr' marks YouTube's auto-SPEECH-recognition track and
+   `auto` an already-machine-translated track. `targets` is the list of languages
+   YouTube can MACHINE-translate a translatable track into ({ lang, name }).
+   prefs: { lang1, lang2, allowAsr, allowAutoTranslation, dual }.
 
-   Rules, in order:
-     - human-authored tracks are always eligible; the two machine kinds each have
-       their own opt-in (ASR behind allowAsr, auto-translation behind
-       allowAutoTranslation), so the default is real, human tracks only.
-     - line 1 (the top, annotated line) wants Chinese: the user's lang1 if present,
-       else the first zh* track, else the first eligible track.
-     - line 2 (the bottom line) wants the user's lang2 if present, else English
-       (the most useful gloss line for a learner) when a different en* track exists,
-       else the first eligible track that differs from line 1.
-   Returns { line1, line2 } (either may be null). Pure: no fetching here. */
-export function pickTracks(tracks, prefs = {}) {
+   Eligibility: human-authored tracks always; the two machine kinds each behind an
+   opt-in (ASR -> allowAsr, machine translation -> allowAutoTranslation). BUT dual is
+   a learner feature whose whole point is a second line, so turning `dual` on implies
+   BOTH opt-ins — otherwise a typical video (one Chinese track, everything else
+   auto) could never produce two lines.
+
+   Rules:
+     - line 1 (top, annotated): lang1 if given (real, else auto-translation), else
+       the first Chinese track, else the first eligible track.
+     - line 2 (bottom): the chosen second language, DEFAULTING TO ENGLISH — a real
+       track in that language, else YouTube auto-translation into it, else any other
+       eligible track that differs from line 1.
+   A returned line may be a real track or a translation descriptor
+   { lang, name, baseUrl, tlang } (tlang = the machine-translation target). Either
+   line may be null. Pure: no fetching here. */
+export function pickTracks(tracks, prefs = {}, targets = []) {
   const list = Array.isArray(tracks) ? tracks.filter((t) => t && t.lang) : []
+  const allowAsr = !!prefs.allowAsr || !!prefs.dual
+  const allowAutoTranslation = !!prefs.allowAutoTranslation || !!prefs.dual
   const eligible = (t) =>
-    t.kind === 'asr' ? !!prefs.allowAsr
-      : t.kind === 'auto' ? !!prefs.allowAutoTranslation
-        : true
+    t.kind === 'asr' ? allowAsr : t.kind === 'auto' ? allowAutoTranslation : true
   const real = list.filter(eligible)
   const isZh = (t) => /^zh/i.test(t.lang)
-  const isEn = (t) => /^en/i.test(t.lang)
   const byLang = (lang) => (lang ? real.find((t) => t.lang === lang) : null)
 
+  // build a machine-translation descriptor for `lang`, if allowed and offered
+  const tgts = Array.isArray(targets) ? targets : []
+  const transBase = list.find((t) => t.translatable) || list[0] || null
+  const translate = (lang) => {
+    const l = lang && String(lang)
+    return allowAutoTranslation && l && transBase && tgts.some((t) => t.lang === l)
+      ? { lang: l, name: l, baseUrl: transBase.baseUrl, tlang: l }
+      : null
+  }
+
   const line1 =
-    byLang(prefs.lang1) || real.find(isZh) || real[0] || null
-  const differs = (t) => t !== line1 && (!line1 || t.lang !== line1.lang)
+    byLang(prefs.lang1) || translate(prefs.lang1) || real.find(isZh) || real[0] || null
+  const differs = (t) => t && t !== line1 && (!line1 || t.lang !== line1.lang)
+
+  const want = String(prefs.lang2 || 'en')
+  const wantRe = new RegExp('^' + want.replace(/[^a-z0-9-]/gi, ''), 'i')
+  const tr = translate(want)
   const line2 =
-    byLang(prefs.lang2) ||
-    real.find((t) => differs(t) && isEn(t)) || // prefer English on the bottom line
-    real.find(differs) ||
+    real.find((t) => differs(t) && wantRe.test(t.lang)) || // a real track in the wanted language
+    (tr && (!line1 || line1.lang !== tr.lang) ? tr : null) || // else auto-translate into it
+    real.find(differs) || // else any other eligible track
     null
   return { line1, line2: line2 === line1 ? null : line2 }
 }

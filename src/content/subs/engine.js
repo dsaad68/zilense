@@ -140,30 +140,14 @@ export function createEngine(adapter) {
   }
 
   // ---- dual mode (Phase 2) ----------------------------------------------------
-  // resolve the two display tracks from the list + prefs. A user-chosen language
-  // that exists only as a machine auto-translation target is honored ONLY when
-  // allowAutoTranslation is on (machine translation is opt-in).
+  // resolve the two display tracks from the list + prefs. All the selection logic
+  // (Chinese on top, the chosen/English second line, dual-implies-auto, and machine
+  // translation) lives in the pure pickTracks helper; targets carry the languages
+  // YouTube can auto-translate into. A line may be a real track or a translation
+  // descriptor { lang, baseUrl, tlang }.
   function resolveLines(list, p) {
-    const tracks = list.tracks || []
-    const targets = list.targets || []
-    const real = (lang) => (lang ? tracks.find((t) => t.lang === lang) : null)
-    const transBase = tracks.find((t) => t.translatable) || tracks[0] || null
-    const asTranslation = (lang) =>
-      p.allowAutoTranslation && transBase && targets.some((t) => t.lang === lang)
-        ? { lang, name: lang, baseUrl: transBase.baseUrl, tlang: lang }
-        : null
-
-    const picked = pickTracks(tracks, p)
-    const l1 = real(p.lang1) || (p.lang1 ? asTranslation(p.lang1) : null) || picked.line1 || null
-    // the chosen second language is a PREFERENCE: use it if the video has it (real,
-    // or an opted-in auto-translation), otherwise fall back to the default pick
-    // (English-preferred) so a global lang2 choice never silently kills the second
-    // line on a video that lacks that language. Empty lang2 -> the default pick.
-    let l2 = p.lang2 ? (real(p.lang2) || asTranslation(p.lang2) || picked.line2) : picked.line2
-    l2 = l2 || null
-    // never show the same real track twice
-    if (l1 && l2 && l1.lang === l2.lang && !l1.tlang && !l2.tlang) l2 = null
-    return { l1, l2 }
+    const { line1, line2 } = pickTracks(list.tracks || [], p, list.targets || [])
+    return { l1: line1, l2: line2 }
   }
 
   // fetch one track's cues from its (signed) baseUrl, falling back to the timedtext
@@ -213,7 +197,9 @@ export function createEngine(adapter) {
     curLang1 = lang1; curLang2 = lang2
     overlay.setControls(trackList ? {
       tracks: trackList.tracks, targets: trackList.targets,
-      lang1, lang2, allowAsr: prefs.allowAsr, allowAutoTranslation: prefs.allowAutoTranslation,
+      lang1, lang2,
+      // dual implies auto, so the picker lists ASR + translation languages too
+      allowAsr: prefs.allowAsr || prefs.dual, allowAutoTranslation: prefs.allowAutoTranslation || prefs.dual,
       // persist the change; it round-trips storage -> index -> setPrefs, which
       // re-picks + re-fetches, so storage stays the single source of truth
       onChange: (patch) => saveSubsPrefs(patch),

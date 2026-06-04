@@ -293,10 +293,10 @@ export function createOverlay({ requestSegment, requestHover, onPin }) {
 
   /* setControls(opts) — show/refresh the language picker. opts.tracks empty/absent
      (the Phase 1 scrape path) hides the gear entirely. Otherwise it renders the two
-     language selects + the pinyin and the two machine-track opt-in toggles (auto
-     captions / auto-translation), reflecting the CURRENTLY displayed selection
-     (lang1/lang2 resolved by the engine), and calls opts.onChange(patch) when the
-     user changes anything. */
+     language selects + the pinyin toggle, reflecting the CURRENTLY displayed
+     selection (lang1/lang2 resolved by the engine), and calls opts.onChange(patch)
+     when the user changes anything. opts.allowAsr/allowAutoTranslation only gate
+     which languages the selects list (dual implies both). */
   function setControls(opts) {
     const o = opts || {}
     if (!o.tracks || !o.tracks.length) { ctrl.style.display = 'none'; return }
@@ -322,14 +322,9 @@ export function createOverlay({ requestSegment, requestHover, onPin }) {
     const py = document.createElement('input'); py.type = 'checkbox'; py.checked = prefs.pinyin !== false
     py.addEventListener('change', () => o.onChange && o.onChange({ pinyin: py.checked }))
     mk('Pinyin', py)
-
-    const asr = document.createElement('input'); asr.type = 'checkbox'; asr.checked = !!o.allowAsr
-    asr.addEventListener('change', () => o.onChange && o.onChange({ allowAsr: asr.checked }))
-    mk('Allow auto-captions', asr)
-
-    const trans = document.createElement('input'); trans.type = 'checkbox'; trans.checked = !!o.allowAutoTranslation
-    trans.addEventListener('change', () => o.onChange && o.onChange({ allowAutoTranslation: trans.checked }))
-    mk('Allow auto-translation', trans)
+    // No auto-captions / auto-translation toggles here: dual subtitles imply both
+    // (that is the whole point of a two-line learner view), so the Top/Bottom
+    // selects already list every available language, real or machine-made.
   }
 
   // clear must also invalidate any in-flight segmentation: bumping each line's gen

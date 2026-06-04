@@ -8,10 +8,15 @@ All notable changes to **Zilense** are documented here. The format is based on
 
 ### Added
 - **Dual subtitles toggle** in the toolbar menu, with a **Second language** picker.
-  When dual is on and the video has the tracks, Chinese shows on top and a second
-  language below. The second line defaults to **English** and can be set to another
-  language; a chosen language falls back to English (or the next available track)
-  when a video doesn't carry it, so the second line never silently disappears.
+  Chinese shows on top and a second language below. The second line defaults to
+  **English** and can be set to another language; a chosen language falls back to
+  English (or the next available track) when a video doesn't carry it, so the second
+  line never silently disappears.
+- Turning on Dual subtitles now **uses YouTube's auto-captions and auto-translation
+  when needed**, so it works on the common case of a video that only has an
+  auto-generated Chinese track — the Chinese line uses that track and the second
+  line is machine-translated into the chosen language. (The separate per-line
+  auto-caption / auto-translation toggles are gone; dual implies them.)
 
 ## [1.9.1] — 2026-06-04
 
