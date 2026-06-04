@@ -92,6 +92,25 @@ test('the Chinese line is annotated by language, even when it is the bottom line
   assert.ok(l2.querySelector('.zr'), 'the bottom Chinese line carries ruby (pinyin columns)')
 })
 
+test('setPrefs({ tones: false }) drops the per-tone color class from subtitle pinyin', async () => {
+  const requestSegment = async () => [{ t: '好', kind: 'word', py: 'hǎo' }] // hǎo = tone 3
+  const ov = createOverlay({ requestSegment, requestHover: async () => null, onPin: noop })
+  const root = closedRoot(ov.host)
+
+  ov.setPrefs({ pinyin: true, tones: true })
+  ov.setLine1('好')
+  await tick()
+  let py = root.querySelector('.line.l1 .py')
+  assert.ok(py, 'pinyin column rendered')
+  assert.match(py.className, /tone-3/, 'tone color class applied when tones on')
+
+  // turning tone colors off re-renders without the tone-N class (plain pinyin)
+  ov.setPrefs({ tones: false })
+  await tick()
+  py = root.querySelector('.line.l1 .py')
+  assert.doesNotMatch(py.className, /tone-\d/, 'no tone color class once tones off')
+})
+
 test('hover card shows the official HSK meaning for a subtitle word', async () => {
   const requestSegment = async () => [{ t: '好', kind: 'word', py: 'hǎo' }]
   const requestHover = async (word) => ({

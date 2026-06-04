@@ -84,10 +84,11 @@ async function init() {
     saveSettingsPatch({ inlinePopup })
   })
 
-  // Pinyin tone colors = settings.toneColors (colors pinyin by tone in the side
-  // panel and Reader). Same global setting the side panel's own menu exposes,
-  // surfaced here too; both write the same mydict.settings field, so whichever
-  // surface renders next reflects it.
+  // Pinyin tone colors — one switch for "color pinyin by tone" everywhere. It drives
+  // BOTH the global setting (settings.toneColors: side panel + Reader) and the
+  // on-video subtitle overlay (mydict.subs.tones), which is otherwise the only
+  // tone-colored surface with no toggle of its own. The subtitle overlay re-renders
+  // live via storage.onChanged; the panel / Reader reflect it on their next render.
   const toneBtn = $('tone-colors')
   let toneColors = settings.toneColors !== false
   setSwitch(toneBtn, toneColors)
@@ -95,6 +96,7 @@ async function init() {
     toneColors = !toneColors
     setSwitch(toneBtn, toneColors)
     saveSettingsPatch({ toneColors })
+    saveSubsPrefs({ tones: toneColors })
   })
 
   // Disable on this site = hostname in the disabled-sites list
