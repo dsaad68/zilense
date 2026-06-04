@@ -26,16 +26,30 @@
   // Notice the player's timedtext requests so we always have a fresh, signed base
   // URL to derive from — robust across SPA navigations where ytInitialPlayerResponse
   // is stale. We only READ the URL; the request itself is the player's own.
+  const noteTimedText = (url) => {
+    try {
+      if (typeof url === 'string' && url.indexOf('/api/timedtext') !== -1) {
+        lastTimedText = url
+        document.dispatchEvent(new CustomEvent(EV_TT, { detail: url }))
+      }
+    } catch (e) {}
+  }
   try {
     const open = XMLHttpRequest.prototype.open
     XMLHttpRequest.prototype.open = function (method, url) {
-      try {
-        if (typeof url === 'string' && url.indexOf('/api/timedtext') !== -1) {
-          lastTimedText = url
-          document.dispatchEvent(new CustomEvent(EV_TT, { detail: url }))
-        }
-      } catch (e) {}
+      noteTimedText(url)
       return open.apply(this, arguments)
+    }
+  } catch (e) {}
+  // YouTube increasingly loads captions via fetch() rather than XHR, so hook it too
+  // (same READ-only capture; we never alter the request or its response).
+  try {
+    const origFetch = window.fetch
+    if (typeof origFetch === 'function') {
+      window.fetch = function (input) {
+        try { noteTimedText(typeof input === 'string' ? input : (input && input.url) || '') } catch (e) {}
+        return origFetch.apply(this, arguments)
+      }
     }
   } catch (e) {}
 

@@ -78,14 +78,13 @@ async function fetchCues(baseUrl, tlang) {
   } catch (e) { return [] }
 }
 
-// the effective display language a captured timedtext URL resolves to: its machine
-// translation target (tlang) if present, else its source track language (lang).
-function ttLang(url) {
-  try {
-    const u = new URL(url, 'https://www.youtube.com')
-    return u.searchParams.get('tlang') || u.searchParams.get('lang') || ''
-  } catch (e) { return '' }
-}
+// opt-in console diagnostics: set `localStorage.zilenseSubsDebug = '1'` on the video
+// page and reload, then watch the console for `[zilense subs]` lines explaining why
+// dual did or didn't engage. Off (silent) otherwise.
+const DEBUG = (() => {
+  try { return typeof localStorage !== 'undefined' && !!localStorage.getItem('zilenseSubsDebug') } catch (e) { return false }
+})()
+const dbg = (...a) => { if (DEBUG) { try { console.info('[zilense subs]', ...a) } catch (e) {} } }
 
 export function createEngine(adapter) {
   let overlay = null
@@ -150,16 +149,31 @@ export function createEngine(adapter) {
     return { l1: line1, l2: line2 }
   }
 
-  // fetch one track's cues from its (signed) baseUrl, falling back to the timedtext
-  // URL the player itself fetched (captured by the hook) when the baseUrl yields
-  // nothing — baseUrls can go stale across SPA navigations. The fallback is used
-  // only when the captured URL resolves to the SAME display language, so we never
-  // show the wrong track; same-origin is still enforced inside fetchCues.
+  // build a json3 fetch URL from the URL the player ITSELF fetched (captured by the
+  // hook). That URL carries the valid pot/signature params that a bare
+  // captionTracks[].baseUrl now lacks — YouTube increasingly returns an empty body
+  // for the raw baseUrl — so we reuse the captured URL and just swap fmt/lang/tlang.
+  // For a translation we keep the player's signed source and only add &tlang; for a
+  // specific real track we set &lang (works because lang/tlang aren't in the
+  // signature). Returns '' when nothing has been captured yet (captions still off).
+  function playerCueUrl(track) {
+    if (!lastTT) return ''
+    try {
+      const u = new URL(lastTT, location.origin)
+      u.searchParams.set('fmt', 'json3')
+      if (track.tlang) u.searchParams.set('tlang', track.tlang)
+      else { u.searchParams.set('lang', track.lang); u.searchParams.delete('tlang') }
+      return u.toString()
+    } catch (e) { return '' }
+  }
+
+  // load one line's cues: prefer the player-derived URL (valid pot/signature), fall
+  // back to the raw baseUrl. Same-origin is enforced inside fetchCues.
   async function loadCues(track) {
-    let cues = await fetchCues(track.baseUrl, track.tlang)
-    if (cues.length) return cues
-    const want = track.tlang || track.lang
-    if (lastTT && want && ttLang(lastTT) === want) cues = await fetchCues(lastTT, '')
+    let cues = []
+    const viaPlayer = playerCueUrl(track)
+    if (viaPlayer) { cues = await fetchCues(viaPlayer, ''); dbg('loadCues viaPlayer', track.lang, track.tlang || '', '→', cues.length) }
+    if (!cues.length) { cues = await fetchCues(track.baseUrl, track.tlang); dbg('loadCues baseUrl', track.lang, track.tlang || '', '→', cues.length) }
     return cues
   }
 
@@ -172,22 +186,26 @@ export function createEngine(adapter) {
     try {
       const list = await requestYtTracks()
       if (stale()) return
-      if (!list || !Array.isArray(list.tracks) || !list.tracks.length) return // no tracks -> stay scrape
+      if (!list || !Array.isArray(list.tracks) || !list.tracks.length) { dbg('no tracks from hook → stay scrape'); return }
       if (typeof list.timedtext === 'string' && list.timedtext) lastTT = list.timedtext
       trackList = { tracks: list.tracks, targets: Array.isArray(list.targets) ? list.targets : [] }
+      dbg('tracks', list.tracks.map((t) => t.lang + (t.kind ? ':' + t.kind : '')).join(','),
+        '| targets', (list.targets || []).length, '| capturedURL', !!lastTT)
       const { l1, l2 } = resolveLines(trackList, prefs)
+      dbg('resolved top', l1 && (l1.lang + (l1.tlang ? '→' + l1.tlang : '')), '| bottom', l2 && (l2.lang + (l2.tlang ? '→' + l2.tlang : '')))
       // the dual VIEW needs two lines; with only one usable track we leave Phase 1
       // scraping in place (we never synthesize a second line), but still offer the
       // language picker so the user can pick a (real or, if opted in, auto) second.
-      if (!l1 || !l2) { acqTries = MAX_ACQ_TRIES; renderControls(l1 ? l1.lang : '', l2 ? l2.lang : ''); return }
+      if (!l1 || !l2) { dbg('only one line resolved → stay scrape'); acqTries = MAX_ACQ_TRIES; renderControls(l1 ? l1.lang : '', l2 ? l2.lang : ''); return }
       const [c1, c2] = await Promise.all([loadCues(l1), loadCues(l2)])
       if (stale()) return
       // the dual view shows TWO synced lines; if either track came back empty we
       // can't honestly render it, so we stay in Phase 1 scrape (and retry up to the
       // cap) rather than hide the native captions behind a single-line overlay.
-      if (!c1.length || !c2.length) return
+      if (!c1.length || !c2.length) { dbg('a line had no cues (top', c1.length, 'bottom', c2.length, ') → stay scrape; turn YouTube captions ON if off'); return }
       cues1 = c1; cues2 = c2; idx1 = -1; idx2 = -1
       enterDual()
+      dbg('ENTER DUAL', l1.lang, '/', l2.lang + (l2.tlang ? '(translated)' : ''))
       renderControls(l1.lang, l2.lang)
     } finally { acquiring = false }
   }

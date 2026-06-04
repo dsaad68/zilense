@@ -11,6 +11,14 @@ All notable changes to **Zilense** are documented here. The format is based on
   sites (YouTube / Coursera), where the feature actually does something; on every
   other page the menu is just the dictionary controls.
 
+### Fixed
+- Dual subtitles failing to load caption text on YouTube: a track's raw caption URL
+  now often returns nothing without a session token the player adds. The hook now
+  captures the player's own caption requests (both `fetch` and XHR) and the engine
+  fetches cues from that working URL (swapping format/language/translation), instead
+  of the bare URL. Set `localStorage.zilenseSubsDebug = '1'` on a video page and
+  reload to see `[zilense subs]` diagnostics if dual still won't engage.
+
 ## [1.9.2] — 2026-06-04
 
 ### Added
