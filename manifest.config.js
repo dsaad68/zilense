@@ -39,6 +39,13 @@ export default defineManifest({
     service_worker: 'src/background/service-worker.js',
     type: 'module',
   },
+  // The bundled PDF viewer runs Tesseract.js (offline OCR for scanned PDFs), whose
+  // WebAssembly core needs 'wasm-unsafe-eval' to compile. Scoped to extension pages
+  // only; everything stays 'self' (no remote code) — the OCR worker, core wasm, and
+  // chi_sim model are all bundled under /tesseract.
+  content_security_policy: {
+    extension_pages: "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'",
+  },
   content_scripts: [
     {
       matches: ['<all_urls>'],
@@ -54,11 +61,21 @@ export default defineManifest({
   // activeTab lets the action popup read the active tab's URL (hostname for
   // "disable on this site") and id (to open the side panel) when the user clicks
   // the icon — no broad host permission needed.
-  permissions: ['sidePanel', 'storage', 'contextMenus', 'activeTab'],
+  // declarativeNetRequestWithHostAccess powers the OPT-IN "open all PDFs
+  // automatically" redirect (a dynamic rule that rewrites *.pdf navigations to the
+  // bundled viewer); it only acts on origins the user has granted host access to,
+  // so it's narrower than full declarativeNetRequest and adds no rule until enabled.
+  permissions: ['sidePanel', 'storage', 'contextMenus', 'activeTab', 'declarativeNetRequestWithHostAccess'],
   // Content scripts (hover lookup) inject everywhere via content_scripts.matches,
   // which needs NO host permission. host_permissions is only for the panel's
   // cross-origin fetches: example sentences (Tatoeba) and stroke data (jsDelivr).
   host_permissions: ['https://tatoeba.org/*', 'https://cdn.jsdelivr.net/*'],
+  // The PDF viewer (an extension page) fetches PDF bytes from arbitrary origins.
+  // Rather than ship a broad host permission at install, we request *://*/* ON
+  // DEMAND (chrome.permissions.request on the user's "Open this PDF"/enable-auto
+  // gesture), keeping the default install prompt minimal. file:// PDFs additionally
+  // need the user-toggled "Allow access to file URLs" (Chrome can't grant it here).
+  optional_host_permissions: ['*://*/*'],
   // Reader mode is an extension page the content script injects as a full-screen
   // iframe over the host page, so the page context must be allowed to load it.
   // (CRXJS also auto-adds the content-script chunk here; this entry is merged in.)
@@ -72,6 +89,14 @@ export default defineManifest({
       resources: ['src/reader/index.html'],
       matches: ['<all_urls>'],
       use_dynamic_url: true,
+    },
+    // The PDF viewer must be at a STABLE URL (no use_dynamic_url): the opt-in
+    // auto-redirect declarativeNetRequest rule and the manual
+    // chrome.runtime.getURL navigation both target a fixed
+    // chrome-extension://<id>/src/pdfviewer/index.html.
+    {
+      resources: ['src/pdfviewer/index.html'],
+      matches: ['<all_urls>'],
     },
   ],
 })

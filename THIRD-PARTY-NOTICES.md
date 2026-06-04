@@ -119,6 +119,34 @@ and libraries — **not** the application code.
 - **License:** MIT — see [`licenses/react-LICENSE.txt`](./licenses/react-LICENSE.txt)
   and [`licenses/react-dom-LICENSE.txt`](./licenses/react-dom-LICENSE.txt).
 
+### pdfjs-dist (PDF.js)
+- **Used for:** rendering PDFs with a real, hoverable text layer in the bundled PDF
+  viewer (`src/pdfviewer/`), so hover-to-define works on PDFs — Chrome's native PDF
+  viewer exposes no hoverable text. The PDF.js web worker is bundled, not fetched.
+- **Source / attribution:** Mozilla and contributors —
+  <https://github.com/mozilla/pdf.js>.
+- **License:** Apache License 2.0 — full text at
+  <https://www.apache.org/licenses/LICENSE-2.0>; the notice that ships with the
+  package is in [`licenses/pdfjs-dist-LICENSE.txt`](./licenses/pdfjs-dist-LICENSE.txt).
+
+### Tesseract.js & tesseract.js-core
+- **Used for:** offline OCR of **scanned** PDFs in the bundled viewer
+  (`src/pdfviewer/ocr.js`). Scanned pages are images with no text layer, so the
+  viewer recognizes the page image (engine + WebAssembly core bundled under
+  `/tesseract`, no network) and synthesizes a text layer for hover/selection.
+- **Source / attribution:** Tesseract.js contributors —
+  <https://github.com/naptha/tesseract.js> — wrapping the Tesseract OCR engine.
+- **License:** Apache License 2.0 — full text at
+  <https://www.apache.org/licenses/LICENSE-2.0>; the bundled notice is in
+  [`licenses/tesseract.js-core-LICENSE.txt`](./licenses/tesseract.js-core-LICENSE.txt).
+
+### Tesseract `chi_sim` trained data
+- **Used for:** the Simplified-Chinese model the OCR engine loads, bundled at
+  `/tesseract/chi_sim.traineddata` so scanned-PDF OCR works fully offline.
+- **Source / attribution:** the Tesseract OCR project (`tessdata_fast`) —
+  <https://github.com/tesseract-ocr/tessdata_fast>.
+- **License:** Apache License 2.0 — <https://www.apache.org/licenses/LICENSE-2.0>.
+
 ---
 
 *Build-time-only tooling (Vite, CRXJS, @vitejs/plugin-react, Playwright,

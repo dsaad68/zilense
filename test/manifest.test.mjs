@@ -17,6 +17,31 @@ test('manifest: permissions are the minimal set', () => {
   }
 })
 
+test('manifest: PDF auto-open uses host-scoped DNR + on-demand host access', () => {
+  // the opt-in "open all PDFs automatically" redirect is host-scoped DNR, not the
+  // unrestricted declarativeNetRequest
+  assert.ok(m.permissions.includes('declarativeNetRequestWithHostAccess'),
+    'declarativeNetRequestWithHostAccess expected for the PDF redirect rule')
+  assert.ok(!m.permissions.includes('declarativeNetRequest'),
+    'must not request the unrestricted declarativeNetRequest')
+  // broad host access for the viewer's cross-origin PDF fetch is OPTIONAL (requested
+  // on a user gesture), so the default install prompt stays minimal
+  assert.ok((m.optional_host_permissions || []).includes('*://*/*'),
+    'broad host access must be optional, not granted at install')
+  assert.ok(!m.host_permissions.includes('*://*/*'),
+    'broad host access must not be in host_permissions (install-time)')
+})
+
+test('manifest: PDF viewer page is web-accessible at a STABLE url', () => {
+  const war = m.web_accessible_resources || []
+  const entry = war.find((w) => (w.resources || []).some((r) => r.includes('pdfviewer')))
+  assert.ok(entry, 'pdfviewer page must be in web_accessible_resources')
+  assert.ok(entry.matches.includes('<all_urls>'), 'pdfviewer must be reachable from any page')
+  // the DNR redirect target + chrome.runtime.getURL navigation need a fixed URL, so
+  // (unlike the reader) it must NOT use a per-session dynamic URL
+  assert.notEqual(entry.use_dynamic_url, true, 'pdfviewer page must use a stable URL')
+})
+
 test('manifest: the toolbar icon opens an action popup', () => {
   assert.ok(m.action && typeof m.action.default_popup === 'string', 'action.default_popup is set')
   assert.ok(m.action.default_popup.includes('popup'), 'default_popup points at the popup page')

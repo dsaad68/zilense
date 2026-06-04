@@ -30,6 +30,11 @@ export default defineConfig({
       input: {
         reader: resolve(__dirname, 'src/reader/index.html'),
         flashcards: resolve(__dirname, 'src/flashcards/index.html'),
+        // The PDF viewer is reached via web_accessible_resources (manual "Open this
+        // PDF in Zilense" navigation, and the opt-in auto-redirect rule), not a
+        // manifest page slot CRXJS auto-discovers — so register it as an explicit
+        // build input or its <script>/<link> ship un-bundled (incl. the pdf.js worker).
+        pdfviewer: resolve(__dirname, 'src/pdfviewer/index.html'),
       },
     },
   },

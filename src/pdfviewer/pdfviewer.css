@@ -1,0 +1,157 @@
+/* pdfviewer.css — chrome for the bundled PDF.js viewer page, plus the canonical
+   PDF.js `.textLayer` rules (vendored from pdfjs-dist/web/pdf_viewer.css). The
+   text layer is a stack of transparent, absolutely-positioned <span>s over each
+   page's canvas — they are REAL DOM text nodes, which is exactly what the shared
+   hover driver's caret detection needs. */
+
+:root {
+  --bg: #f3ede0;
+  --bar-bg: #fbf7ee;
+  --ink: #2a2520;
+  --ink2: #6b6258;
+  --border: #d8ccb5;
+  --accent: #c8443a;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #211e19;
+    --bar-bg: #2c2822;
+    --ink: #ece3d2;
+    --ink2: #b3a896;
+    --border: #453f33;
+  }
+}
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+#bar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 44px;
+  padding: 0 16px;
+  background: var(--bar-bg);
+  border-bottom: 1px solid var(--border);
+}
+#brand { font-weight: 600; color: var(--accent); }
+#status { font-size: 13px; color: var(--ink2); }
+
+#viewer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+}
+
+/* one page = a positioned stack: canvas at the bottom, text layer on top */
+.page {
+  position: relative;
+  background: #fff;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, .18);
+  /* width/height are set inline per page from the scaled viewport */
+}
+.page canvas {
+  display: block;
+}
+
+/* OCR progress badge, shown over a scanned page while Tesseract runs */
+.ocr-status {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  font-size: 12px;
+  color: #fff;
+  background: rgba(40, 36, 30, .82);
+  border-radius: 6px;
+  pointer-events: none;
+}
+
+#empty {
+  margin: 64px auto;
+  max-width: 460px;
+  padding: 0 24px;
+  text-align: center;
+  color: var(--ink2);
+  line-height: 1.6;
+}
+#empty h2 { color: var(--ink); font-size: 18px; }
+#empty a { color: var(--accent); }
+#empty code {
+  background: var(--bar-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 13px;
+}
+
+/* ---- PDF.js text layer (vendored from pdfjs-dist/web/pdf_viewer.css) ---- */
+.textLayer {
+  position: absolute;
+  text-align: initial;
+  inset: 0;
+  overflow: clip;
+  opacity: 1;
+  line-height: 1;
+  -webkit-text-size-adjust: none;
+  -moz-text-size-adjust: none;
+  text-size-adjust: none;
+  forced-color-adjust: none;
+  transform-origin: 0 0;
+  caret-color: CanvasText;
+  z-index: 0;
+}
+.textLayer :is(span, br) {
+  color: transparent;
+  position: absolute;
+  white-space: pre;
+  cursor: text;
+  transform-origin: 0% 0%;
+}
+.textLayer > :not(.markedContent),
+.textLayer .markedContent span:not(.markedContent) {
+  z-index: 1;
+}
+.textLayer span.markedContent {
+  top: 0;
+  height: 0;
+}
+.textLayer span[role="img"] {
+  user-select: none;
+  cursor: default;
+}
+/* the glyphs are transparent, so selection is only visible through ::selection —
+   without these rules dragging selects text but shows nothing (looks unselectable) */
+.textLayer ::selection {
+  background: rgba(0 0 255 / 0.25);
+  background: color-mix(in srgb, AccentColor, transparent 75%);
+}
+.textLayer br::selection {
+  background: transparent;
+}
+.textLayer .endOfContent {
+  display: block;
+  position: absolute;
+  inset: 100% 0 0;
+  z-index: 0;
+  cursor: default;
+  user-select: none;
+}
+.textLayer.selecting .endOfContent {
+  top: 0;
+}

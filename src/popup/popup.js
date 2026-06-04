@@ -16,6 +16,28 @@ import {
 
 const $ = (id) => document.getElementById(id)
 
+// does this tab URL look like a PDF? Chrome's native viewer keeps the real URL in
+// tab.url, so a `.pdf` pathname is the practical signal (Content-Type isn't visible
+// from the popup). Covers http(s) and local file:// PDFs.
+function looksLikePdf(url) {
+  try {
+    const u = new URL(url)
+    if (!/^(https?|file):$/.test(u.protocol)) return false
+    return /\.pdf$/i.test(u.pathname)
+  } catch { return false }
+}
+
+// the host-permission match pattern for a PDF's origin (so the viewer can fetch
+// it). Null for file:// — that needs the "Allow access to file URLs" toggle, not a
+// host permission.
+function originPattern(url) {
+  try {
+    const u = new URL(url)
+    if (u.protocol === 'file:') return null
+    return `${u.protocol}//${u.host}/*`
+  } catch { return null }
+}
+
 function setSwitch(el, on) {
   el.classList.toggle('on', on)
   el.setAttribute('aria-checked', on ? 'true' : 'false')
@@ -59,6 +81,27 @@ async function init() {
     chrome.tabs.create({ url: chrome.runtime.getURL('src/flashcards/index.html') })
     window.close()
   })
+
+  // Open this PDF in Zilense — only shown when the active tab is a PDF. Chrome's
+  // native PDF viewer has no hoverable text, so we navigate the tab to the bundled
+  // PDF.js viewer (real text layer) with the PDF URL in the hash. For http(s) we
+  // first request host access to that origin (a user gesture, granted on demand)
+  // so the viewer can fetch the bytes; file:// relies on the user's "Allow access
+  // to file URLs" toggle instead (Chrome can't grant it programmatically).
+  const pdfBtn = $('open-pdf')
+  if (tab && tab.id != null && tab.url && looksLikePdf(tab.url)) {
+    pdfBtn.hidden = false
+    pdfBtn.addEventListener('click', async () => {
+      const url = tab.url
+      const target = chrome.runtime.getURL('src/pdfviewer/index.html') + '#file=' + encodeURIComponent(url)
+      try {
+        const pat = originPattern(url)
+        if (pat) await chrome.permissions.request({ origins: [pat] }).catch(() => {})
+      } catch (e) { /* request rejected/unsupported — navigate anyway, viewer shows a hint */ }
+      chrome.tabs.update(tab.id, { url: target })
+      window.close()
+    })
+  }
 
   // Hover popup = settings.inlinePopup (the floating mini-card)
   const hoverBtn = $('hover-toggle')
