@@ -153,6 +153,20 @@ test('pickTracks: dual fills both lines via auto-captions + auto-translation', (
   assert.equal(es.line2?.tlang, 'es', 'honors the chosen second language via translation')
 })
 
+test('pickTracks: a human track beats an auto-generated one in the same language', () => {
+  // real-world YouTube: an ASR `en` track plus a human `en-GB` track. The ASR `en`
+  // is not separately fetchable, so the human en-GB must win the bottom line.
+  const tracks = [
+    { lang: 'zh', name: 'Chinese', kind: '' },
+    { lang: 'en', name: 'English (auto-generated)', kind: 'asr' },
+    { lang: 'en-GB', name: 'English (UK)', kind: '' },
+  ]
+  const { line1, line2 } = pickTracks(tracks, { dual: true }, [{ lang: 'en', name: 'English' }])
+  assert.equal(line1.lang, 'zh')
+  assert.equal(line2.lang, 'en-GB', 'human English beats the ASR en track')
+  assert.notEqual(line2.kind, 'asr')
+})
+
 test('pickTracks: the bottom line prefers English over other non-Chinese tracks', () => {
   // Chinese floats to the top; among the rest, English is the most useful gloss line
   // for a learner, so it wins the bottom line even when it is not listed first.

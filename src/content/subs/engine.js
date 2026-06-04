@@ -174,6 +174,14 @@ export function createEngine(adapter) {
     const viaPlayer = playerCueUrl(track)
     if (viaPlayer) { cues = await fetchCues(viaPlayer, ''); dbg('loadCues viaPlayer', track.lang, track.tlang || '', '→', cues.length) }
     if (!cues.length) { cues = await fetchCues(track.baseUrl, track.tlang); dbg('loadCues baseUrl', track.lang, track.tlang || '', '→', cues.length) }
+    // Last resort for a real track that just won't load (e.g. a regional/ASR variant
+    // that isn't separately fetchable): machine-translate the player's own source
+    // into the track's base language off the captured signed URL. Still real text in
+    // the right language, just machine-made.
+    if (!cues.length && !track.tlang && lastTT) {
+      const base = String(track.lang || '').split('-')[0]
+      if (base) { cues = await fetchCues(playerCueUrl({ tlang: base }), ''); dbg('loadCues translate→', base, cues.length) }
+    }
     return cues
   }
 

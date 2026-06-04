@@ -175,11 +175,16 @@ export function pickTracks(tracks, prefs = {}, targets = []) {
 
   const want = String(prefs.lang2 || 'en')
   const wantRe = new RegExp('^' + want.replace(/[^a-z0-9-]/gi, ''), 'i')
-  const tr = translate(want)
+  const matches = real.filter((t) => differs(t) && wantRe.test(t.lang))
+  // a human track wins over an auto-generated one in the SAME language: e.g. when a
+  // video has both `en` (ASR) and `en-GB` (human), prefer `en-GB` — the ASR `en` is
+  // not separately fetchable and would come back empty.
+  const tr = (!line1 || line1.lang !== want) ? translate(want) : null
   const line2 =
-    real.find((t) => differs(t) && wantRe.test(t.lang)) || // a real track in the wanted language
-    (tr && (!line1 || line1.lang !== tr.lang) ? tr : null) || // else auto-translate into it
-    real.find(differs) || // else any other eligible track
+    matches.find((t) => t.kind !== 'asr') || // a human track in the wanted language (best)
+    tr ||                                     // else machine-translate into it (reliable)
+    matches[0] ||                             // else an auto-generated track in that language
+    real.find(differs) ||                     // else any other eligible track
     null
   return { line1, line2: line2 === line1 ? null : line2 }
 }

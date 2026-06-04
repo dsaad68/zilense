@@ -4,6 +4,16 @@ All notable changes to **Zilense** are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/), and the project follows
 [Semantic Versioning](https://semver.org/).
 
+## [1.9.4] — 2026-06-04
+
+### Fixed
+- Dual subtitles not showing an **English** second line when a video has both an
+  auto-generated `en` track and a human `en-GB` track: the picker grabbed the ASR
+  `en` (which isn't separately fetchable and came back empty). It now prefers a
+  human track over an auto-generated one in the same language, and if a chosen track
+  still won't load it falls back to machine-translating into that language — so the
+  second line shows reliably.
+
 ## [1.9.3] — 2026-06-04
 
 ### Changed
