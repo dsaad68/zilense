@@ -137,10 +137,11 @@ export function json3Url(baseUrl, tlang) {
      - human-authored tracks are always eligible; the two machine kinds each have
        their own opt-in (ASR behind allowAsr, auto-translation behind
        allowAutoTranslation), so the default is real, human tracks only.
-     - line 1 wants Chinese: the user's lang1 if present, else the first zh* track,
-       else the first eligible track.
-     - line 2 wants the user's lang2 if present, else the first eligible track that
-       differs from line 1.
+     - line 1 (the top, annotated line) wants Chinese: the user's lang1 if present,
+       else the first zh* track, else the first eligible track.
+     - line 2 (the bottom line) wants the user's lang2 if present, else English
+       (the most useful gloss line for a learner) when a different en* track exists,
+       else the first eligible track that differs from line 1.
    Returns { line1, line2 } (either may be null). Pure: no fetching here. */
 export function pickTracks(tracks, prefs = {}) {
   const list = Array.isArray(tracks) ? tracks.filter((t) => t && t.lang) : []
@@ -150,13 +151,16 @@ export function pickTracks(tracks, prefs = {}) {
         : true
   const real = list.filter(eligible)
   const isZh = (t) => /^zh/i.test(t.lang)
+  const isEn = (t) => /^en/i.test(t.lang)
   const byLang = (lang) => (lang ? real.find((t) => t.lang === lang) : null)
 
   const line1 =
     byLang(prefs.lang1) || real.find(isZh) || real[0] || null
+  const differs = (t) => t !== line1 && (!line1 || t.lang !== line1.lang)
   const line2 =
     byLang(prefs.lang2) ||
-    real.find((t) => t !== line1 && (!line1 || t.lang !== line1.lang)) ||
+    real.find((t) => differs(t) && isEn(t)) || // prefer English on the bottom line
+    real.find(differs) ||
     null
   return { line1, line2: line2 === line1 ? null : line2 }
 }

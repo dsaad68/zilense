@@ -155,9 +155,12 @@ export function createEngine(adapter) {
 
     const picked = pickTracks(tracks, p)
     const l1 = real(p.lang1) || (p.lang1 ? asTranslation(p.lang1) : null) || picked.line1 || null
-    let l2 = null
-    if (p.lang2) l2 = real(p.lang2) || asTranslation(p.lang2)
-    else l2 = picked.line2 || null
+    // the chosen second language is a PREFERENCE: use it if the video has it (real,
+    // or an opted-in auto-translation), otherwise fall back to the default pick
+    // (English-preferred) so a global lang2 choice never silently kills the second
+    // line on a video that lacks that language. Empty lang2 -> the default pick.
+    let l2 = p.lang2 ? (real(p.lang2) || asTranslation(p.lang2) || picked.line2) : picked.line2
+    l2 = l2 || null
     // never show the same real track twice
     if (l1 && l2 && l1.lang === l2.lang && !l1.tlang && !l2.tlang) l2 = null
     return { l1, l2 }

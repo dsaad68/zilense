@@ -119,20 +119,30 @@ async function init() {
     siteBtn.style.cursor = 'default'
   }
 
-  // Subtitles (pinyin + lookup) — the on-video overlay. Master toggle + a pinyin
-  // sub-toggle, persisted under mydict.subs (read live by the content script). The
-  // pinyin row dims when the feature is off, mirroring the reader's dependent rows.
+  // Subtitles (pinyin + lookup) — the on-video overlay. Master toggle plus two
+  // sub-toggles (dual subtitles, pinyin), persisted under mydict.subs (read live by
+  // the content script). The sub-rows dim when the feature is off, mirroring the
+  // reader's dependent rows.
   const subs = await loadSubsPrefs()
   const subsBtn = $('subs-toggle')
+  const subsDualBtn = $('subs-dual')
   const subsPyBtn = $('subs-pinyin')
-  const subsPyRow = $('subs-pinyin-row')
+  const subsLang2 = $('subs-lang2')
+  const subRows = [$('subs-dual-row'), $('subs-lang2-row'), $('subs-pinyin-row')]
   let subsOn = !!subs.enabled
+  let subsDual = subs.dual !== false
   let subsPinyin = subs.pinyin !== false
+  // the chosen bottom-line language; empty = English-preferred default. Only known
+  // options are reflected, so an unfamiliar stored code falls back to the default.
+  subsLang2.value = [...subsLang2.options].some((o) => o.value === (subs.lang2 || '')) ? (subs.lang2 || '') : ''
   const reflectSubs = () => {
     setSwitch(subsBtn, subsOn)
+    setSwitch(subsDualBtn, subsDual)
     setSwitch(subsPyBtn, subsPinyin)
-    subsPyRow.style.opacity = subsOn ? '1' : '.4'
-    subsPyRow.style.pointerEvents = subsOn ? 'auto' : 'none'
+    for (const row of subRows) {
+      row.style.opacity = subsOn ? '1' : '.4'
+      row.style.pointerEvents = subsOn ? 'auto' : 'none'
+    }
   }
   reflectSubs()
   subsBtn.addEventListener('click', () => {
@@ -140,6 +150,16 @@ async function init() {
     reflectSubs()
     saveSubsPrefs({ enabled: subsOn })
   })
+  // Dual subtitles — show two tracks at once (Chinese on top, a second language
+  // below) when the video has them; off falls back to the single shown track.
+  subsDualBtn.addEventListener('click', () => {
+    subsDual = !subsDual
+    setSwitch(subsDualBtn, subsDual)
+    saveSubsPrefs({ dual: subsDual })
+  })
+  // Second (bottom-line) language for the dual view. Empty = English-preferred; a
+  // chosen language is a preference that gracefully falls back when a video lacks it.
+  subsLang2.addEventListener('change', () => saveSubsPrefs({ lang2: subsLang2.value }))
   subsPyBtn.addEventListener('click', () => {
     subsPinyin = !subsPinyin
     setSwitch(subsPyBtn, subsPinyin)

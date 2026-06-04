@@ -260,15 +260,17 @@ export async function saveReaderPrefs(patch) {
    from the dictionary itself, so it lives under its own mydict.subs key rather
    than mixing into mydict.settings. Same read-modify-write merge as the reader so
    toggling one control never clobbers another. `lang1`/`lang2` hold the two
-   chosen caption language codes for the Phase 2 dual-track view (empty = auto:
-   the displayed track for line 1, none for line 2). */
+   chosen caption language codes for the Phase 2 dual-track view: empty lang1 =
+   auto (Chinese-preferred top line); empty lang2 = English-preferred bottom line.
+   A non-empty lang2 is a preference that falls back to that default when a video
+   doesn't carry the chosen language. */
 export const SUBS_DEFAULTS = {
   enabled: false, // master switch for the whole subtitle feature
   pinyin: true, // ruby pinyin above the Chinese line
   tones: true, // color the pinyin by tone
   dual: true, // when two tracks are available, show both stacked
-  lang1: '', // preferred language code for the top (annotated) line
-  lang2: '', // preferred language code for the bottom line
+  lang1: '', // preferred language code for the top (annotated) line (empty = Chinese-preferred)
+  lang2: '', // preferred language code for the bottom line (empty = English-preferred)
   // the two machine-track opt-ins, split so the user can accept one without the
   // other: ASR is YouTube's auto-SPEECH-recognition captions; autoTranslation is
   // its machine translation of a track into another language. Both default off

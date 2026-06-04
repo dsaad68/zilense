@@ -126,3 +126,18 @@ test('one track fetch fails -> engine stays in scrape mode (no dual)', async () 
   assert.doesNotMatch(painted, /你好/, 'no cue text painted (still scraping)')
   engine.stop()
 })
+
+test('a chosen second language falls back to English when the video lacks it', async () => {
+  // the tracks are zh-Hans + en; the user has globally picked Spanish for line 2.
+  // A chosen lang2 is a preference, so the bottom line falls back to the
+  // English-preferred default and the dual view still activates.
+  globalThis.fetch = async () => ({ ok: true, json: async () => JSON.parse(J3) })
+  const engine = createEngine(adapter)
+  engine.start({ ...PREFS, lang2: 'es' })
+  await flush()
+
+  const root = closedRoot(player.querySelector('#' + 'mydict-subs-host'))
+  assert.equal(root.querySelector('.ctrl').style.display, 'flex',
+    'dual still activates (lang2 fell back to the available English track)')
+  engine.stop()
+})

@@ -132,6 +132,26 @@ test('pickTracks: prefers a human Chinese track for line 1, a different one for 
   assert.ok(line2 && line2.lang !== 'zh-Hans', 'a second, different track fills line 2')
 })
 
+test('pickTracks: the bottom line prefers English over other non-Chinese tracks', () => {
+  // Chinese floats to the top; among the rest, English is the most useful gloss line
+  // for a learner, so it wins the bottom line even when it is not listed first.
+  const tracks = [
+    { lang: 'fr', name: 'French', kind: '' },
+    { lang: 'zh-Hans', name: 'Chinese', kind: '' },
+    { lang: 'en', name: 'English', kind: '' },
+  ]
+  const { line1, line2 } = pickTracks(tracks, {})
+  assert.equal(line1.lang, 'zh-Hans', 'Chinese on top')
+  assert.equal(line2.lang, 'en', 'English on the bottom, ahead of French')
+
+  // with no English track, the bottom line falls back to any other track
+  const noEn = pickTracks([
+    { lang: 'zh-Hans', name: 'Chinese', kind: '' },
+    { lang: 'fr', name: 'French', kind: '' },
+  ], {})
+  assert.equal(noEn.line2.lang, 'fr', 'falls back to the next available track')
+})
+
 test('pickTracks: explicit language choices are honored', () => {
   const tracks = [
     { lang: 'en', name: 'English', kind: '' },
