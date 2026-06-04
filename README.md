@@ -61,6 +61,18 @@ npm run test:e2e     # Playwright smoke test (loads dist/ in Chromium; build fir
   work just like on a web page. **Scanned/image-only PDFs** are recognized with
   **offline OCR** (bundled Tesseract.js + a Simplified-Chinese model — no network),
   so even photographed workbooks become hoverable.
+- **🎬 Video subtitles — pinyin + dual captions (experimental)** → on **YouTube**
+  (and **Coursera**), the on-video captions get the same treatment as the page:
+  **tone-colored pinyin** above the Chinese and **clickable words** that look up in
+  the panel. Turn on **Dual subtitles** to show **Chinese on top and a second
+  language below** (defaults to **English**, switchable in the toolbar menu); when a
+  video has no human track for the Chinese or the second line, YouTube's
+  auto-captions / auto-translation fill in. The controls (on/off, dual, second
+  language, pinyin) appear in the toolbar menu only on supported video sites, and
+  there's a 字 gear on the player to pick languages per video.
+  - ⚠️ **Experimental.** It relies on each site's player internals and YouTube's
+    caption endpoints, which change often, so expect rough edges. **Netflix support
+    is planned for a later release.**
 - **🎴 Flashcards** (toolbar menu → **Flashcards**, opens a full-page tab) → study
   your **starred words** or any **HSK 3.0 level** with flip cards and keyboard
   shortcuts; progress is kept on the device.
