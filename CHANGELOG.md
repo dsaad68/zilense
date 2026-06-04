@@ -4,6 +4,19 @@ All notable changes to **Zilense** are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/), and the project follows
 [Semantic Versioning](https://semver.org/).
 
+## [1.9.7] — 2026-06-04
+
+### Added
+- A master on/off switch at the top of the toolbar popup that turns the on-page
+  lookup (hover, click-to-pin, and selection) on or off everywhere.
+
+### Fixed
+- "Disable on this site" now disables the whole on-page lookup. Previously only
+  hover was suppressed, so clicking a word on a disabled site still pinned it and
+  opened the side panel; click/Alt-click/hotkey pinning and selection lookup are
+  now gated too, and any live highlight/popup/pin is cleared when a site (or the
+  new master switch) is turned off.
+
 ## [1.9.6] — 2026-06-04
 
 ### Changed

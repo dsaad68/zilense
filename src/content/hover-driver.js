@@ -25,10 +25,11 @@
                       when the site is added to the hover-disabled list).
 
    Options:
-     • allowDisable — optional () => boolean. When it returns true, hover is
-                      suppressed (selection/pin still work). content.js passes its
-                      per-site toggle; the PDF viewer omits it (our own page is
-                      never "disabled"). */
+     • allowDisable — optional () => boolean. When it returns true the driver is
+                      fully inert — hover, click/Alt-click/hotkey pin, AND selection
+                      lookup all stop. content.js passes its combined per-site +
+                      global-master predicate; the PDF viewer omits it (our own page
+                      is never "disabled"). */
 
 import { isHanChar, normalizeSelection, shouldLookupSelection, charAt } from './content-core.js'
 import { collectForward, textOf } from './word-walk.js'
@@ -37,6 +38,11 @@ const SETTINGS_KEY = 'mydict.settings'
 
 export function initHoverDriver(opts = {}) {
   const allowDisable = typeof opts.allowDisable === 'function' ? opts.allowDisable : null
+  // "disabled here" = the caller's predicate says so (site in the disabled list, or
+  // the global master switch is off). When true the WHOLE driver goes inert: hover,
+  // click/Alt-click/hotkey pinning, AND selection lookup. (Previously only hover was
+  // gated, so a click on a disabled site still opened the panel.)
+  const isDisabled = () => !!(allowDisable && allowDisable())
   // optional predicate (node) => boolean. When true for the text node under the
   // cursor, the visual overlays (hover token highlight + pin box) are NOT painted —
   // the popup and panel lookup still work. The PDF viewer uses this for OCR'd
@@ -195,7 +201,7 @@ export function initHoverDriver(opts = {}) {
   }
 
   function onMouseMove(e) {
-    if (allowDisable && allowDisable()) return // hover turned off for this site (selection/pin still work)
+    if (isDisabled()) return // extension off here — no hover
     if (selecting) return
     if (pinned) return // locked onto a clicked word — ignore hover
     if (hasSelection()) { clearHover(); return }
@@ -226,6 +232,7 @@ export function initHoverDriver(opts = {}) {
 
   function onMouseUp(e) {
     selecting = false
+    if (isDisabled()) return // extension off here — no pin, no selection lookup
     const roots = shadowRootsFromPath(e)
     const sel = selectionText(roots)
 
@@ -251,6 +258,7 @@ export function initHoverDriver(opts = {}) {
   // non-passive so we can preventDefault the navigation that a plain click on a
   // hyperlinked word would otherwise trigger.
   function onAltClick(e) {
+    if (isDisabled()) return // extension off here
     if (!e.altKey || e.button !== 0) return
     const roots = shadowRootsFromPath(e)
     const hit = charAtPoint(e.clientX, e.clientY, roots)
@@ -263,6 +271,7 @@ export function initHoverDriver(opts = {}) {
   // Hover-pin hotkey: with a word under the cursor (and focus not in an editable
   // field), pressing the configured key pins it — works on links with no click.
   function onKeyDown(e) {
+    if (isDisabled()) return // extension off here — hotkey pin disabled
     const key = (settings.pinKey || 'p').toLowerCase()
     if (!key || e.ctrlKey || e.metaKey || e.altKey) return
     if ((e.key || '').toLowerCase() !== key) return
@@ -565,5 +574,5 @@ export function initHoverDriver(opts = {}) {
     unpin()
   }
 
-  return { destroy, clearHover }
+  return { destroy, clearHover, unpin }
 }

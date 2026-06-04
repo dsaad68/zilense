@@ -23,16 +23,18 @@ import { initSubs } from './subs/index.js'
 // is dynamically imported on first Reader-mode open (see extractArticle), keeping
 // it in a separate on-demand chunk.
 
-let hoverDisabled = false // this site is in the user's "disable hover" list
+let hoverDisabled = false // this site is in the user's "disable on this site" list
+let extEnabled = true // global master switch (settings.enabled); off = inert everywhere
 let hskLevel = 0 // current "highlight HSK ≤ N" level on this page (0 = off)
 let hskNames = [] // CSS highlight names currently set for the HSK overlay
 let hskGen = 0 // bumped on every clear so an in-flight chunked scan can cancel
 const hskWordCache = new Map() // level -> [word, rank][] from the service worker
 
 // the cursor-driven hover/pin/select machinery (shared with the PDF viewer). It
-// owns the highlight + popup + pin box; we pass the per-site disable predicate so
-// hover stays off on disabled sites (selection/pin still work via the driver).
-const hover = initHoverDriver({ allowDisable: () => hoverDisabled })
+// owns the highlight + popup + pin box. We pass a COMBINED disable predicate so the
+// whole on-page lookup (hover, click-to-pin, and selection) goes off when either
+// this site is disabled or the extension's global master switch is turned off.
+const hover = initHoverDriver({ allowDisable: () => hoverDisabled || !extEnabled })
 
 function lookup(q) {
   if (!q) return
@@ -281,28 +283,39 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   }
 })
 
-/* Per-site "disable hover" — the toolbar popup can turn hover off on a hostname.
-   The accent/settings sync lives in the shared driver; here we only track the
-   disabled-sites list and clear any live highlight/popup when it flips on so it
-   disappears without needing another mousemove. */
-const DISABLED_KEY = 'mydict.disabledSites' // hostnames where hover is turned off
+/* Turning the lookup off — two layers, both driven from the toolbar popup:
+     • per-site: this hostname is in mydict.disabledSites, or
+     • global:   the master switch mydict.settings.enabled is false.
+   Either makes the shared driver inert (hover + click-to-pin + selection all stop);
+   when one flips ON we also clear any live highlight / popup / pin so it disappears
+   immediately without needing another mousemove. */
+const DISABLED_KEY = 'mydict.disabledSites' // hostnames where lookup is turned off
+const SETTINGS_KEY = 'mydict.settings' // holds the global `enabled` master switch
 
 function applyDisabledSites(list) {
   const next = Array.isArray(list) && list.includes(location.hostname)
-  if (next && !hoverDisabled) hover.clearHover()
+  if (next && !hoverDisabled) { hover.clearHover(); hover.unpin() }
   hoverDisabled = next
 }
 
+function applyEnabled(settings) {
+  const next = !(settings && settings.enabled === false) // absent/true = enabled
+  if (!next && extEnabled) { hover.clearHover(); hover.unpin() } // master just turned off
+  extEnabled = next
+}
+
 try {
-  chrome.storage?.local.get([DISABLED_KEY], (got) => {
+  chrome.storage?.local.get([DISABLED_KEY, SETTINGS_KEY], (got) => {
     if (chrome.runtime.lastError) return
     applyDisabledSites(got && got[DISABLED_KEY])
+    applyEnabled(got && got[SETTINGS_KEY])
   })
   chrome.storage?.onChanged.addListener((changes, area) => {
     if (area !== 'local') return
     if (changes[DISABLED_KEY]) applyDisabledSites(changes[DISABLED_KEY].newValue)
+    if (changes[SETTINGS_KEY]) applyEnabled(changes[SETTINGS_KEY].newValue)
   })
-} catch (e) { /* no chrome.storage (e.g. tests) — hover stays enabled */ }
+} catch (e) { /* no chrome.storage (e.g. tests) — extension stays enabled */ }
 
 /* PDF prompt toast — when you navigate to a PDF, Chrome shows it in its native
    viewer, which has no hoverable text. This content script DOES run on that PDF

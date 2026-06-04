@@ -15,6 +15,7 @@ const FAMILIARITY_KEY = 'mydict.familiarity'
 const HISTORY_MAX = 100 // cap recent lookups so the list stays bounded
 
 export const DEFAULT_SETTINGS = {
+  enabled: true, // master on/off for the on-page lookup (hover / click / select)
   accent: '#c8443a',
   hanFont: 'sans', // 'sans' | 'serif'
   toneColors: true,

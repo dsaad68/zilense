@@ -49,6 +49,9 @@ body {
 .set-label { font-family: var(--font-en); font-size: 14px; color: var(--ink); }
 .sub { display: block; font-family: var(--font-ui); font-size: 11px; color: var(--ink3); margin-top: 1px; }
 
+/* master switch (the on/off at the very top) reads as the primary control */
+.row.master .set-label { font-weight: 600; }
+
 .switch {
   flex: none; width: 42px; height: 24px; border-radius: 999px; border: none; cursor: pointer;
   padding: 0; background: var(--line2); position: relative; transition: background .16s;

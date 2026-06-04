@@ -48,6 +48,16 @@ test('toggleSite: a falsy host is a no-op', () => {
   assert.equal(toggleSite(list, undefined), list)
 })
 
+test('settings: the extension master switch defaults ON', async () => {
+  // content.js treats only an explicit `enabled === false` as off, so the default
+  // (and any older install with no stored value) must read as enabled.
+  assert.equal(DEFAULT_SETTINGS.enabled, true, 'enabled defaults to true')
+  const store = stubLocalStorage()
+  const merged = await saveSettingsPatch({ enabled: false })
+  assert.equal(merged.enabled, false, 'the master switch persists when turned off')
+  assert.equal(JSON.parse(store.get(SETTINGS_KEY)).enabled, false)
+})
+
 test('saveSettingsPatch: two sequential patches both persist (no clobber)', async () => {
   // mirrors the toolbar popup toggling two switches in one session: each call
   // must merge onto the CURRENT stored settings, not a stale snapshot.

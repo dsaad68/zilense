@@ -29,6 +29,8 @@ beforeEach(() => {
   document.body.innerHTML = ''
   // a known caret target is set per-test by pointing caretPositionFromPoint at it
   delete document.caretPositionFromPoint
+  // default to "no active selection" so click tests pin (a selection test overrides)
+  window.getSelection = () => ({ isCollapsed: true, toString: () => '' })
 })
 
 // canned service-worker reply: 你好 is a 2-char word
@@ -82,6 +84,132 @@ test('hover: respects the allowDisable predicate (no highlight when disabled)', 
   document.body.innerHTML = '<p id="t">你好世界</p>'
   moveOver(document.getElementById('t').firstChild)
   assert.ok(!globalThis.CSS.highlights.has('mydict-tok'), 'disabled site paints nothing')
+  driver.destroy()
+})
+
+// a chrome stub that records every message sent (for the click/pin assertions)
+function recordingChrome() {
+  const sent = []
+  globalThis.chrome = {
+    runtime: {
+      lastError: undefined,
+      sendMessage(msg, cb) {
+        sent.push(msg)
+        if (cb) cb(msg && msg.type === 'hover' ? { word: '你好', len: 2, pinyin: 'nǐ hǎo', defs: ['hello'], hskSenses: [] } : {})
+      },
+    },
+  }
+  return sent
+}
+function clickAt(node) {
+  document.caretPositionFromPoint = () => ({ offsetNode: node, offset: 0 })
+  document.dispatchEvent(new window.MouseEvent('mousedown', { clientX: 5, clientY: 5, bubbles: true }))
+  document.dispatchEvent(new window.MouseEvent('mouseup', { clientX: 5, clientY: 5, bubbles: true }))
+}
+
+test('enabled: clicking a word pins it and opens the panel', () => {
+  const sent = recordingChrome()
+  const driver = initHoverDriver()
+  document.body.innerHTML = '<p id="t">你好世界</p>'
+  clickAt(document.getElementById('t').firstChild)
+  const open = sent.find((m) => m && m.type === 'open-panel')
+  assert.ok(open && open.q === '你好', 'a plain click pins the word and asks to open the panel')
+  driver.destroy()
+})
+
+test('disabled: clicking a word does NOT pin or open the panel (the bug)', () => {
+  const sent = recordingChrome()
+  const driver = initHoverDriver({ allowDisable: () => true })
+  document.body.innerHTML = '<p id="t">你好世界</p>'
+  clickAt(document.getElementById('t').firstChild)
+  assert.ok(!sent.some((m) => m && m.type === 'open-panel'), 'no open-panel message when disabled')
+  assert.ok(!globalThis.CSS.highlights.has('mydict-pin'), 'no pin highlight when disabled')
+  driver.destroy()
+})
+
+function altClickAt(node) {
+  document.caretPositionFromPoint = () => ({ offsetNode: node, offset: 0 })
+  document.dispatchEvent(new window.MouseEvent('click', { altKey: true, button: 0, clientX: 5, clientY: 5, bubbles: true }))
+}
+function selectText(text) {
+  window.getSelection = () => ({ isCollapsed: false, toString: () => text })
+}
+
+test('enabled: Alt-click pins the word', () => {
+  const sent = recordingChrome()
+  const driver = initHoverDriver()
+  document.body.innerHTML = '<p id="t">你好世界</p>'
+  altClickAt(document.getElementById('t').firstChild)
+  const open = sent.find((m) => m && m.type === 'open-panel')
+  assert.ok(open && open.q === '你好', 'Alt-click pins the word')
+  driver.destroy()
+})
+
+test('disabled: Alt-click does NOT pin', () => {
+  const sent = recordingChrome()
+  const driver = initHoverDriver({ allowDisable: () => true })
+  document.body.innerHTML = '<p id="t">你好世界</p>'
+  altClickAt(document.getElementById('t').firstChild)
+  assert.ok(!sent.some((m) => m && m.type === 'open-panel'), 'Alt-click inert when disabled')
+  driver.destroy()
+})
+
+test('enabled: the pin hotkey pins the hovered word', () => {
+  const sent = recordingChrome()
+  const driver = initHoverDriver()
+  document.body.innerHTML = '<p id="t">你好世界</p>'
+  moveOver(document.getElementById('t').firstChild) // sets the hovered word
+  sent.length = 0 // drop the hover messages; we only care about the keydown
+  document.dispatchEvent(new window.KeyboardEvent('keydown', { key: 'p', bubbles: true }))
+  const open = sent.find((m) => m && m.type === 'open-panel')
+  assert.ok(open && open.q === '你好', 'pressing the pin key pins the hovered word')
+  driver.destroy()
+})
+
+test('disabled: the pin hotkey does NOT pin (even with a previously hovered word)', () => {
+  let off = false
+  const sent = recordingChrome()
+  const driver = initHoverDriver({ allowDisable: () => off })
+  document.body.innerHTML = '<p id="t">你好世界</p>'
+  moveOver(document.getElementById('t').firstChild) // hover while enabled to set the word
+  off = true
+  sent.length = 0
+  document.dispatchEvent(new window.KeyboardEvent('keydown', { key: 'p', bubbles: true }))
+  assert.ok(!sent.some((m) => m && m.type === 'open-panel'), 'hotkey inert once disabled')
+  driver.destroy()
+})
+
+test('enabled: selecting text looks it up', () => {
+  const sent = recordingChrome()
+  const driver = initHoverDriver()
+  document.body.innerHTML = '<p id="t">你好世界</p>'
+  selectText('你好')
+  document.dispatchEvent(new window.MouseEvent('mousedown', { clientX: 5, clientY: 5, bubbles: true }))
+  document.dispatchEvent(new window.MouseEvent('mouseup', { clientX: 5, clientY: 5, bubbles: true }))
+  const lk = sent.find((m) => m && m.type === 'lookup')
+  assert.ok(lk && lk.q === '你好', 'the selection is looked up')
+  driver.destroy()
+})
+
+test('disabled: selecting text does NOT look up', () => {
+  const sent = recordingChrome()
+  const driver = initHoverDriver({ allowDisable: () => true })
+  document.body.innerHTML = '<p id="t">你好世界</p>'
+  selectText('你好')
+  document.dispatchEvent(new window.MouseEvent('mousedown', { clientX: 5, clientY: 5, bubbles: true }))
+  document.dispatchEvent(new window.MouseEvent('mouseup', { clientX: 5, clientY: 5, bubbles: true }))
+  assert.ok(!sent.some((m) => m && m.type === 'lookup'), 'no selection lookup when disabled')
+  driver.destroy()
+})
+
+test('unpin() is exposed and clears the pin overlay', () => {
+  recordingChrome()
+  const driver = initHoverDriver()
+  document.body.innerHTML = '<p id="t">你好世界</p>'
+  clickAt(document.getElementById('t').firstChild) // pin it
+  assert.ok(globalThis.CSS.highlights.has('mydict-pin'), 'a pin highlight is set')
+  driver.unpin()
+  assert.ok(!globalThis.CSS.highlights.has('mydict-pin'), 'unpin() clears the pin highlight')
   driver.destroy()
 })
 
