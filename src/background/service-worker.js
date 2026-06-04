@@ -219,6 +219,59 @@ chrome.runtime.onMessage.addListener((msg, sender) => {
   )
 })
 
+// Open the dictionary in a detached, chromeless popup window — the "app-like"
+// mode. Single-instance: the window id is remembered in session storage, so a
+// repeat trigger focuses the existing window instead of opening another (with a
+// stale-id fallback for a window the user has since closed). chrome.windows.create
+// needs no user gesture, so both the toolbar menu (via the 'open-window' message)
+// and the keyboard command can drive this from here — one source of truth for the
+// window's size and single-instance behavior. ?mode=window tells App.jsx to draw
+// its own brand header, since a popup window has no side-panel bar to supply one.
+async function openDictWindow() {
+  try {
+    const { panelWindowId } = await chrome.storage.session.get('panelWindowId')
+    if (panelWindowId != null) {
+      try {
+        await chrome.windows.get(panelWindowId) // throws if it was closed
+        await chrome.windows.update(panelWindowId, { focused: true })
+        return
+      } catch {
+        // stale id — the window is gone; fall through and open a fresh one
+      }
+    }
+    const win = await chrome.windows.create({
+      url: chrome.runtime.getURL('src/sidepanel/index.html') + '?mode=window',
+      type: 'popup',
+      width: 420,
+      height: 680,
+    })
+    await chrome.storage.session.set({ panelWindowId: win.id })
+  } catch (e) {
+    console.error('[mydict] open window', e)
+  }
+}
+
+// The toolbar menu's "Open in window" button delegates here (rather than calling
+// chrome.windows.create itself) so the single-instance logic lives in one place.
+chrome.runtime.onMessage.addListener((msg) => {
+  if (!msg || msg.type !== 'open-window') return
+  openDictWindow()
+})
+
+// Keyboard shortcuts (manifest `commands`). Open-window goes through the shared
+// opener above; open-side-panel runs sidePanel.open() for the active tab — the
+// command invocation is the user gesture sidePanel.open() requires.
+chrome.commands.onCommand.addListener((command) => {
+  if (command === 'open-window') { openDictWindow(); return }
+  if (command === 'open-side-panel') {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      const id = tabs && tabs[0] && tabs[0].id
+      if (id == null) return
+      chrome.sidePanel.open({ tabId: id }).catch((e) => console.error('[mydict] sidePanel.open', e))
+    })
+  }
+})
+
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   if (!tab) return
   // Reader mode: tell the tab's content script to extract + open the reader.

@@ -235,8 +235,7 @@ a:hover { text-decoration: underline; }
 .ui .p-head { flex: none; display: flex; align-items: center; justify-content: space-between;
   padding: 13px 14px 11px; border-bottom: 1px solid var(--line); }
 .ui .brand { display: flex; align-items: center; gap: 9px; }
-.ui .seal { width: 28px; height: 28px; border-radius: 7px; background: var(--accent); color: #fff;
-  display: grid; place-items: center; font-size: 17px; font-weight: 700; font-family: var(--font-han);
+.ui .seal { width: 28px; height: 28px; border-radius: 7px; object-fit: cover; display: block;
   box-shadow: 0 2px 8px var(--accent-soft); }
 .ui .brand-name { font-family: var(--font-en); font-weight: 700; font-size: 16px; color: var(--ink); }
 .ui .head-actions { display: flex; gap: 2px; }

@@ -36,7 +36,8 @@ npm run test:e2e     # Playwright smoke test (loads dist/ in Chromium; build fir
 2. Go to `chrome://extensions`, enable **Developer mode**.
 3. **Load unpacked** → select the `dist/` folder.
 4. Click the **Zilense** toolbar icon → a small menu opens with **Open side
-   panel**, a **Hover popup** toggle, and **Disable on this site**.
+   panel**, **Open in window**, a **Hover popup** toggle, and **Disable on this
+   site**.
 
 ## Use
 
@@ -50,6 +51,11 @@ npm run test:e2e     # Playwright smoke test (loads dist/ in Chromium; build fir
 - **🔊 Pronounce** plays Mandarin via the browser’s speech synthesis (when a
   zh-CN voice is installed).
 - **★ Save** entries to your deck (persists via `chrome.storage`).
+- **🪟 Open in window** (toolbar menu → **Open in window**) → the same dictionary in
+  a detached, chromeless popup window that floats free of the side panel and stays
+  put across tab switches. It shares your saved words, history, and settings, and
+  gets the same live hover/selection lookups; clicking again focuses the existing
+  window instead of opening another.
 - **🎴 Flashcards** (toolbar menu → **Flashcards**, opens a full-page tab) → study
   your **starred words** or any **HSK 3.0 level** with flip cards and keyboard
   shortcuts; progress is kept on the device.
@@ -73,8 +79,18 @@ npm run test:e2e     # Playwright smoke test (loads dist/ in Chromium; build fir
 > Note: Chrome only lets the side panel open from a user gesture, so hovering
 > can't auto-open it, open the panel once (toolbar icon menu → **Open side
 > panel**, or right-click → *Look up …*), then it updates live as you hover and
-> select. The toolbar menu also lets you toggle the inline hover popup and
-> disable hover on the current site (selection and pinning keep working there).
+> select. Prefer a free-floating window? Use **Open in window** instead — same UI,
+> same live lookups, just not docked to the browser edge. The toolbar menu also
+> lets you toggle the inline hover popup and disable hover on the current site
+> (selection and pinning keep working there).
+
+> **Keyboard shortcuts** (rebind at `chrome://extensions/shortcuts`):
+> - **Ctrl + Shift + Y** (`⌘ + Shift + Y` on macOS) → open the dictionary **window**.
+> - **Ctrl + Shift + E** (`⌘ + Shift + E` on macOS) → open the **side panel**.
+>
+> These launch the dictionary directly without going through the toolbar menu —
+> the closest thing to opening it like an app. If a suggested key is already taken,
+> Chrome leaves it unassigned; set your own on the shortcuts page.
 
 ## Architecture
 
@@ -83,7 +99,8 @@ npm run test:e2e     # Playwright smoke test (loads dist/ in Chromium; build fir
 | Manifest (MV3) | `manifest.config.js` (CRXJS), `vite.config.js` |
 | Data pipelines | `assets/scripts/build-dict.mjs` → `src/data/cedict.json` (CC-CEDICT entries + traditional↔simplified maps + merged HSK/POS/char data + merged **CedPane** names/proper nouns); CedPane is fetched once at build time and cached, committed, as `assets/cedpane/cedpane.json` so later builds/tests are deterministic and offline. `assets/scripts/convert-chars.mjs` → `assets/char-data/char-data.json` (radical/components/strokes, from makemeahanzi); `assets/scripts/fetch-fonts.mjs` → `src/sidepanel/fonts/` + `fonts.css` (vendored Google Fonts). `assets/scripts/convert-hsk.mjs` (`npm run convert:hsk`) → `assets/hsk-vocab/hsk-data.json` (HSK level + POS + official gloss, parsed from the committed `.xls` lists). All build/data scripts live under `assets/`. |
 | Dictionary logic | `src/lib/dict-core.js` (pure lookup/search/segment, unit-tested), `src/lib/dict.js` (loads the index, wraps core), `src/lib/pinyin.js`, `src/lib/storage.js`, `src/lib/examples.js` (Tatoeba) |
-| Side panel UI | `src/sidepanel/` (`App.jsx` + `components/`, `panel.css`) |
+| Side panel UI | `src/sidepanel/` (`App.jsx` + `components/`, `panel.css`); the same page also serves the **Open in window** mode — `App.jsx` reads `?mode=window` to draw its own brand header when not docked |
+| Toolbar menu | `src/popup/` (`index.html`, `popup.js`, `popup.css`); opens the side panel or a detached window (`chrome.windows.create`, single-instance via `chrome.storage.session`), toggles hover popup / site-disable, and runs HSK highlight |
 | Flashcards page | `src/flashcards/` (`index.html`, `flashcards.js` deck/round/setup logic + custom deck dropdown, `progress.js` local per-device progress, `flashcards.css`); HSK decks are built entirely from the bundled HSK lists (one card per sense, scope = just/​up-to a level), starred decks from saved words; `src/lib/anki.js` (pure TSV formatter) |
 | On-page lookup | `src/content/content.js` (hover + click-to-pin + select), `content.css` |
 | Background | `src/background/service-worker.js` (panel open + context menu) |

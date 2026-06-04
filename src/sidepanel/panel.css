@@ -93,6 +93,18 @@ body {
 .iconbtn:hover { background: var(--card2); color: var(--ink); }
 .iconbtn.on { color: var(--accent); }
 
+/* brand header — only shown when opened as a detached window (WINDOW_MODE),
+   where there's no side-panel bar to supply the icon + name */
+.win-head {
+  flex-shrink: 0; display: flex; align-items: center; gap: 8px;
+  padding: 12px 14px 0; font-weight: 700; font-size: 14px; color: var(--ink);
+}
+.win-seal {
+  width: 22px; height: 22px; border-radius: 7px; object-fit: cover; display: block;
+  background: var(--accent); box-shadow: 0 2px 8px var(--accent-soft);
+}
+.win-title { letter-spacing: .01em; }
+
 /* search */
 .searchbar {
   flex-shrink: 0; margin: 14px 14px 0; display: flex; align-items: center; gap: 8px;

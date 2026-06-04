@@ -35,6 +35,21 @@ export default defineManifest({
     128: 'icons/icon-128.png',
     512: 'icons/icon-512.png',
   },
+  // Keyboard shortcuts (chrome://extensions/shortcuts lets users rebind them).
+  // Both are handled in the service worker's chrome.commands.onCommand listener;
+  // a command invocation is a user gesture, which sidePanel.open() requires. If a
+  // suggested key collides with an existing Chrome/extension binding, Chrome just
+  // leaves it unassigned and the user can set their own — the command still exists.
+  commands: {
+    'open-window': {
+      suggested_key: { default: 'Ctrl+Shift+Y', mac: 'Command+Shift+Y' },
+      description: 'Open Zilense in a window',
+    },
+    'open-side-panel': {
+      suggested_key: { default: 'Ctrl+Shift+E', mac: 'Command+Shift+E' },
+      description: 'Open the Zilense side panel',
+    },
+  },
   background: {
     service_worker: 'src/background/service-worker.js',
     type: 'module',

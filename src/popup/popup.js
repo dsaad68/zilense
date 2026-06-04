@@ -39,6 +39,16 @@ async function init() {
     window.close()
   })
 
+  // Open in window — the dictionary in a chromeless popup window that floats free
+  // of the tab strip and stays put across tab switches. The actual open lives in
+  // the service worker (openDictWindow): it owns the single-instance logic so the
+  // toolbar menu and the keyboard shortcut share one implementation. We just send
+  // the message; the worker focuses an existing window or creates a fresh one.
+  $('open-window').addEventListener('click', () => {
+    chrome.runtime.sendMessage({ type: 'open-window' }, () => void chrome.runtime.lastError)
+    window.close()
+  })
+
   // Reader mode — tell the active tab's content script to extract the article and
   // open the reader overlay. Disabled on non-web tabs (no content script there).
   const readerBtn = $('reader-mode')

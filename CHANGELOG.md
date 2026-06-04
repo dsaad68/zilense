@@ -4,6 +4,19 @@ All notable changes to **Zilense** are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/), and the project follows
 [Semantic Versioning](https://semver.org/).
 
+## [1.7.5] — 2026-06-04
+
+### Added
+- **Open in window** (toolbar menu → Open in window): the dictionary in a detached,
+  chromeless popup window that floats free of the side panel and stays put across
+  tab switches. It shares the side panel's data and receives the same live
+  hover/selection lookups; a repeat click focuses the existing window rather than
+  opening another.
+- **Keyboard shortcuts** for launching the dictionary directly, without the toolbar
+  menu (rebind at `chrome://extensions/shortcuts`):
+  - **Ctrl/⌘ + Shift + Y** → open the dictionary window.
+  - **Ctrl/⌘ + Shift + E** → open the side panel.
+
 ## [1.7.0] — 2026-06-04
 
 ### Added

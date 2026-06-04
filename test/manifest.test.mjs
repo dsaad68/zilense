@@ -22,6 +22,15 @@ test('manifest: the toolbar icon opens an action popup', () => {
   assert.ok(m.action.default_popup.includes('popup'), 'default_popup points at the popup page')
 })
 
+test('manifest: keyboard shortcuts for opening the window and the side panel', () => {
+  assert.ok(m.commands, 'commands block is set')
+  for (const c of ['open-window', 'open-side-panel']) {
+    assert.ok(m.commands[c], `missing command ${c}`)
+    assert.ok(m.commands[c].suggested_key, `command ${c} needs a suggested key`)
+    assert.ok(typeof m.commands[c].description === 'string', `command ${c} needs a description`)
+  }
+})
+
 test('manifest: host_permissions narrowed to the real fetch targets (no <all_urls>)', () => {
   assert.ok(!m.host_permissions.includes('<all_urls>'), 'host_permissions must not be <all_urls>')
   assert.ok(m.host_permissions.some((h) => h.includes('tatoeba.org')), 'Tatoeba host expected')

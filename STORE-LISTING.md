@@ -47,6 +47,10 @@ is factual and matches the shipped code (`manifest.config.js`, `src/`) and the
 > - **Pronunciation** — hear Mandarin via your browser's speech synthesis.
 > - **Saved deck** — star words to build your own study list; it stays on your
 >   device.
+> - **Side panel or floating window** — use the dictionary docked in Chrome's side
+>   panel, or pop it out into a detached window that floats free and stays put as
+>   you switch tabs. Both share your saved words, settings, and live lookups, and
+>   **keyboard shortcuts** can open either one directly (rebindable in Chrome).
 > - **Flashcards** — study your starred words or any HSK 3.0 level on a full-page
 >   trainer with flip cards and keyboard shortcuts. HSK decks come from the
 >   official word lists (exact gloss, part of speech, and pinyin per entry); pick

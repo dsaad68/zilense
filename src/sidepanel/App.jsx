@@ -22,6 +22,13 @@ function softHex(hex, a) {
   return 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')'
 }
 
+// Opened as a detached popup window (?mode=window) rather than the side panel.
+// Chrome's side-panel bar shows the icon + name, but a popup window has none, so
+// the app draws its own compact brand header in that mode.
+const WINDOW_MODE = (() => {
+  try { return new URLSearchParams(location.search).get('mode') === 'window' } catch { return false }
+})()
+
 export default function App() {
   const [loadStatus, setLoadStatus] = useState('loading') // 'loading' | 'ready' | 'error'
   const ready = loadStatus === 'ready'
@@ -208,8 +215,16 @@ export default function App() {
         <SettingsMenu settings={settings} onSetting={setSetting} onClose={() => setShowSettings(false)} />
       )}
 
-      {/* Chrome's side-panel bar already shows the icon + name, so the app header
-          carries no brand — the search row hosts the settings / theme controls. */}
+      {/* In the side panel Chrome's own bar shows the icon + name, so no brand is
+          drawn; in a detached window (WINDOW_MODE) there's no such bar, so render a
+          compact brand header. The search row hosts the settings / theme controls. */}
+      {WINDOW_MODE && (
+        <div className="win-head">
+          <img className="win-seal" src="/icons/icon-48.png" alt="" width="22" height="22" />
+          <span className="win-title">Zilense</span>
+        </div>
+      )}
+
       <div className="searchbar">
         <span className="search-ic">{Svg.search}</span>
         <input

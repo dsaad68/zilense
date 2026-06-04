@@ -72,7 +72,7 @@
         <div class="dock ui">
           <div class="dock-head">Side panel</div>
           <div class="p-head">
-            <div class="brand"><span class="seal" lang="zh">字</span><span class="brand-name">Zilense</span></div>
+            <div class="brand"><img class="seal" src="icon.png" alt=""><span class="brand-name">Zilense</span></div>
             <div class="head-actions">
               <button class="iconbtn" aria-label="Settings"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg></button>
               <button class="iconbtn" aria-label="Dark mode"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z"/></svg></button>
@@ -365,8 +365,36 @@
         </div>
       </section>
 
-      <!-- customize -->
+      <!-- open in window -->
       <section class="feat rev">
+        <div class="feat-text">
+          <p class="eyebrow">Dock it or float it</p>
+          <h2>Side panel — or a window of its own</h2>
+          <p>Keep the dictionary docked in Chrome's <strong>side panel</strong>, or pop it out into a
+            <strong>detached window</strong> that floats free and stays put as you switch tabs.</p>
+          <p>Both share the same saved words, settings, and live hover &amp; selection lookups — open
+            whichever fits how you read, or launch either with a <strong>keyboard shortcut</strong>.</p>
+        </div>
+        <div class="feat-visual">
+          <div class="ui" style="width:300px">
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line)">
+              <span class="bw-lights" style="padding:0"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i></span>
+              <span style="display:flex;align-items:center;gap:7px;font-family:var(--font-en);font-weight:700;font-size:14px;color:var(--ink)"><img class="seal" src="icon.png" alt="" style="width:20px;height:20px"> Zilense</span>
+            </div>
+            <div class="p-body" style="border-top:none">
+              <div class="entry">
+                <div class="entry-head"><div class="hanzi-big" lang="zh">字</div></div>
+                <div class="pinyin-row" lang="zh"><span class="tone-4">zì</span></div>
+                <div class="meta-row"><span class="badge-hsk">HSK 1</span><span class="pos">noun</span><span class="freq">· very common</span></div>
+                <ol class="defs"><li>character</li><li>word</li><li>letter</li></ol>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- customize -->
+      <section class="feat">
         <div class="feat-text">
           <p class="eyebrow">Make it yours</p>
           <h2>Themes, fonts &amp; tone colors</h2>
@@ -396,7 +424,7 @@
       </section>
 
       <!-- familiarity / progress (experimental) -->
-      <section class="feat">
+      <section class="feat rev">
         <div class="feat-text">
           <p class="eyebrow">Spaced for memory</p>
           <h2>Track what you know <span class="tag-exp">Experimental</span></h2>
