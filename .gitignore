@@ -15,6 +15,9 @@ assets/char-data/*.txt
 test-results/
 playwright-report/
 
+# Personal pre-publish checklist (not part of the repo)
+todo.md
+
 # OS
 .DS_Store
 
