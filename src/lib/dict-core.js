@@ -157,6 +157,36 @@ export function segmentLongest(db, text, maxLen = 12) {
   return { word: chars[0], len: 1 }
 }
 
+/* segmentText(db, text, { window, maxCP }) — tokenize a line/paragraph of mixed
+   Chinese and other text into render tokens: greedy longest-match each Han run
+   into the longest dictionary word (segmentLongest), tag it word/char, and attach
+   the tone-marked pinyin (from lookup); every non-Han code point passes through as
+   its own `punct` token. Pure (no DOM / no bundler imports), so it's the shared
+   tokenizer behind the reader's paragraph segmentation (service worker) and the
+   on-video subtitle overlay, and is unit-testable on its own.
+
+   `window` bounds how many leading code points segmentLongest inspects (so a long
+   line isn't re-joined on every step — the O(n^2) trap); `maxCP` caps the input
+   length. Both default to "no limit beyond segmentLongest's own maxLen". */
+export function segmentText(db, text, { window = 12, maxCP = Infinity } = {}) {
+  const out = []
+  if (!db) return out
+  const cps = [...String(text)].slice(0, maxCP) // code points (astral-safe), capped
+  let i = 0
+  while (i < cps.length) {
+    const ch = cps[i]
+    if (!HAN.test(ch)) { out.push({ t: ch, kind: 'punct' }); i++; continue }
+    // segmentLongest reads at most `window` leading code points, so join only that
+    // window instead of the whole remaining text
+    const seg = segmentLongest(db, cps.slice(i, i + window).join(''))
+    const word = seg ? seg.word : ch
+    const e = lookup(db, word)
+    out.push({ t: word, kind: [...word].length > 1 ? 'word' : 'char', py: e ? e.pinyin : '' })
+    i += seg ? seg.len : 1
+  }
+  return out
+}
+
 // small object for result rows (avoids full normalization while scanning)
 function preview(db, key) {
   const primary = db.entries[key][0]

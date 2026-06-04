@@ -4,6 +4,93 @@ All notable changes to **Zilense** are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/), and the project follows
 [Semantic Versioning](https://semver.org/).
 
+## [1.9.4] — 2026-06-04
+
+### Fixed
+- Dual subtitles not showing an **English** second line when a video has both an
+  auto-generated `en` track and a human `en-GB` track: the picker grabbed the ASR
+  `en` (which isn't separately fetchable and came back empty). It now prefers a
+  human track over an auto-generated one in the same language, and if a chosen track
+  still won't load it falls back to machine-translating into that language — so the
+  second line shows reliably.
+
+## [1.9.3] — 2026-06-04
+
+### Changed
+- The toolbar menu now shows the **Subtitles** section only on supported video
+  sites (YouTube / Coursera), where the feature actually does something; on every
+  other page the menu is just the dictionary controls.
+
+### Fixed
+- **The on-video subtitle engine never loaded on real pages.** The content script's
+  lazy `import('./engine.js')` went through Vite's module-preload helper, which
+  resolved the engine chunk against the *page* origin (`https://www.youtube.com/
+  assets/engine-*.js` → 404) and rejected the import — so the whole overlay (pinyin,
+  lookup, dual) silently never ran. Disabled module preload for the build so the
+  import resolves against the extension origin.
+- Dual subtitles failing to load caption text on YouTube: a track's raw caption URL
+  now often returns nothing without a session token the player adds. The hook now
+  captures the player's own caption requests (both `fetch` and XHR) and the engine
+  fetches cues from that working URL (swapping format/language/translation), instead
+  of the bare URL. Set `localStorage.zilenseSubsDebug = '1'` on a video page and
+  reload to see `[zilense subs]` diagnostics if dual still won't engage.
+
+## [1.9.2] — 2026-06-04
+
+### Added
+- **Dual subtitles toggle** in the toolbar menu, with a **Second language** picker.
+  Chinese shows on top and a second language below. The second line defaults to
+  **English** and can be set to another language; a chosen language falls back to
+  English (or the next available track) when a video doesn't carry it, so the second
+  line never silently disappears.
+- Turning on Dual subtitles now **uses YouTube's auto-captions and auto-translation
+  when needed**, so it works on the common case of a video that only has an
+  auto-generated Chinese track — the Chinese line uses that track and the second
+  line is machine-translated into the chosen language. (The separate per-line
+  auto-caption / auto-translation toggles are gone; dual implies them.)
+
+## [1.9.1] — 2026-06-04
+
+### Added
+- A **Pinyin tone colors** toggle in the toolbar menu. It turns tone coloring on/off
+  everywhere at once — the side panel and Reader, and the on-video subtitle overlay
+  (which previously had no way to switch its tone colors off).
+
+### Fixed
+- The subtitle engine no longer tries to load on YouTube login/creator subdomains
+  (`accounts.`/`studio.`/`consent.youtube.com`). Those frames have no video player
+  and a strict CSP that blocked the dynamically-imported engine chunk; the feature
+  now runs only on the surfaces that actually have a player.
+- Right-click **look up selection** no longer fails to open the side panel with "may
+  only be called in response to a user gesture" — the panel is now opened within the
+  click gesture before any async work.
+
+## [1.9.0] — 2026-06-04
+
+### Added
+- **Dual subtitles (Phase 2).** On YouTube, Zilense can now show two real caption
+  tracks at once — the Chinese line annotated with pinyin + clickable words, a
+  second line beneath it — synced to the video clock from same-origin `timedtext`
+  (no new permission). A gear menu picks the top/bottom languages.
+- The Chinese line is annotated by language, so pinyin and word lookup follow the
+  Chinese track whether it is the top or the bottom line.
+
+### Changed
+- The single "allow auto" subtitle option is now two independent opt-ins —
+  **auto-captions** (YouTube's speech recognition) and **auto-translation** (its
+  machine translation). Both default off, so the picker offers human-authored
+  tracks only unless you opt in; existing settings are migrated automatically.
+
+### Fixed
+- Dual mode now activates only when **both** chosen tracks actually have cues; a
+  single failed fetch keeps the native captions instead of hiding them behind a
+  one-line overlay.
+- A subtitle line cleared during navigation can no longer be repainted by a late
+  in-flight segmentation reply.
+- When a caption track's signed URL goes stale across an in-page navigation, the
+  engine falls back to the timedtext URL the player itself fetched (matched by
+  language, same-origin).
+
 ## [1.8.5] — 2026-06-04
 
 ### Changed

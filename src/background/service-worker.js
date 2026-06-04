@@ -96,22 +96,13 @@ const SEG_YIELD_EVERY = 20 // paragraphs between event-loop yields
 
 const yieldToLoop = () => new Promise((r) => setTimeout(r, 0))
 
+// one paragraph -> word/char/punct tokens with tone-marked pinyin. The tokenizer
+// itself lives in dict-core (segmentText) so the reader path here and the on-video
+// subtitle overlay share one tested implementation; we just pass the reader's
+// security caps (bounded code-point window, hard length cap on the web-accessible
+// reader payload).
 function segmentPara(db, p) {
-  const out = []
-  const cps = [...String(p)].slice(0, SEG_MAX_CP) // code points, astral-safe + capped
-  let i = 0
-  while (i < cps.length) {
-    const ch = cps[i]
-    if (!core.HAN.test(ch)) { out.push({ t: ch, kind: 'punct' }); i++; continue }
-    // segmentLongest reads at most SEG_WINDOW leading code points, so only join
-    // that window instead of the whole remaining paragraph (the O(n²) hot path)
-    const seg = core.segmentLongest(db, cps.slice(i, i + SEG_WINDOW).join(''))
-    const word = seg ? seg.word : ch
-    const e = core.lookup(db, word)
-    out.push({ t: word, kind: [...word].length > 1 ? 'word' : 'char', py: e ? e.pinyin : '' })
-    i += seg ? seg.len : 1
-  }
-  return out
+  return core.segmentText(db, p, { window: SEG_WINDOW, maxCP: SEG_MAX_CP })
 }
 
 // Reader article hand-off: the content script extracts the article and
@@ -318,14 +309,17 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   }
   if (info.menuItemId !== MENU_ID) return
   const q = (info.selectionText || '').trim()
-  // Stash the query BEFORE opening so a cold panel (listener not yet registered)
-  // still picks it up on mount via takePendingLookup(). Then also message the
-  // panel directly — the fast path when it's already open.
-  if (q) await setPendingLookup(q)
-  try {
-    await chrome.sidePanel.open({ tabId: tab.id })
-  } catch (e) {
-    console.error('[mydict] sidePanel.open', e)
+  // Open the panel FIRST, synchronously, so the right-click stays a user gesture:
+  // an `await` before sidePanel.open() consumes the activation and Chrome rejects
+  // the call ("may only be called in response to a user gesture"). Then stash the
+  // query and message the panel only AFTER the write resolves — a cold panel sees
+  // the word via takePendingLookup() on mount, an open one gets the direct 'lookup'
+  // (same ordering as dispatchPanel).
+  if (tab && tab.id != null) {
+    chrome.sidePanel.open({ tabId: tab.id }).catch((e) => console.error('[mydict] sidePanel.open', e))
   }
-  if (q) chrome.runtime.sendMessage({ type: 'lookup', q }, () => void chrome.runtime.lastError)
+  if (q) {
+    await setPendingLookup(q)
+    chrome.runtime.sendMessage({ type: 'lookup', q }, () => void chrome.runtime.lastError)
+  }
 })

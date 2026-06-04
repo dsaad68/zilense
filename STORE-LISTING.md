@@ -66,6 +66,11 @@ is factual and matches the shipped code (`manifest.config.js`, `src/`) and the
 >   where hover, lookup, and selection work just like on a web page. Scanned or
 >   image-only PDFs are recognized with offline OCR (a bundled Chinese model — no
 >   network), so even photographed pages become hoverable.
+> - **Video subtitles (experimental)** — on YouTube (and Coursera), the on-video
+>   captions get tone-colored pinyin and clickable words that look up in the panel,
+>   and an optional **dual-subtitle** mode shows Chinese on top with a second
+>   language (English by default, switchable) below. This feature is experimental
+>   and depends on each site's player; **Netflix support is planned for later.**
 > - **HSK highlighting** and a customizable look (accent color, Chinese serif/
 >   sans face, tone colors, dark mode).
 >

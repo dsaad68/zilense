@@ -12,7 +12,10 @@ import {
   loadDisabledSites,
   saveDisabledSites,
   toggleSite,
+  loadSubsPrefs,
+  saveSubsPrefs,
 } from '../lib/storage.js'
+import { detectPlatform } from '../content/subs/platforms.js'
 
 const $ = (id) => document.getElementById(id)
 
@@ -82,6 +85,21 @@ async function init() {
     saveSettingsPatch({ inlinePopup })
   })
 
+  // Pinyin tone colors — one switch for "color pinyin by tone" everywhere. It drives
+  // BOTH the global setting (settings.toneColors: side panel + Reader) and the
+  // on-video subtitle overlay (mydict.subs.tones), which is otherwise the only
+  // tone-colored surface with no toggle of its own. The subtitle overlay re-renders
+  // live via storage.onChanged; the panel / Reader reflect it on their next render.
+  const toneBtn = $('tone-colors')
+  let toneColors = settings.toneColors !== false
+  setSwitch(toneBtn, toneColors)
+  toneBtn.addEventListener('click', () => {
+    toneColors = !toneColors
+    setSwitch(toneBtn, toneColors)
+    saveSettingsPatch({ toneColors })
+    saveSubsPrefs({ tones: toneColors })
+  })
+
   // Disable on this site = hostname in the disabled-sites list
   const siteBtn = $('site-toggle')
   const hostEl = $('host')
@@ -101,6 +119,58 @@ async function init() {
     siteBtn.style.opacity = '.4'
     siteBtn.style.cursor = 'default'
   }
+
+  // Subtitles (pinyin + lookup) — the on-video overlay. The whole section is shown
+  // ONLY on a supported video site (YouTube / Coursera), since that is the only
+  // place the feature does anything; detectPlatform is the same host check the
+  // content script uses. Master toggle plus two sub-toggles (dual subtitles,
+  // pinyin), persisted under mydict.subs (read live by the content script). The
+  // sub-rows dim when the feature is off, mirroring the reader's dependent rows.
+  if (host && detectPlatform(host)) {
+  $('subs-section').hidden = false
+  const subs = await loadSubsPrefs()
+  const subsBtn = $('subs-toggle')
+  const subsDualBtn = $('subs-dual')
+  const subsPyBtn = $('subs-pinyin')
+  const subsLang2 = $('subs-lang2')
+  const subRows = [$('subs-dual-row'), $('subs-lang2-row'), $('subs-pinyin-row')]
+  let subsOn = !!subs.enabled
+  let subsDual = subs.dual !== false
+  let subsPinyin = subs.pinyin !== false
+  // the chosen bottom-line language; empty = English-preferred default. Only known
+  // options are reflected, so an unfamiliar stored code falls back to the default.
+  subsLang2.value = [...subsLang2.options].some((o) => o.value === (subs.lang2 || '')) ? (subs.lang2 || '') : ''
+  const reflectSubs = () => {
+    setSwitch(subsBtn, subsOn)
+    setSwitch(subsDualBtn, subsDual)
+    setSwitch(subsPyBtn, subsPinyin)
+    for (const row of subRows) {
+      row.style.opacity = subsOn ? '1' : '.4'
+      row.style.pointerEvents = subsOn ? 'auto' : 'none'
+    }
+  }
+  reflectSubs()
+  subsBtn.addEventListener('click', () => {
+    subsOn = !subsOn
+    reflectSubs()
+    saveSubsPrefs({ enabled: subsOn })
+  })
+  // Dual subtitles — show two tracks at once (Chinese on top, a second language
+  // below) when the video has them; off falls back to the single shown track.
+  subsDualBtn.addEventListener('click', () => {
+    subsDual = !subsDual
+    setSwitch(subsDualBtn, subsDual)
+    saveSubsPrefs({ dual: subsDual })
+  })
+  // Second (bottom-line) language for the dual view. Empty = English-preferred; a
+  // chosen language is a preference that gracefully falls back when a video lacks it.
+  subsLang2.addEventListener('change', () => saveSubsPrefs({ lang2: subsLang2.value }))
+  subsPyBtn.addEventListener('click', () => {
+    subsPinyin = !subsPinyin
+    setSwitch(subsPyBtn, subsPinyin)
+    saveSubsPrefs({ pinyin: subsPinyin })
+  })
+  } // end supported-video-site gate
 
   // Highlight HSK ≤ N — a one-shot action on the active tab's content script.
   const levelSel = $('hsk-level')

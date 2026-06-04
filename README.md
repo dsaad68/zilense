@@ -61,6 +61,18 @@ npm run test:e2e     # Playwright smoke test (loads dist/ in Chromium; build fir
   work just like on a web page. **Scanned/image-only PDFs** are recognized with
   **offline OCR** (bundled Tesseract.js + a Simplified-Chinese model — no network),
   so even photographed workbooks become hoverable.
+- **🎬 Video subtitles — pinyin + dual captions (experimental)** → on **YouTube**
+  (and **Coursera**), the on-video captions get the same treatment as the page:
+  **tone-colored pinyin** above the Chinese and **clickable words** that look up in
+  the panel. Turn on **Dual subtitles** to show **Chinese on top and a second
+  language below** (defaults to **English**, switchable in the toolbar menu); when a
+  video has no human track for the Chinese or the second line, YouTube's
+  auto-captions / auto-translation fill in. The controls (on/off, dual, second
+  language, pinyin) appear in the toolbar menu only on supported video sites, and
+  there's a 字 gear on the player to pick languages per video.
+  - ⚠️ **Experimental.** It relies on each site's player internals and YouTube's
+    caption endpoints, which change often, so expect rough edges. **Netflix support
+    is planned for a later release.**
 - **🎴 Flashcards** (toolbar menu → **Flashcards**, opens a full-page tab) → study
   your **starred words** or any **HSK 3.0 level** with flip cards and keyboard
   shortcuts; progress is kept on the device.
@@ -108,9 +120,10 @@ npm run test:e2e     # Playwright smoke test (loads dist/ in Chromium; build fir
 | Toolbar menu | `src/popup/` (`index.html`, `popup.js`, `popup.css`); opens the side panel or a detached window (`chrome.windows.create`, single-instance via `chrome.storage.session`), toggles hover popup / site-disable, and runs HSK highlight |
 | Flashcards page | `src/flashcards/` (`index.html`, `flashcards.js` deck/round/setup logic + custom deck dropdown, `progress.js` local per-device progress, `flashcards.css`); HSK decks are built entirely from the bundled HSK lists (one card per sense, scope = just/​up-to a level), starred decks from saved words; `src/lib/anki.js` (pure TSV formatter) |
 | On-page lookup | `src/content/hover-driver.js` (shared cursor→highlight/popup/pin driver), `src/content/content.js` (initializes it + HSK highlight + Reader mode + the native-PDF "Open in Zilense" toast), `content.css` |
+| Dual subtitles + pinyin | `src/content/subs/` (loaded on demand by `content.js`, OFF by default): `index.js` gate, `engine.js` runtime, `platforms.js` adapters (YouTube, Coursera), `overlay.js` ruby overlay + word lookup, `subs-core.js` pure tokens/cues/track helpers, `yt-hook.js` MAIN-world caption-track reader. Settings under `mydict.subs`, toggled from the toolbar popup. Phase 1 annotates the shown track with pinyin + clickable words; Phase 2 shows two real YouTube tracks at once (same-origin `timedtext`, no new permission; auto-captions/auto-translation are separate opt-ins) |
 | PDF viewer | `src/pdfviewer/` (`main.js` PDF.js render + lazy pages + text-layer selection, reuses the hover driver; `ocr.js`/`ocr-core.js` offline Tesseract OCR for scanned pages; `target.js` URL parsing, `pdfviewer.css`). OCR engine + chi_sim model bundled under `public/tesseract/` |
 | Background | `src/background/service-worker.js` (panel open, context menus, hover/segment lookup, PDF redirect rule + `open-pdf` navigation) |
-| Tests | `test/*.test.mjs` (`npm test`, Node's built-in runner: dict-core, pinyin, content-core, manifest, storage-helpers, reader-stash, anki, cedpane, familiarity, grammar, hsk-data, meanings, word-family, **hover-driver** + **pdf-target** + **ocr-core** for the PDF/OCR logic; DOM logic, reader-extract, word-walk, via happy-dom); `e2e/*.spec.js` (`npm run test:e2e`, Playwright extension tests: `panel.spec.js`, `popup.spec.js`, `reader.spec.js`, `flashcards.spec.js`, and `pdfviewer.spec.js` — text-layer render, hover-to-pin, the native-PDF toast, scanned-PDF OCR, and selection) |
+| Tests | `test/*.test.mjs` (`npm test`, Node's built-in runner: dict-core, pinyin, content-core, manifest, storage-helpers, reader-stash, anki, cedpane, familiarity, grammar, hsk-data, meanings, word-family, subs-core, **hover-driver** + **pdf-target** + **ocr-core** for the PDF/OCR logic; DOM logic, reader-extract, word-walk, subs-overlay, subs-engine, via happy-dom); `e2e/*.spec.js` (`npm run test:e2e`, Playwright extension tests: `panel.spec.js`, `popup.spec.js`, `reader.spec.js`, `flashcards.spec.js`, and `pdfviewer.spec.js` — text-layer render, hover-to-pin, the native-PDF toast, scanned-PDF OCR, and selection) |
 
 ## Known limitations / next steps
 

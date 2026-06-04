@@ -72,6 +72,24 @@ export default defineManifest({
       // lives in the panel), so the per-frame cost is small.
       all_frames: true,
     },
+    {
+      // MAIN-world hook for the dual-subtitle feature (Phase 2). It runs in
+      // YouTube's own page context so it can read the player's caption-track list
+      // and notice the player's timedtext requests; the content script (isolated
+      // world) can't. It talks back over CustomEvents only and makes no requests of
+      // its own — the engine fetches tracks same-origin on youtube.com, so this adds
+      // NO host permission. A content_scripts `matches` entry is declarative
+      // injection, not a host grant (the entry above already matches <all_urls>).
+      matches: [
+        'https://www.youtube.com/*',
+        'https://m.youtube.com/*',
+        'https://www.youtube-nocookie.com/*',
+      ],
+      js: ['src/content/subs/yt-hook.js'],
+      run_at: 'document_start',
+      all_frames: true,
+      world: 'MAIN',
+    },
   ],
   // activeTab lets the action popup read the active tab's URL (hostname for
   // "disable on this site") and id (to open the side panel) when the user clicks

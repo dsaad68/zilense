@@ -16,6 +16,7 @@
 import { normalizeSelection, shouldLookupSelection, matchWords } from './content-core.js'
 import { htmlToParas, fallbackParas } from './reader-extract.js'
 import { initHoverDriver } from './hover-driver.js'
+import { initSubs } from './subs/index.js'
 // NOTE: @mozilla/readability is NOT imported at the top. This content script runs
 // on <all_urls> with all_frames:true, so a static import would make every page and
 // embedded frame parse ~110 KB of extraction code it almost never uses. Instead it
@@ -354,3 +355,8 @@ function maybeShowPdfToast() {
   ;(document.body || document.documentElement).appendChild(host)
 }
 maybeShowPdfToast()
+
+// Subtitle overlay (pinyin + clickable words on supported video sites). Self-gates
+// on a hostname check and the mydict.subs setting, so this is a no-op on every
+// other page; the heavy engine is dynamically imported only when it activates.
+initSubs()

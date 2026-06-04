@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Zilense, Chinese Dictionary for Chrome</title>
-  <meta name="description" content="Zilense is a Chrome side-panel Chinese dictionary: hover or select any hanzi for tone-colored pinyin, meaning, stroke order, examples, names &amp; places, HSK flashcards with Anki export, a clean reader mode, and hover/lookup in PDFs — including scanned PDFs via offline OCR.">
+  <meta name="description" content="Zilense is a Chrome side-panel Chinese dictionary: hover or select any hanzi for tone-colored pinyin, meaning, stroke order, examples, names &amp; places, HSK flashcards with Anki export, a clean reader mode, hover/lookup in PDFs (incl. scanned via offline OCR), and experimental dual subtitles with pinyin on YouTube video.">
   <link rel="icon" href="icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -266,6 +266,35 @@
               <div class="reader-tools" style="justify-content:space-between">
                 <span style="font-size:13px;opacity:.7">📄 Scanned PDF · OCR</span>
                 <span class="segmini"><button class="on">Open in Zilense</button></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- video subtitles (experimental) -->
+      <section class="feat">
+        <div class="feat-text">
+          <p class="eyebrow">On video, too</p>
+          <h2>Dual subtitles with pinyin <span class="tag-exp">Experimental</span></h2>
+          <p>On <strong>YouTube</strong> (and Coursera), the on-video captions get the same
+            tone-colored pinyin and <strong>clickable words</strong> — tap one and it opens in the
+            side panel, just like on a page.</p>
+          <p>Turn on <strong>dual subtitles</strong> to read <strong>Chinese on top and a second
+            language below</strong> — English by default, switchable in the toolbar menu. It's early
+            and leans on each site's player, so expect rough edges. <strong>Netflix support is coming
+            in a later release.</strong></p>
+        </div>
+        <div class="feat-visual">
+          <div class="ui bare">
+            <div style="background:#0d0d10;border-radius:12px;aspect-ratio:16/10;position:relative;overflow:hidden;display:flex;align-items:flex-end;justify-content:center">
+              <span style="position:absolute;top:12px;left:14px;font-size:12px;color:#cdd;opacity:.65">▶ YouTube</span>
+              <span style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px">▶</span>
+              <div style="margin-bottom:20px;text-align:center;padding:0 10px;line-height:1.5">
+                <p lang="zh" style="margin:0 0 6px;font-size:21px;color:#fff;background:rgba(8,8,8,.72);border-radius:8px;padding:4px 10px;display:inline-block">
+                  <ruby>我<rt class="tone-3">wǒ</rt></ruby><ruby>喜<rt class="tone-3">xǐ</rt></ruby><ruby>欢<rt class="tone-5">huan</rt></ruby><ruby>喝<rt class="tone-1">hē</rt></ruby><ruby>茶<rt class="tone-2">chá</rt></ruby>
+                </p><br>
+                <p style="margin:0;font-size:15px;color:#f1ece3;background:rgba(8,8,8,.72);border-radius:8px;padding:3px 10px;display:inline-block">I like drinking tea</p>
               </div>
             </div>
           </div>
