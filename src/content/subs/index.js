@@ -16,7 +16,7 @@ const SUPPORTED_HOST = /(^|\.)(youtube(-nocookie)?\.com|coursera\.org)$/i
 const SUBS_KEY = 'mydict.subs'
 const DISABLED_KEY = 'mydict.disabledSites'
 
-const DEFAULTS = { enabled: false, pinyin: true, tones: true, dual: true, lang1: '', lang2: '', allowAuto: false }
+const DEFAULTS = { enabled: false, pinyin: true, tones: true, dual: true, lang1: '', lang2: '', allowAsr: false, allowAutoTranslation: false }
 
 let engine = null
 let importing = null

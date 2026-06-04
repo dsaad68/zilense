@@ -149,7 +149,7 @@ export function createOverlay({ requestSegment, requestHover, onPin }) {
   const root = host.attachShadow({ mode: 'closed' })
   const style = document.createElement('style'); style.textContent = STYLE
   const wrap = document.createElement('div'); wrap.className = 'wrap'
-  const l1 = document.createElement('div'); l1.className = 'line l1'; l1.lang = 'zh'
+  const l1 = document.createElement('div'); l1.className = 'line l1'
   const l2 = document.createElement('div'); l2.className = 'line l2'
   const card = document.createElement('div'); card.className = 'card'
   wrap.append(l1, l2, card)
@@ -165,10 +165,11 @@ export function createOverlay({ requestSegment, requestHover, onPin }) {
   root.append(style, wrap, ctrl)
 
   let prefs = { pinyin: true, tones: true }
-  let seg1 = 0 // invalidates a stale async segment when the line changed again
   let hoverSeq = 0 // invalidates a stale hover response after the mouse moved on
-  let lastL1 = '' // last raw text rendered on line 1 (skip redundant re-segments)
-  let lastL2 = ''
+  // per-line state: `last` skips redundant re-segments; `gen` invalidates a stale
+  // async segment after the line changed (or was cleared) while we awaited the worker
+  const s1 = { last: '', gen: 0 }
+  const s2 = { last: '', gen: 0 }
 
   const showCard = (resp, anchor) => {
     if (!resp || !resp.word || !((resp.defs && resp.defs.length) || resp.pinyin)) { hideCard(); return }
@@ -210,47 +211,55 @@ export function createOverlay({ requestSegment, requestHover, onPin }) {
 
   // line 1 — the annotated line. Han text is segmented (worker) then rubied;
   // non-Han text is shown plainly (so the same setter works for any language).
-  async function setLine1(text) {
+  async function renderLine(lineEl, state, text) {
     const t = String(text || '').trim()
-    if (t === lastL1) return
-    lastL1 = t
-    const myGen = ++seg1
-    if (!t) { l1.textContent = ''; hideCard(); return }
-    if (!containsHan(t)) { l1.textContent = t; return } // non-Chinese line: show plainly
+    if (t === state.last) return
+    state.last = t
+    const myGen = ++state.gen
+    const han = containsHan(t)
+    lineEl.lang = han ? 'zh' : ''
+    if (!t) { lineEl.textContent = ''; hideCard(); return }
+    if (!han) { lineEl.textContent = t; return } // non-Chinese line: show plainly
     let tokens = []
     try { tokens = (await requestSegment(t)) || [] } catch (e) { tokens = [] }
-    if (myGen !== seg1) return // line changed while we were segmenting
-    if (!tokens.length) { l1.textContent = t; return }
-    paintRuby(l1, tokensToRuby(tokens), prefs, handlers)
+    if (myGen !== state.gen) return // line changed (or cleared) while we segmented
+    if (!tokens.length) { lineEl.textContent = t; return }
+    paintRuby(lineEl, tokensToRuby(tokens), prefs, handlers)
   }
+  // either line can be the Chinese one (the user picks which track is top/bottom),
+  // so both run the same path; renderLine annotates whichever contains Han.
+  const setLine1 = (text) => renderLine(l1, s1, text)
 
-  function setLine2(text) {
-    const t = String(text || '').trim()
-    if (t === lastL2) return
-    lastL2 = t
-    l2.textContent = t
-  }
+  const setLine2 = (text) => renderLine(l2, s2, text)
 
   function setPrefs(next) {
     prefs = { ...prefs, ...next }
-    // re-render line 1 so a pinyin/tone toggle takes effect immediately
-    const t = lastL1; lastL1 = ' '; setLine1(t)
+    // re-render both lines so a pinyin/tone toggle takes effect immediately
+    const a = s1.last, b = s2.last
+    s1.last = ''; s2.last = ''
+    setLine1(a); setLine2(b)
   }
 
-  // build the language <select> options: every real caption track, then (only when
-  // the user has opted into machine translation) the languages YouTube can
-  // auto-translate into that aren't already a real track. value = language code.
-  function fillLangSelect(sel, tracks, targets, allowAuto, selected, withNone) {
+  // build the language <select> options: human-authored caption tracks always; the
+  // machine-made ones only behind their own opt-in, so the default list is real
+  // tracks only. `opts` = { allowAsr, allowAutoTranslation }:
+  //   - ASR (YouTube auto-SPEECH-recognition) tracks appear only when allowAsr.
+  //   - auto-TRANSLATION targets (languages YouTube can machine-translate into that
+  //     aren't already a real track) appear only when allowAutoTranslation.
+  // Both are labelled so the user can tell a machine track from a human one.
+  function fillLangSelect(sel, tracks, targets, opts, selected, withNone) {
+    const { allowAsr, allowAutoTranslation } = opts || {}
     sel.textContent = ''
     if (withNone) { const o = document.createElement('option'); o.value = ''; o.textContent = 'None'; sel.appendChild(o) }
     const seen = new Set()
     for (const t of tracks) {
+      if (t.kind === 'asr' && !allowAsr) continue // hide ASR unless opted in
       seen.add(t.lang)
       const o = document.createElement('option'); o.value = t.lang
-      o.textContent = t.name + (t.kind === 'asr' ? ' (auto)' : '')
+      o.textContent = t.name + (t.kind === 'asr' ? ' (auto-generated)' : '')
       sel.appendChild(o)
     }
-    if (allowAuto) for (const tg of targets) {
+    if (allowAutoTranslation) for (const tg of targets) {
       if (seen.has(tg.lang)) continue
       const o = document.createElement('option'); o.value = tg.lang
       o.textContent = tg.name + ' (YouTube auto-translation)'
@@ -261,27 +270,29 @@ export function createOverlay({ requestSegment, requestHover, onPin }) {
 
   /* setControls(opts) — show/refresh the language picker. opts.tracks empty/absent
      (the Phase 1 scrape path) hides the gear entirely. Otherwise it renders the two
-     language selects + the pinyin and auto-translation toggles, reflecting the
-     CURRENTLY displayed selection (lang1/lang2 resolved by the engine), and calls
-     opts.onChange(patch) when the user changes anything. */
+     language selects + the pinyin and the two machine-track opt-in toggles (auto
+     captions / auto-translation), reflecting the CURRENTLY displayed selection
+     (lang1/lang2 resolved by the engine), and calls opts.onChange(patch) when the
+     user changes anything. */
   function setControls(opts) {
     const o = opts || {}
     if (!o.tracks || !o.tracks.length) { ctrl.style.display = 'none'; return }
     ctrl.style.display = 'flex'
     menu.textContent = ''
     const tracks = o.tracks, targets = o.targets || []
+    const gate = { allowAsr: !!o.allowAsr, allowAutoTranslation: !!o.allowAutoTranslation }
     const mk = (labelText, node) => {
       const row = document.createElement('div'); row.className = 'mrow'
       const l = document.createElement('span'); l.className = 'mlabel'; l.textContent = labelText
       row.append(l, node); menu.appendChild(row); return row
     }
     const top = document.createElement('select')
-    fillLangSelect(top, tracks, targets, o.allowAuto, o.lang1, false)
+    fillLangSelect(top, tracks, targets, gate, o.lang1, false)
     top.addEventListener('change', () => o.onChange && o.onChange({ lang1: top.value }))
     mk('Top', top)
 
     const bottom = document.createElement('select')
-    fillLangSelect(bottom, tracks, targets, o.allowAuto, o.lang2, true)
+    fillLangSelect(bottom, tracks, targets, gate, o.lang2, true)
     bottom.addEventListener('change', () => o.onChange && o.onChange({ lang2: bottom.value }))
     mk('Bottom', bottom)
 
@@ -289,14 +300,24 @@ export function createOverlay({ requestSegment, requestHover, onPin }) {
     py.addEventListener('change', () => o.onChange && o.onChange({ pinyin: py.checked }))
     mk('Pinyin', py)
 
-    const auto = document.createElement('input'); auto.type = 'checkbox'; auto.checked = !!o.allowAuto
-    auto.addEventListener('change', () => o.onChange && o.onChange({ allowAuto: auto.checked }))
-    mk('Allow auto-translation', auto)
+    const asr = document.createElement('input'); asr.type = 'checkbox'; asr.checked = !!o.allowAsr
+    asr.addEventListener('change', () => o.onChange && o.onChange({ allowAsr: asr.checked }))
+    mk('Allow auto-captions', asr)
+
+    const trans = document.createElement('input'); trans.type = 'checkbox'; trans.checked = !!o.allowAutoTranslation
+    trans.addEventListener('change', () => o.onChange && o.onChange({ allowAutoTranslation: trans.checked }))
+    mk('Allow auto-translation', trans)
   }
 
-  function clear() { lastL1 = ''; lastL2 = ''; l1.textContent = ''; l2.textContent = ''; hideCard() }
+  // clear must also invalidate any in-flight segmentation: bumping each line's gen
+  // means a pending renderLine worker reply (from before a clear / SPA navigation)
+  // sees myGen !== state.gen and drops its repaint instead of painting stale text.
+  function clear() {
+    s1.last = ''; s2.last = ''; s1.gen++; s2.gen++
+    l1.textContent = ''; l2.textContent = ''; hideCard()
+  }
 
-  function destroy() { hoverSeq++; seg1++; host.remove() }
+  function destroy() { hoverSeq++; s1.gen++; s2.gen++; host.remove() }
 
   return { host, setLine1, setLine2, setPrefs, setControls, clear, destroy }
 }

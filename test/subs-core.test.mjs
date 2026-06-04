@@ -155,7 +155,7 @@ test('json3Url: asks for json3, optionally a machine translation, keeps base par
   assert.equal(json3Url(''), '', 'missing base -> empty')
 })
 
-test('pickTracks: auto-translation / ASR tracks are excluded unless allowAuto', () => {
+test('pickTracks: ASR and auto-translation each gated by their own opt-in', () => {
   const tracks = [
     { lang: 'zh-Hans', name: 'Chinese', kind: '' },
     { lang: 'en', name: 'English (auto-generated)', kind: 'asr' },
@@ -163,9 +163,20 @@ test('pickTracks: auto-translation / ASR tracks are excluded unless allowAuto', 
   ]
   const off = pickTracks(tracks, {})
   assert.equal(off.line1.lang, 'zh-Hans')
-  assert.equal(off.line2, null, 'no eligible second human track -> none')
+  assert.equal(off.line2, null, 'default is human tracks only -> no eligible second')
 
-  const on = pickTracks(tracks, { allowAuto: true })
-  assert.ok(on.line2 && (on.line2.kind === 'asr' || on.line2.kind === 'auto'),
-    'with allowAuto a machine track may fill line 2')
+  // allowAsr admits the ASR track but NOT the auto-translation one
+  const asr = pickTracks(tracks, { allowAsr: true })
+  assert.ok(asr.line2 && asr.line2.kind === 'asr', 'ASR fills line 2 when allowAsr')
+
+  // allowAutoTranslation admits the auto-translation track but NOT the ASR one
+  const trans = pickTracks(tracks, { allowAutoTranslation: true })
+  assert.ok(trans.line2 && trans.line2.kind === 'auto', 'auto-translation fills line 2 when allowAutoTranslation')
+
+  // the two opt-ins are independent: ASR on, translation off -> the 'auto' track stays excluded
+  const onlyAsr = pickTracks([
+    { lang: 'zh-Hans', name: 'Chinese', kind: '' },
+    { lang: 'ja', name: 'Japanese (auto)', kind: 'auto' },
+  ], { allowAsr: true })
+  assert.equal(onlyAsr.line2, null, 'allowAsr must not admit an auto-translation track')
 })

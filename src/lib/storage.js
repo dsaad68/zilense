@@ -185,16 +185,35 @@ export const SUBS_DEFAULTS = {
   dual: true, // when two tracks are available, show both stacked
   lang1: '', // preferred language code for the top (annotated) line
   lang2: '', // preferred language code for the bottom line
-  allowAuto: false, // allow YouTube's own machine auto-translation as a track
+  // the two machine-track opt-ins, split so the user can accept one without the
+  // other: ASR is YouTube's auto-SPEECH-recognition captions; autoTranslation is
+  // its machine translation of a track into another language. Both default off
+  // (human-authored tracks only).
+  allowAsr: false,
+  allowAutoTranslation: false,
+}
+
+/* migrateSubs(obj) — fold the legacy single `allowAuto` flag (which conflated ASR
+   and auto-translation) into the two split flags, so an existing opt-in survives the
+   rename. Only applies when the new keys aren't already stored. Returns a clean
+   object without the legacy key. */
+function migrateSubs(obj) {
+  const o = { ...obj }
+  if ('allowAuto' in o) {
+    if (!('allowAsr' in o)) o.allowAsr = !!o.allowAuto
+    if (!('allowAutoTranslation' in o)) o.allowAutoTranslation = !!o.allowAuto
+    delete o.allowAuto
+  }
+  return o
 }
 
 export async function loadSubsPrefs() {
   if (hasChrome) {
     const got = await getLocal([SUBS_KEY])
-    return { ...SUBS_DEFAULTS, ...(got[SUBS_KEY] || {}) }
+    return { ...SUBS_DEFAULTS, ...migrateSubs(got[SUBS_KEY] || {}) }
   }
   try {
-    return { ...SUBS_DEFAULTS, ...JSON.parse(localStorage.getItem(SUBS_KEY) || '{}') }
+    return { ...SUBS_DEFAULTS, ...migrateSubs(JSON.parse(localStorage.getItem(SUBS_KEY) || '{}')) }
   } catch {
     return { ...SUBS_DEFAULTS }
   }
@@ -203,13 +222,13 @@ export async function loadSubsPrefs() {
 export async function saveSubsPrefs(patch) {
   if (hasChrome) {
     const got = await getLocal([SUBS_KEY])
-    const merged = { ...SUBS_DEFAULTS, ...(got[SUBS_KEY] || {}), ...patch }
+    const merged = { ...SUBS_DEFAULTS, ...migrateSubs(got[SUBS_KEY] || {}), ...patch }
     await setLocal({ [SUBS_KEY]: merged })
     return merged
   }
   let current = {}
   try { current = JSON.parse(localStorage.getItem(SUBS_KEY) || '{}') } catch {}
-  const merged = { ...SUBS_DEFAULTS, ...current, ...patch }
+  const merged = { ...SUBS_DEFAULTS, ...migrateSubs(current), ...patch }
   try { localStorage.setItem(SUBS_KEY, JSON.stringify(merged)) } catch {}
   return merged
 }

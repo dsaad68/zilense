@@ -130,11 +130,13 @@ export function json3Url(baseUrl, tlang) {
 /* pickTracks(tracks, prefs) — choose the two caption tracks to show from the
    list YouTube exposes. Each track: { lang, name, kind } where kind 'asr' marks
    YouTube's auto-SPEECH-recognition track and `auto` marks its machine
-   auto-TRANSLATION (we tag those ourselves). prefs: { lang1, lang2, allowAuto }.
+   auto-TRANSLATION (we tag those ourselves). prefs:
+   { lang1, lang2, allowAsr, allowAutoTranslation }.
 
    Rules, in order:
-     - real (human, non-asr, non-auto) tracks are preferred; auto ones are only
-       eligible when allowAuto is true (machine translation is opt-in).
+     - human-authored tracks are always eligible; the two machine kinds each have
+       their own opt-in (ASR behind allowAsr, auto-translation behind
+       allowAutoTranslation), so the default is real, human tracks only.
      - line 1 wants Chinese: the user's lang1 if present, else the first zh* track,
        else the first eligible track.
      - line 2 wants the user's lang2 if present, else the first eligible track that
@@ -142,7 +144,10 @@ export function json3Url(baseUrl, tlang) {
    Returns { line1, line2 } (either may be null). Pure: no fetching here. */
 export function pickTracks(tracks, prefs = {}) {
   const list = Array.isArray(tracks) ? tracks.filter((t) => t && t.lang) : []
-  const eligible = (t) => prefs.allowAuto || (t.kind !== 'asr' && t.kind !== 'auto')
+  const eligible = (t) =>
+    t.kind === 'asr' ? !!prefs.allowAsr
+      : t.kind === 'auto' ? !!prefs.allowAutoTranslation
+        : true
   const real = list.filter(eligible)
   const isZh = (t) => /^zh/i.test(t.lang)
   const byLang = (lang) => (lang ? real.find((t) => t.lang === lang) : null)

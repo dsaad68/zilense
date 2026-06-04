@@ -49,6 +49,7 @@ const MAX_ACQ_TRIES = 6 // bounded dual-track probes per video (~4s) so a 1-trac
 //                         no-caption video isn't re-requested on every ensure tick
 const EV_REQ = 'zilense-subs-yt-req' // -> MAIN-world hook
 const EV_TRACKS = 'zilense-subs-yt-tracks' // <- MAIN-world hook
+const EV_TT = 'zilense-subs-yt-timedtext' // <- MAIN-world hook: a captured timedtext URL
 
 // ask the MAIN-world hook for the caption track list; resolve with the parsed reply
 // or null on timeout. One-shot listener per call.
@@ -77,13 +78,22 @@ async function fetchCues(baseUrl, tlang) {
   } catch (e) { return [] }
 }
 
+// the effective display language a captured timedtext URL resolves to: its machine
+// translation target (tlang) if present, else its source track language (lang).
+function ttLang(url) {
+  try {
+    const u = new URL(url, 'https://www.youtube.com')
+    return u.searchParams.get('tlang') || u.searchParams.get('lang') || ''
+  } catch (e) { return '' }
+}
+
 export function createEngine(adapter) {
   let overlay = null
   let observer = null
   let observedRoot = null
   let ensureTimer = 0
   let rafPending = false
-  let prefs = { pinyin: true, tones: true, dual: true, lang1: '', lang2: '', allowAuto: false }
+  let prefs = { pinyin: true, tones: true, dual: true, lang1: '', lang2: '', allowAsr: false, allowAutoTranslation: false }
   let running = false
   let onNav = null
 
@@ -96,6 +106,9 @@ export function createEngine(adapter) {
   let syncRaf = 0
   let trackList = null // { tracks, targets } from the hook, for the picker
   let curLang1 = '', curLang2 = '' // languages currently displayed (for the picker)
+  let lastTT = '' // the most recent timedtext URL the player itself fetched (hook
+  //                capture), used as a fallback when a track's baseUrl goes stale
+  let onTT = null // EV_TT listener handle (added in start, removed in stop)
 
   // dual track fetching is same-origin youtube.com only (the desktop watch page);
   // m.youtube.com / nocookie embeds keep Phase 1 scraping
@@ -129,14 +142,14 @@ export function createEngine(adapter) {
   // ---- dual mode (Phase 2) ----------------------------------------------------
   // resolve the two display tracks from the list + prefs. A user-chosen language
   // that exists only as a machine auto-translation target is honored ONLY when
-  // allowAuto is on (machine translation is opt-in).
+  // allowAutoTranslation is on (machine translation is opt-in).
   function resolveLines(list, p) {
     const tracks = list.tracks || []
     const targets = list.targets || []
     const real = (lang) => (lang ? tracks.find((t) => t.lang === lang) : null)
     const transBase = tracks.find((t) => t.translatable) || tracks[0] || null
     const asTranslation = (lang) =>
-      p.allowAuto && transBase && targets.some((t) => t.lang === lang)
+      p.allowAutoTranslation && transBase && targets.some((t) => t.lang === lang)
         ? { lang, name: lang, baseUrl: transBase.baseUrl, tlang: lang }
         : null
 
@@ -150,6 +163,19 @@ export function createEngine(adapter) {
     return { l1, l2 }
   }
 
+  // fetch one track's cues from its (signed) baseUrl, falling back to the timedtext
+  // URL the player itself fetched (captured by the hook) when the baseUrl yields
+  // nothing — baseUrls can go stale across SPA navigations. The fallback is used
+  // only when the captured URL resolves to the SAME display language, so we never
+  // show the wrong track; same-origin is still enforced inside fetchCues.
+  async function loadCues(track) {
+    let cues = await fetchCues(track.baseUrl, track.tlang)
+    if (cues.length) return cues
+    const want = track.tlang || track.lang
+    if (lastTT && want && ttLang(lastTT) === want) cues = await fetchCues(lastTT, '')
+    return cues
+  }
+
   async function acquireDual(videoId) {
     if (acquiring) return
     acquiring = true
@@ -160,15 +186,19 @@ export function createEngine(adapter) {
       const list = await requestYtTracks()
       if (stale()) return
       if (!list || !Array.isArray(list.tracks) || !list.tracks.length) return // no tracks -> stay scrape
+      if (typeof list.timedtext === 'string' && list.timedtext) lastTT = list.timedtext
       trackList = { tracks: list.tracks, targets: Array.isArray(list.targets) ? list.targets : [] }
       const { l1, l2 } = resolveLines(trackList, prefs)
       // the dual VIEW needs two lines; with only one usable track we leave Phase 1
       // scraping in place (we never synthesize a second line), but still offer the
       // language picker so the user can pick a (real or, if opted in, auto) second.
       if (!l1 || !l2) { acqTries = MAX_ACQ_TRIES; renderControls(l1 ? l1.lang : '', l2 ? l2.lang : ''); return }
-      const [c1, c2] = await Promise.all([fetchCues(l1.baseUrl, l1.tlang), fetchCues(l2.baseUrl, l2.tlang)])
+      const [c1, c2] = await Promise.all([loadCues(l1), loadCues(l2)])
       if (stale()) return
-      if (!c1.length && !c2.length) return // both fetches failed -> stay scrape (retry up to the cap)
+      // the dual view shows TWO synced lines; if either track came back empty we
+      // can't honestly render it, so we stay in Phase 1 scrape (and retry up to the
+      // cap) rather than hide the native captions behind a single-line overlay.
+      if (!c1.length || !c2.length) return
       cues1 = c1; cues2 = c2; idx1 = -1; idx2 = -1
       enterDual()
       renderControls(l1.lang, l2.lang)
@@ -180,7 +210,7 @@ export function createEngine(adapter) {
     curLang1 = lang1; curLang2 = lang2
     overlay.setControls(trackList ? {
       tracks: trackList.tracks, targets: trackList.targets,
-      lang1, lang2, allowAuto: prefs.allowAuto,
+      lang1, lang2, allowAsr: prefs.allowAsr, allowAutoTranslation: prefs.allowAutoTranslation,
       // persist the change; it round-trips storage -> index -> setPrefs, which
       // re-picks + re-fetches, so storage stays the single source of truth
       onChange: (patch) => saveSubsPrefs(patch),
@@ -252,6 +282,9 @@ export function createEngine(adapter) {
     // re-find the player + re-acquire tracks for the new video
     onNav = () => { acqVideo = null; trackList = null; if (mode === 'dual') exitDual(); else if (overlay) overlay.clear(); observedRoot = null; ensure() }
     document.addEventListener('yt-navigate-finish', onNav)
+    // keep the freshest player-fetched timedtext URL around as a stale-baseUrl fallback
+    onTT = (e) => { if (e && typeof e.detail === 'string' && e.detail) lastTT = e.detail }
+    document.addEventListener(EV_TT, onTT)
     ensure()
     ensureTimer = setInterval(ensure, ENSURE_MS)
   }
@@ -262,7 +295,8 @@ export function createEngine(adapter) {
     if (overlay) overlay.setPrefs(prefs)
     const langChanged =
       prev.lang1 !== prefs.lang1 || prev.lang2 !== prefs.lang2 ||
-      prev.dual !== prefs.dual || prev.allowAuto !== prefs.allowAuto
+      prev.dual !== prefs.dual ||
+      prev.allowAsr !== prefs.allowAsr || prev.allowAutoTranslation !== prefs.allowAutoTranslation
     if (langChanged) {
       acqVideo = null // re-pick + re-fetch on the next ensure
       if (mode === 'dual') exitDual()
@@ -277,9 +311,10 @@ export function createEngine(adapter) {
     if (ensureTimer) { clearInterval(ensureTimer); ensureTimer = 0 }
     stopSync()
     detachObserver()
-    mode = 'scrape'; acqVideo = null; acqTries = 0; trackList = null
+    mode = 'scrape'; acqVideo = null; acqTries = 0; trackList = null; lastTT = ''
     cues1 = []; cues2 = []; idx1 = -1; idx2 = -1
     if (onNav) { document.removeEventListener('yt-navigate-finish', onNav); onNav = null }
+    if (onTT) { document.removeEventListener(EV_TT, onTT); onTT = null }
     removeNativeHide(document) // restore the platform's own captions (reversibility)
     if (overlay) { overlay.destroy(); overlay = null }
   }
