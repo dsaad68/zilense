@@ -78,34 +78,76 @@ async function renderPage(page, holder) {
   }
 }
 
-// OCR a scanned page's canvas into the text layer, with a small progress overlay.
-// tesseract.js (and the chi_sim model) load on demand — only when a scanned page is
-// actually encountered — so digital PDFs never pay for the OCR engine.
+// OCR a scanned page's canvas into the text layer, with a prominent progress card
+// (a centered overlay with a spinner + progress bar) so it's clear why a scanned
+// page pauses before hover/selection works. tesseract.js (and the chi_sim model)
+// load on demand — only when a scanned page is encountered — so digital PDFs never
+// pay for the OCR engine.
 async function runOcr(holder, canvas, textLayerDiv, outputScale) {
-  const status = document.createElement('div')
-  status.className = 'ocr-status'
-  status.textContent = 'Recognizing text…'
-  holder.appendChild(status)
+  const card = buildOcrCard()
+  holder.appendChild(card.root)
   try {
     const { ocrCanvasToLayer } = await import('./ocr.js')
-    const n = await ocrCanvasToLayer(canvas, textLayerDiv, outputScale, (m) => {
-      status.textContent = ocrLabel(m)
-    })
-    if (n > 0) bindTextLayerSelection(textLayerDiv)
-    else status.textContent = 'No text recognized on this page'
-    if (n > 0) status.remove()
+    const n = await ocrCanvasToLayer(canvas, textLayerDiv, outputScale, (m) => card.update(ocrInfo(m)))
+    if (n > 0) {
+      // mark as an OCR layer so the hover driver skips the highlight/pin overlays
+      // (the synthesized spans don't align pixel-perfectly with the page image)
+      textLayerDiv.classList.add('ocr')
+      bindTextLayerSelection(textLayerDiv)
+      card.root.remove()
+    } else {
+      card.done('No text found on this page', 'This page didn’t contain recognizable text.')
+    }
   } catch (e) {
-    status.textContent = 'OCR failed — see console'
+    card.done('Couldn’t read this page', 'OCR failed — see the console for details.')
     console.error('[zilense] OCR failed', e)
   }
 }
 
-// friendly label for a tesseract progress message
-function ocrLabel(m) {
-  const pct = m.progress != null ? ' ' + Math.round(m.progress * 100) + '%' : ''
-  if (m.status === 'recognizing text') return 'Recognizing text…' + pct
-  if ((m.status || '').includes('loading')) return 'Loading OCR…' + pct
-  return (m.status || 'Working…') + pct
+// build the centered OCR progress card and return handles to update it
+function buildOcrCard() {
+  const root = document.createElement('div')
+  root.className = 'ocr-card'
+  root.innerHTML =
+    '<div class="ocr-spinner" aria-hidden="true"></div>' +
+    '<div class="ocr-text">' +
+    '<div class="ocr-title">Reading this page…</div>' +
+    '<div class="ocr-detail">Recognizing the scanned text so you can hover and select it.</div>' +
+    '<div class="ocr-bar"><div class="ocr-bar-fill"></div></div>' +
+    '</div>'
+  root.setAttribute('role', 'status')
+  root.setAttribute('aria-live', 'polite')
+  const titleEl = root.querySelector('.ocr-title')
+  const detailEl = root.querySelector('.ocr-detail')
+  const fillEl = root.querySelector('.ocr-bar-fill')
+  return {
+    root,
+    update({ title, detail, progress }) {
+      if (title) titleEl.textContent = title
+      if (detail) detailEl.textContent = detail
+      fillEl.style.width = progress != null ? Math.round(progress * 100) + '%' : '0%'
+    },
+    // terminal state: drop the spinner/bar, show a message, then fade out
+    done(title, detail) {
+      root.classList.add('ocr-done')
+      titleEl.textContent = title
+      detailEl.textContent = detail
+      setTimeout(() => root.remove(), 4000)
+    },
+  }
+}
+
+// map a tesseract progress message to friendly title/detail/percent
+function ocrInfo(m) {
+  const progress = typeof m.progress === 'number' ? m.progress : null
+  const pct = progress != null ? ' ' + Math.round(progress * 100) + '%' : ''
+  if (m.status === 'recognizing text') {
+    return { title: 'Recognizing text…' + pct, detail: 'Reading this scanned page so you can hover and select it.', progress }
+  }
+  if ((m.status || '').includes('loading')) {
+    return { title: 'Preparing the recognizer…' + pct, detail: 'Loading the Chinese OCR model (first scanned page only).', progress }
+  }
+  return { title: 'Reading this page…' + pct, detail: 'Recognizing the scanned text so you can hover and select it.', progress }
 }
 
 /* Text-layer selection enhancement, ported from pdfjs-dist's web/pdf_viewer
@@ -195,20 +237,72 @@ function showEmpty(target, detail) {
 
 async function main() {
   // Start the shared hover driver immediately: its listeners live on `document`, so
-  // any page rendered now or later is covered. (Our own page is never "disabled",
-  // so no allowDisable predicate.)
-  initHoverDriver()
+  // any page rendered now or later is covered. (Our own page is never "disabled".)
+  // suppressHighlight: on OCR'd (scanned) pages the synthesized text layer doesn't
+  // align pixel-perfectly with the image, so skip the hover/pin overlays there —
+  // the popup + panel lookup still work. Digital text layers keep the overlays.
+  initHoverDriver({
+    suppressHighlight: (node) => {
+      const el = node && (node.nodeType === 1 ? node : node.parentElement)
+      return !!(el && el.closest && el.closest('.textLayer.ocr'))
+    },
+  })
 
   const target = parsePdfTarget(window.location.hash)
   if (!target) { showEmpty(''); return }
+  loadPdf(target)
+}
 
+// does the extension already have host access to fetch this URL? file:// is governed
+// by the separate "Allow access to file URLs" toggle, not a host permission.
+async function hasHostAccess(url) {
+  try {
+    const u = new URL(url)
+    if (u.protocol === 'file:' || !chrome.permissions) return true
+    return await chrome.permissions.contains({ origins: [`${u.protocol}//${u.host}/*`] })
+  } catch (e) { return true }
+}
+
+// prompt to grant host access (chrome.permissions.request needs a user gesture).
+// Reached when the fetch failed and we don't yet have access to the PDF's origin —
+// the in-page toast that opened the viewer couldn't request it (content scripts
+// can't), so the user grants it here with one click.
+function showGrant(target) {
+  viewer.hidden = true
+  emptyEl.hidden = false
+  let host = target
+  try { host = new URL(target).host } catch (e) {}
+  emptyEl.innerHTML =
+    '<h2>Open this PDF in Zilense</h2>' +
+    `<p>Allow Zilense to read PDFs from <b>${host}</b> so it can show the text for hover and selection.</p>`
+  const btn = document.createElement('button')
+  btn.className = 'grant-btn'
+  btn.textContent = 'Allow & open'
+  btn.addEventListener('click', async () => {
+    let ok = false
+    try {
+      const u = new URL(target)
+      ok = await chrome.permissions.request({ origins: [`${u.protocol}//${u.host}/*`] })
+    } catch (e) {}
+    if (ok) loadPdf(target)
+  })
+  emptyEl.appendChild(btn)
+}
+
+async function loadPdf(target) {
+  emptyEl.hidden = true
+  viewer.hidden = false
+  viewer.textContent = '' // clear any prior render on retry
   setStatus('Loading…')
   let pdf
   try {
     pdf = await pdfjsLib.getDocument({ url: target }).promise
   } catch (e) {
-    showEmpty(target, e && e.message)
     setStatus('')
+    // a cross-origin fetch we lack host access for is the common failure → offer the
+    // one-click grant; otherwise show the generic (or file://) message
+    if (!(await hasHostAccess(target))) showGrant(target)
+    else showEmpty(target, e && e.message)
     return
   }
 

@@ -28,8 +28,13 @@ export function ensureOcrWorker(onStatus) {
     cacheMethod: 'none', // it's already local; no IndexedDB copy needed
     logger: (m) => { if (onStatus && m && m.status) onStatus(m) },
   }).then(async (w) => {
-    // PSM.AUTO: let Tesseract find the page's blocks/lines itself
-    await w.setParameters({ tessedit_pageseg_mode: PSM.AUTO })
+    await w.setParameters({
+      tessedit_pageseg_mode: PSM.AUTO, // let Tesseract find the page's blocks/lines
+      // Tesseract's native code prints chatty debug lines ("Estimating resolution
+      // as…", "Detected N diacritics") to stderr → the console on every page.
+      // Redirecting debug_file to /dev/null silences that noise (it's not errors).
+      debug_file: '/dev/null',
+    })
     return w
   }).catch((e) => { workerPromise = null; throw e })
   return workerPromise

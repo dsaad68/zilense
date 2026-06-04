@@ -85,6 +85,19 @@ test('hover: respects the allowDisable predicate (no highlight when disabled)', 
   driver.destroy()
 })
 
+test('hover: suppressHighlight skips the token overlay but keeps the popup', () => {
+  stubChrome()
+  // suppress overlays (as the PDF viewer does for OCR layers)
+  const driver = initHoverDriver({ suppressHighlight: () => true })
+  document.body.innerHTML = '<p id="t">你好世界</p>'
+  moveOver(document.getElementById('t').firstChild)
+  assert.ok(!globalThis.CSS.highlights.has('mydict-tok'), 'no highlight overlay when suppressed')
+  const host = document.getElementById('mydict-popup-host')
+  assert.ok(host && host.style.display === 'block', 'popup still shows when highlight is suppressed')
+  assert.ok(host.shadowRoot.textContent.includes('你好'), 'popup still has the word')
+  driver.destroy()
+})
+
 test('destroy: removes listeners so a later mousemove is inert', () => {
   stubChrome()
   const driver = initHoverDriver()

@@ -37,6 +37,13 @@ const SETTINGS_KEY = 'mydict.settings'
 
 export function initHoverDriver(opts = {}) {
   const allowDisable = typeof opts.allowDisable === 'function' ? opts.allowDisable : null
+  // optional predicate (node) => boolean. When true for the text node under the
+  // cursor, the visual overlays (hover token highlight + pin box) are NOT painted —
+  // the popup and panel lookup still work. The PDF viewer uses this for OCR'd
+  // (scanned) pages, where the synthesized text layer doesn't align pixel-perfectly
+  // with the page image, so a highlight box would sit slightly off the glyphs.
+  const suppressHighlight = typeof opts.suppressHighlight === 'function' ? opts.suppressHighlight : null
+  const noPaint = (positions) => !!(suppressHighlight && positions && positions[0] && suppressHighlight(positions[0].node))
 
   let selecting = false
   let rafPending = false
@@ -168,8 +175,11 @@ export function initHoverDriver(opts = {}) {
     if (!positions || !positions.length) return
     clearHover()
     pinned = { positions: positions.slice(0, len) }
-    setHighlight('mydict-pin', positions, len)
-    drawPinBox(positions, len)
+    // skip the visual pin overlay on imprecise (OCR) layers; the panel still opens
+    if (!noPaint(positions)) {
+      setHighlight('mydict-pin', positions, len)
+      drawPinBox(positions, len)
+    }
     // Pinning is a deliberate lookup AND a user gesture (click / Alt-click / hotkey),
     // so route it through the service worker: it opens the side panel if closed and
     // shows/records the pinned word (hover alone is neither recorded nor opening).
@@ -202,7 +212,7 @@ export function initHoverDriver(opts = {}) {
       if (hit.node === lastNode && hit.index === lastIndex) return
       lastNode = hit.node; lastIndex = hit.index
       resolveWord(hit.node, hit.index, (positions, len, resp) => {
-        setHighlight('mydict-tok', positions, len)
+        if (!noPaint(positions)) setHighlight('mydict-tok', positions, len)
         hoverWord = positions.length ? { positions, len } : null
         if (settings.inlinePopup) showPopup(x, y, resp)
       })

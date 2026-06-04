@@ -302,3 +302,55 @@ try {
     if (changes[DISABLED_KEY]) applyDisabledSites(changes[DISABLED_KEY].newValue)
   })
 } catch (e) { /* no chrome.storage (e.g. tests) — hover stays enabled */ }
+
+/* PDF prompt toast — when you navigate to a PDF, Chrome shows it in its native
+   viewer, which has no hoverable text. This content script DOES run on that PDF
+   tab's top frame (document.contentType === 'application/pdf'), so we surface a
+   small, dismissible toast offering to reopen the PDF in Zilense's bundled viewer
+   (real text layer → hover, lookup, selection; scanned PDFs get OCR). Top frame
+   only; once dismissed it stays hidden for that page. Clicking "Open" asks the
+   service worker to navigate this tab to the viewer. */
+const PDF_TOAST_DISMISSED = 'mydict.pdfToastDismissed'
+function maybeShowPdfToast() {
+  if (window.top !== window) return // only the top frame, not embedded PDFs
+  if (document.contentType !== 'application/pdf') return // only native PDF tabs
+  try { if (sessionStorage.getItem(PDF_TOAST_DISMISSED)) return } catch (e) {}
+
+  const host = document.createElement('div')
+  host.id = 'mydict-pdf-toast-host'
+  host.style.cssText =
+    'all:initial;position:fixed;left:0;right:0;bottom:18px;z-index:2147483647;' +
+    'display:flex;justify-content:center;pointer-events:none;'
+  const root = host.attachShadow({ mode: 'open' })
+  const dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+  const t = dark
+    ? { bg: '#2c2822', ink: '#ece3d2', ink3: '#b3a896', border: '#453f33' }
+    : { bg: '#fbf7ee', ink: '#2a2520', ink3: '#9a9082', border: '#d8ccb5' }
+  const style = document.createElement('style')
+  style.textContent =
+    '.toast{pointer-events:auto;display:flex;align-items:center;gap:12px;max-width:92vw;' +
+    'font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:13.5px;' +
+    `color:${t.ink};background:${t.bg};border:1px solid ${t.border};border-radius:12px;` +
+    'padding:10px 12px 10px 14px;box-shadow:0 8px 30px rgba(0,0,0,.28)}' +
+    '.msg{line-height:1.4}.msg b{font-weight:700}' +
+    '.open{flex:none;font:inherit;font-weight:700;color:#fff;background:#c8443a;border:none;' +
+    'border-radius:8px;padding:7px 13px;cursor:pointer}.open:hover{filter:brightness(1.06)}' +
+    `.x{flex:none;font:inherit;color:${t.ink3};background:none;border:none;font-size:15px;` +
+    'line-height:1;cursor:pointer;padding:4px 2px}'
+  const card = document.createElement('div'); card.className = 'toast'
+  const msg = document.createElement('div'); msg.className = 'msg'
+  msg.innerHTML = '📄&nbsp; Open this PDF in <b>Zilense</b> to hover &amp; look up Chinese.'
+  const open = document.createElement('button'); open.className = 'open'; open.textContent = 'Open in Zilense'
+  const x = document.createElement('button'); x.className = 'x'; x.textContent = '✕'; x.setAttribute('aria-label', 'Dismiss')
+  open.addEventListener('click', () => {
+    try { chrome.runtime.sendMessage({ type: 'open-pdf', url: location.href }, () => void chrome.runtime.lastError) } catch (e) {}
+  })
+  x.addEventListener('click', () => {
+    try { sessionStorage.setItem(PDF_TOAST_DISMISSED, '1') } catch (e) {}
+    host.remove()
+  })
+  card.append(msg, open, x)
+  root.append(style, card)
+  ;(document.body || document.documentElement).appendChild(host)
+}
+maybeShowPdfToast()

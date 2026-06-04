@@ -238,6 +238,16 @@ chrome.runtime.onMessage.addListener((msg, sender) => {
   )
 })
 
+// the in-page PDF toast (content script on a native PDF tab) asks the worker to
+// reopen this tab's PDF in the bundled viewer. sender.tab.id is always available;
+// the toast passes the PDF's URL (its own location.href).
+chrome.runtime.onMessage.addListener((msg, sender) => {
+  if (!msg || msg.type !== 'open-pdf') return
+  const url = (msg.url || '').trim()
+  const tabId = sender.tab && sender.tab.id
+  if (url && tabId != null) chrome.tabs.update(tabId, { url: pdfViewerUrl(url) })
+})
+
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   if (!tab) return
   // Reader mode: tell the tab's content script to extract + open the reader.

@@ -92,6 +92,26 @@ test('PDF viewer: hover paints the token; click pins the word to the panel', asy
   await page.close()
 })
 
+test('PDF toast: native PDF shows an "Open in Zilense" toast that loads the viewer', async () => {
+  // open the digital fixture in Chrome's NATIVE viewer (navigate the tab to the .pdf).
+  // The content script runs on the PDF tab's top frame and shows the toast.
+  const page = await context.newPage()
+  await page.goto(PDF_URL)
+  // the toast lives in a shadow root on #mydict-pdf-toast-host
+  await expect
+    .poll(() => page.evaluate(() => {
+      const h = document.getElementById('mydict-pdf-toast-host')
+      return !!(h && h.shadowRoot && h.shadowRoot.querySelector('.open'))
+    }), { timeout: 15_000 })
+    .toBe(true)
+  // clicking "Open in Zilense" asks the worker to navigate this tab to the viewer
+  await page.evaluate(() =>
+    document.getElementById('mydict-pdf-toast-host').shadowRoot.querySelector('.open').click())
+  await expect.poll(() => page.url(), { timeout: 15_000 }).toContain('/src/pdfviewer/index.html')
+  await expect(page.locator('.textLayer span').first()).toBeVisible({ timeout: 30_000 })
+  await page.close()
+})
+
 test('PDF viewer: OCRs a scanned (image-only) PDF into a selectable text layer', async () => {
   // a one-page image-only PDF (no text layer) — see fixtures/make-scanned-pdf.mjs
   const scanned = readFileSync(resolve(__dirname, 'fixtures/zh-scanned.pdf'))

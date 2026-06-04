@@ -4,7 +4,21 @@ All notable changes to **Zilense** are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/), and the project follows
 [Semantic Versioning](https://semver.org/).
 
-## [1.8.1] — 2026-06-04
+## [1.8.4] — 2026-06-04
+
+### Added
+- When you open a PDF in Chrome's native viewer, Zilense now shows a small,
+  dismissible **in-page toast** offering to reopen it in Zilense (where hover,
+  lookup, and selection work). Clicking **Open in Zilense** loads it in the bundled
+  viewer; cross-origin PDFs get a one-click "Allow & open" grant in the viewer. No
+  new permissions. (Replaces the earlier toolbar-popup banner.)
+
+### Fixed
+- Silenced Tesseract's chatty native debug output ("Estimating resolution as…",
+  "Detected N diacritics") that was logged to the console on every OCR'd page
+  (`debug_file` redirected to `/dev/null`).
+
+## [1.8.2] — 2026-06-04
 
 ### Added
 - **Hover-to-define in PDFs.** Chrome's built-in PDF viewer renders text to a
@@ -24,7 +38,10 @@ All notable changes to **Zilense** are documented here. The format is based on
     have no text layer, so the viewer runs bundled **Tesseract.js** with a
     Simplified-Chinese model — fully offline, no network — to recognize each page
     image and synthesize a text layer, making hover and selection work on scanned
-    pages too. OCR runs on demand per visible page with a progress badge.
+    pages too. OCR runs on demand per visible page with a progress badge. On OCR'd
+    pages the hover/pin highlight overlays are suppressed (the recognized text can't
+    align pixel-perfectly with the image) — the popup and panel lookup still work;
+    digital PDFs keep the overlays.
 
 ### Changed
 - The on-page hover/pin/popup machinery was factored into a shared `hover-driver`

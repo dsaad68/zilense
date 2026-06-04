@@ -1,7 +1,7 @@
 {
   "name": "zilense",
   "private": true,
-  "version": "1.8.1",
+  "version": "1.8.4",
   "type": "module",
   "license": "MIT",
   "description": "Zilense - Chinese dictionary in the Chrome side panel (hover, select, search & save)",
