@@ -54,6 +54,13 @@ export default defineManifest({
     service_worker: 'src/background/service-worker.js',
     type: 'module',
   },
+  // The bundled PDF viewer runs Tesseract.js (offline OCR for scanned PDFs), whose
+  // WebAssembly core needs 'wasm-unsafe-eval' to compile. Scoped to extension pages
+  // only; everything stays 'self' (no remote code) — the OCR worker, core wasm, and
+  // chi_sim model are all bundled under /tesseract.
+  content_security_policy: {
+    extension_pages: "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'",
+  },
   content_scripts: [
     {
       matches: ['<all_urls>'],
@@ -74,6 +81,12 @@ export default defineManifest({
   // which needs NO host permission. host_permissions is only for the panel's
   // cross-origin fetches: example sentences (Tatoeba) and stroke data (jsDelivr).
   host_permissions: ['https://tatoeba.org/*', 'https://cdn.jsdelivr.net/*'],
+  // The PDF viewer (an extension page) fetches PDF bytes from arbitrary origins.
+  // Rather than ship a broad host permission at install, we request *://*/* ON
+  // DEMAND (chrome.permissions.request on the user's "Open this PDF"/enable-auto
+  // gesture), keeping the default install prompt minimal. file:// PDFs additionally
+  // need the user-toggled "Allow access to file URLs" (Chrome can't grant it here).
+  optional_host_permissions: ['*://*/*'],
   // Reader mode is an extension page the content script injects as a full-screen
   // iframe over the host page, so the page context must be allowed to load it.
   // (CRXJS also auto-adds the content-script chunk here; this entry is merged in.)
@@ -87,6 +100,13 @@ export default defineManifest({
       resources: ['src/reader/index.html'],
       matches: ['<all_urls>'],
       use_dynamic_url: true,
+    },
+    // The PDF viewer is navigated to (from the in-page "Open in Zilense" toast and
+    // the right-click menu) via a fixed chrome.runtime.getURL, so it's a STABLE URL
+    // (no use_dynamic_url).
+    {
+      resources: ['src/pdfviewer/index.html'],
+      matches: ['<all_urls>'],
     },
   ],
 })

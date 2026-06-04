@@ -169,6 +169,12 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
 const MENU_ID = 'mydict-lookup'
 const READER_MENU_ID = 'mydict-reader'
+const PDF_MENU_ID = 'mydict-pdf'
+
+// the bundled PDF.js viewer page, with the target PDF URL in the hash (see
+// src/pdfviewer/target.js). Shared by the context menu and the in-page PDF toast.
+const pdfViewerUrl = (pdfUrl) =>
+  chrome.runtime.getURL('src/pdfviewer/index.html') + '#file=' + encodeURIComponent(pdfUrl)
 
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
@@ -182,6 +188,18 @@ chrome.runtime.onInstalled.addListener(() => {
     id: READER_MENU_ID,
     title: 'Open in Zilense Reader',
     contexts: ['page', 'selection'],
+  })
+  // Open a PDF (the current page, or a right-clicked PDF link) in the bundled
+  // viewer where hover works. Restricted to .pdf URLs. Cross-origin fetch needs
+  // host access, which the viewer requests on demand (a content script / worker
+  // can't); until granted the viewer shows a one-click "Allow & open". Re-created
+  // on every onInstalled (idempotent across updates).
+  chrome.contextMenus.create({
+    id: PDF_MENU_ID,
+    title: 'Open this PDF in Zilense',
+    contexts: ['page', 'link'],
+    documentUrlPatterns: ['*://*/*.pdf', 'file://*/*.pdf'],
+    targetUrlPatterns: ['*://*/*.pdf', 'file://*/*.pdf'],
   })
 })
 
@@ -272,6 +290,16 @@ chrome.commands.onCommand.addListener((command) => {
   }
 })
 
+// the in-page PDF toast (content script on a native PDF tab) asks the worker to
+// reopen this tab's PDF in the bundled viewer. sender.tab.id is always available;
+// the toast passes the PDF's URL (its own location.href).
+chrome.runtime.onMessage.addListener((msg, sender) => {
+  if (!msg || msg.type !== 'open-pdf') return
+  const url = (msg.url || '').trim()
+  const tabId = sender.tab && sender.tab.id
+  if (url && tabId != null) chrome.tabs.update(tabId, { url: pdfViewerUrl(url) })
+})
+
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   if (!tab) return
   // Reader mode: tell the tab's content script to extract + open the reader.
@@ -279,6 +307,13 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     if (tab.id != null) {
       chrome.tabs.sendMessage(tab.id, { type: 'reader-open' }, () => void chrome.runtime.lastError)
     }
+    return
+  }
+  // PDF: navigate the tab to the bundled viewer for the right-clicked PDF (a link
+  // URL) or the current PDF page.
+  if (info.menuItemId === PDF_MENU_ID) {
+    const pdfUrl = info.linkUrl || info.pageUrl
+    if (pdfUrl && tab.id != null) chrome.tabs.update(tab.id, { url: pdfViewerUrl(pdfUrl) })
     return
   }
   if (info.menuItemId !== MENU_ID) return

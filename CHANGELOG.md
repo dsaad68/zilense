@@ -4,6 +4,57 @@ All notable changes to **Zilense** are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/), and the project follows
 [Semantic Versioning](https://semver.org/).
 
+## [1.8.5] — 2026-06-04
+
+### Changed
+- Removed the opt-in "open all PDFs automatically" auto-redirect and its
+  `declarativeNetRequestWithHostAccess` permission — PDFs are opened manually via
+  the in-page toast and the right-click menu, so the extension no longer intercepts
+  navigations. Manifest permissions are back to the minimal `sidePanel`, `storage`,
+  `contextMenus`, `activeTab`.
+
+## [1.8.4] — 2026-06-04
+
+### Added
+- When you open a PDF in Chrome's native viewer, Zilense now shows a small,
+  dismissible **in-page toast** offering to reopen it in Zilense (where hover,
+  lookup, and selection work). Clicking **Open in Zilense** loads it in the bundled
+  viewer; cross-origin PDFs get a one-click "Allow & open" grant in the viewer. No
+  new permissions. (Replaces the earlier toolbar-popup banner.)
+
+### Fixed
+- Silenced Tesseract's chatty native debug output ("Estimating resolution as…",
+  "Detected N diacritics") that was logged to the console on every OCR'd page
+  (`debug_file` redirected to `/dev/null`).
+
+## [1.8.2] — 2026-06-04
+
+### Added
+- **Hover-to-define in PDFs.** Chrome's built-in PDF viewer renders text to a
+  canvas with no hoverable text, so Zilense now ships a bundled **PDF.js viewer**
+  whose real text layer makes hover, the inline popup, click-to-pin, and selection
+  lookup work on PDFs exactly as they do on web pages.
+  - **Open this PDF in Zilense** — opening a PDF shows an in-page toast (and a
+    right-click menu item) that reopens it in the viewer. No broad permissions by
+    default; host access for the PDF's origin is requested on demand (the viewer
+    offers a one-click "Allow & open"). PDFs are opened manually — no navigation
+    redirect.
+  - Works with `http(s)://` PDFs, and local `file://` PDFs once **“Allow access to
+    file URLs”** is enabled for Zilense (the viewer shows that hint when needed).
+  - **Scanned PDFs (offline OCR).** Image-only PDFs (e.g. photographed workbooks)
+    have no text layer, so the viewer runs bundled **Tesseract.js** with a
+    Simplified-Chinese model — fully offline, no network — to recognize each page
+    image and synthesize a text layer, making hover and selection work on scanned
+    pages too. OCR runs on demand per visible page with a progress badge. On OCR'd
+    pages the hover/pin highlight overlays are suppressed (the recognized text can't
+    align pixel-perfectly with the image) — the popup and panel lookup still work;
+    digital PDFs keep the overlays.
+
+### Changed
+- The on-page hover/pin/popup machinery was factored into a shared `hover-driver`
+  module so the content script and the PDF viewer drive it from one implementation.
+  No behavior change for existing pages.
+
 ## [1.7.5] — 2026-06-04
 
 ### Added
