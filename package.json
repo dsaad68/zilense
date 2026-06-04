@@ -22,20 +22,20 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
-    "@mozilla/readability": "^0.6.0",
-    "hanzi-writer": "^3.5.0",
-    "pdfjs-dist": "^4.10.38",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "tesseract.js": "^7.0.0"
+    "@mozilla/readability": "0.6.0",
+    "hanzi-writer": "3.7.3",
+    "pdfjs-dist": "6.0.227",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
+    "tesseract.js": "7.0.0"
   },
   "devDependencies": {
-    "@crxjs/vite-plugin": "^2.0.0-beta.28",
-    "@happy-dom/global-registrator": "^20.9.0",
-    "@playwright/test": "^1.49.0",
-    "@vitejs/plugin-react": "^4.3.4",
-    "cc-cedict": "^1.0.0",
-    "happy-dom": "^20.9.0",
-    "vite": "^5.4.11"
+    "@crxjs/vite-plugin": "2.4.0",
+    "@happy-dom/global-registrator": "20.10.1",
+    "@playwright/test": "1.60.0",
+    "@vitejs/plugin-react": "4.7.0",
+    "cc-cedict": "1.1.1",
+    "happy-dom": "20.10.1",
+    "vite": "7.3.5"
   }
 }
