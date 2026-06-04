@@ -84,6 +84,19 @@ async function init() {
     saveSettingsPatch({ inlinePopup })
   })
 
+  // Pinyin tone colors = settings.toneColors (colors pinyin by tone in the side
+  // panel and Reader). Same global setting the side panel's own menu exposes,
+  // surfaced here too; both write the same mydict.settings field, so whichever
+  // surface renders next reflects it.
+  const toneBtn = $('tone-colors')
+  let toneColors = settings.toneColors !== false
+  setSwitch(toneBtn, toneColors)
+  toneBtn.addEventListener('click', () => {
+    toneColors = !toneColors
+    setSwitch(toneBtn, toneColors)
+    saveSettingsPatch({ toneColors })
+  })
+
   // Disable on this site = hostname in the disabled-sites list
   const siteBtn = $('site-toggle')
   const hostEl = $('host')
