@@ -18,6 +18,15 @@ export default defineConfig({
   build: {
     // match the manifest's minimum_chrome_version
     target: 'chrome116',
+    // Disable Vite's module-preload helper. In a content script the lazy
+    // `import('./engine.js')` otherwise goes through __vitePreload, which resolves
+    // the dep chunk paths against the PAGE origin (e.g. https://www.youtube.com/
+    // assets/engine-*.js) — those 404, the preload promise rejects, and the whole
+    // dynamic import fails, so the subtitle engine never loads on the page. With
+    // preload off the import is a plain import() resolved via import.meta.url (the
+    // chrome-extension:// origin), which loads correctly. Extension pages load from
+    // the extension origin either way, so they're unaffected.
+    modulePreload: false,
     rollupOptions: {
       // Reader mode is reached only via web_accessible_resources (the content
       // script injects it as an iframe), not from the manifest's page slots that

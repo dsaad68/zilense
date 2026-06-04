@@ -12,6 +12,12 @@ All notable changes to **Zilense** are documented here. The format is based on
   other page the menu is just the dictionary controls.
 
 ### Fixed
+- **The on-video subtitle engine never loaded on real pages.** The content script's
+  lazy `import('./engine.js')` went through Vite's module-preload helper, which
+  resolved the engine chunk against the *page* origin (`https://www.youtube.com/
+  assets/engine-*.js` → 404) and rejected the import — so the whole overlay (pinyin,
+  lookup, dual) silently never ran. Disabled module preload for the build so the
+  import resolves against the extension origin.
 - Dual subtitles failing to load caption text on YouTube: a track's raw caption URL
   now often returns nothing without a session token the player adds. The hook now
   captures the player's own caption requests (both `fetch` and XHR) and the engine
