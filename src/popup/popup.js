@@ -1,5 +1,5 @@
 /* popup.js — the toolbar action menu:
-     • Zilense (master)   -> flips settings.enabled (on-page lookup on/off everywhere)
+     • Pause             -> pauses the on-page lookup everywhere (settings.enabled)
      • Open side panel   -> chrome.sidePanel.open() (this click is the user gesture)
      • Hover popup        -> flips settings.inlinePopup (the inline mini-card)
      • Disable on site    -> toggles location.hostname in mydict.disabledSites
@@ -34,18 +34,18 @@ async function init() {
   const { settings } = await loadState()
   document.body.dataset.theme = settings.dark ? 'dark' : 'light'
 
-  // Master switch — turns the on-page lookup (hover / click-to-pin / selection) on
-  // or off everywhere. Writes settings.enabled; the content script reads it live via
-  // chrome.storage.onChanged and goes inert when off. (Side panel, flashcards, and
-  // the other explicit actions below still work — this gates the automatic on-page
-  // behavior, which is what "turn the extension off" means in practice.)
+  // Pause switch — pauses the on-page lookup (hover / click-to-pin / selection)
+  // everywhere. The switch shows the PAUSED state (on = paused) and writes
+  // settings.enabled (paused === enabled:false); the content script reads it live via
+  // chrome.storage.onChanged and goes inert while paused. The side panel, flashcards,
+  // and the other explicit actions below keep working.
   const masterBtn = $('master-toggle')
-  let enabled = settings.enabled !== false
-  setSwitch(masterBtn, enabled)
+  let paused = settings.enabled === false
+  setSwitch(masterBtn, paused)
   masterBtn.addEventListener('click', () => {
-    enabled = !enabled
-    setSwitch(masterBtn, enabled)
-    saveSettingsPatch({ enabled })
+    paused = !paused
+    setSwitch(masterBtn, paused)
+    saveSettingsPatch({ enabled: !paused })
   })
 
   // Open side panel — must call open() synchronously inside this click handler

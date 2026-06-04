@@ -49,12 +49,12 @@ test('toolbar popup renders the brand icon and controls', async () => {
   await expect(page.locator('#hsk-color')).toBeVisible()
   await expect(page.locator('#hsk-level option')).toHaveCount(8)
 
-  // master on/off switch — present, defaults ON, and flips when clicked
+  // pause switch — present, defaults OFF (not paused), and flips when clicked
   const master = page.locator('#master-toggle')
   await expect(master).toBeVisible()
-  await expect(master).toHaveAttribute('aria-checked', 'true')
-  await master.click()
   await expect(master).toHaveAttribute('aria-checked', 'false')
+  await master.click()
+  await expect(master).toHaveAttribute('aria-checked', 'true')
 })
 
 test('panel draws a brand header only when opened as a window', async () => {

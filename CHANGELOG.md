@@ -4,11 +4,11 @@ All notable changes to **Zilense** are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/), and the project follows
 [Semantic Versioning](https://semver.org/).
 
-## [1.9.7] — 2026-06-04
+## [1.9.8] — 2026-06-04
 
 ### Added
-- A master on/off switch at the top of the toolbar popup that turns the on-page
-  lookup (hover, click-to-pin, and selection) on or off everywhere.
+- A **Pause** switch at the top of the toolbar popup that pauses the on-page
+  lookup (hover, click-to-pin, and selection) everywhere.
 
 ### Fixed
 - "Disable on this site" now disables the whole on-page lookup. Previously only
