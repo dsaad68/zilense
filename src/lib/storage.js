@@ -24,9 +24,6 @@ export const DEFAULT_SETTINGS = {
   hskColorByLevel: false, // "highlight HSK ≤ N": color matches by band vs one color
   showFamiliarity: false, // show the New/Learning/Known control + Progress tab
   dark: false,
-  pdfAutoOpen: false, // opt-in: auto-open every PDF in Zilense's viewer (replaces
-  // Chrome's native PDF viewer; the service worker adds a declarativeNetRequest
-  // redirect rule + requests broad host access only while this is on)
 }
 
 const hasChrome =

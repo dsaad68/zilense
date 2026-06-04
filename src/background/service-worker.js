@@ -172,7 +172,7 @@ const READER_MENU_ID = 'mydict-reader'
 const PDF_MENU_ID = 'mydict-pdf'
 
 // the bundled PDF.js viewer page, with the target PDF URL in the hash (see
-// src/pdfviewer/target.js). Shared by the context menu and the auto-redirect rule.
+// src/pdfviewer/target.js). Shared by the context menu and the in-page PDF toast.
 const pdfViewerUrl = (pdfUrl) =>
   chrome.runtime.getURL('src/pdfviewer/index.html') + '#file=' + encodeURIComponent(pdfUrl)
 
@@ -191,10 +191,9 @@ chrome.runtime.onInstalled.addListener(() => {
   })
   // Open a PDF (the current page, or a right-clicked PDF link) in the bundled
   // viewer where hover works. Restricted to .pdf URLs. Cross-origin fetch needs
-  // host access; the popup's "Open this PDF" button is the path that requests it
-  // on a user gesture (the worker can't), so this menu is best-effort for origins
-  // already granted (e.g. after enabling auto-open) — otherwise the viewer guides
-  // the user. Re-created on every onInstalled (idempotent across updates).
+  // host access, which the viewer requests on demand (a content script / worker
+  // can't); until granted the viewer shows a one-click "Allow & open". Re-created
+  // on every onInstalled (idempotent across updates).
   chrome.contextMenus.create({
     id: PDF_MENU_ID,
     title: 'Open this PDF in Zilense',
@@ -277,54 +276,3 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   }
   if (q) chrome.runtime.sendMessage({ type: 'lookup', q }, () => void chrome.runtime.lastError)
 })
-
-/* Opt-in "open all PDFs automatically" — a single dynamic declarativeNetRequest
-   rule that redirects top-level *.pdf navigations to the bundled viewer (with the
-   original URL in the hash), so PDFs open in the hover-enabled viewer instead of
-   Chrome's native one. The rule only ACTS on origins the user has granted host
-   access to (declarativeNetRequestWithHostAccess) — the side panel requests broad
-   host access on the toggle's user gesture before enabling. We mirror the rule to
-   the pdfAutoOpen setting: added when on, removed when off, synced on startup. */
-const PDF_RULE_ID = 1
-const SETTINGS_KEY = 'mydict.settings'
-
-function setPdfRedirect(enabled) {
-  const addRules = enabled ? [{
-    id: PDF_RULE_ID,
-    priority: 1,
-    // top-level navigations whose URL ends in .pdf (case-insensitive), with an
-    // optional query string; redirect carrying the whole matched URL (\0) in the hash
-    condition: {
-      regexFilter: '^(https?|file)://.*\\.[pP][dD][fF](\\?.*)?$',
-      resourceTypes: ['main_frame'],
-    },
-    action: {
-      type: 'redirect',
-      redirect: { regexSubstitution: chrome.runtime.getURL('src/pdfviewer/index.html') + '#file=\\0' },
-    },
-  }] : []
-  return chrome.declarativeNetRequest
-    .updateDynamicRules({ removeRuleIds: [PDF_RULE_ID], addRules })
-    .catch((e) => console.error('[mydict] setPdfRedirect', e))
-}
-
-function syncPdfRedirect() {
-  try {
-    chrome.storage.local.get([SETTINGS_KEY], (got) => {
-      if (chrome.runtime.lastError) return
-      setPdfRedirect(!!(got && got[SETTINGS_KEY] && got[SETTINGS_KEY].pdfAutoOpen))
-    })
-  } catch (e) { /* storage unavailable — leave the rule as-is */ }
-}
-
-// keep the rule in step with the setting (side panel toggles it after the host
-// permission is granted) and re-assert it when the worker (re)starts
-chrome.storage.onChanged.addListener((changes, area) => {
-  if (area === 'local' && changes[SETTINGS_KEY]) {
-    const nv = changes[SETTINGS_KEY].newValue || {}
-    const ov = changes[SETTINGS_KEY].oldValue || {}
-    if (!!nv.pdfAutoOpen !== !!ov.pdfAutoOpen) setPdfRedirect(!!nv.pdfAutoOpen)
-  }
-})
-chrome.runtime.onStartup.addListener(syncPdfRedirect)
-chrome.runtime.onInstalled.addListener(syncPdfRedirect)

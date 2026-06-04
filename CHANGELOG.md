@@ -4,6 +4,15 @@ All notable changes to **Zilense** are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/), and the project follows
 [Semantic Versioning](https://semver.org/).
 
+## [1.8.5] — 2026-06-04
+
+### Changed
+- Removed the opt-in "open all PDFs automatically" auto-redirect and its
+  `declarativeNetRequestWithHostAccess` permission — PDFs are opened manually via
+  the in-page toast and the right-click menu, so the extension no longer intercepts
+  navigations. Manifest permissions are back to the minimal `sidePanel`, `storage`,
+  `contextMenus`, `activeTab`.
+
 ## [1.8.4] — 2026-06-04
 
 ### Added
@@ -25,13 +34,11 @@ All notable changes to **Zilense** are documented here. The format is based on
   canvas with no hoverable text, so Zilense now ships a bundled **PDF.js viewer**
   whose real text layer makes hover, the inline popup, click-to-pin, and selection
   lookup work on PDFs exactly as they do on web pages.
-  - **Open this PDF in Zilense** — a toolbar-popup button (shown on PDF tabs) and a
-    right-click menu item open the current/linked PDF in the viewer. No broad
-    permissions by default; host access for the PDF's origin is requested on that
-    click.
-  - **Open all PDFs automatically** (Settings, opt-in) redirects every PDF into the
-    viewer, replacing Chrome's native PDF viewer. Requests broad host access on the
-    toggle and adds a single `declarativeNetRequest` redirect rule only while on.
+  - **Open this PDF in Zilense** — opening a PDF shows an in-page toast (and a
+    right-click menu item) that reopens it in the viewer. No broad permissions by
+    default; host access for the PDF's origin is requested on demand (the viewer
+    offers a one-click "Allow & open"). PDFs are opened manually — no navigation
+    redirect.
   - Works with `http(s)://` PDFs, and local `file://` PDFs once **“Allow access to
     file URLs”** is enabled for Zilense (the viewer shows that hint when needed).
   - **Scanned PDFs (offline OCR).** Image-only PDFs (e.g. photographed workbooks)

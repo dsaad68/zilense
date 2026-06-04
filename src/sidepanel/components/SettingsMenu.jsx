@@ -6,7 +6,7 @@ const ACCENTS = [
   { c: '#3b5b8c', n: 'Indigo' }, { c: '#b5862f', n: 'Gold' }, { c: '#4a4540', n: 'Ink' },
 ]
 
-export function SettingsMenu({ settings, onSetting, onPdfAutoOpen, onClose }) {
+export function SettingsMenu({ settings, onSetting, onClose }) {
   return (
     <>
       <div className="set-overlay" onClick={onClose} />
@@ -79,22 +79,6 @@ export function SettingsMenu({ settings, onSetting, onPdfAutoOpen, onClose }) {
             onClick={() => onSetting('hskFirst', !settings.hskFirst)}>
             <span className="knob" />
           </button>
-        </div>
-
-        <div className="set-row col">
-          <div className="set-row" style={{ width: '100%' }}>
-            <span className="set-label">Open all PDFs automatically</span>
-            <button className={'switch' + (settings.pdfAutoOpen ? ' on' : '')}
-              role="switch" aria-checked={!!settings.pdfAutoOpen}
-              onClick={() => onPdfAutoOpen(!settings.pdfAutoOpen)}>
-              <span className="knob" />
-            </button>
-          </div>
-          <span className="set-sub">
-            Opens PDFs in Zilense’s hover viewer instead of Chrome’s (so you can
-            hover characters). Replaces Chrome’s built-in PDF viewer. Local
-            (file://) PDFs also need “Allow access to file URLs” enabled for Zilense.
-          </span>
         </div>
 
         <div className="set-row">

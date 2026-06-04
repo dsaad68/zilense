@@ -17,19 +17,27 @@ test('manifest: permissions are the minimal set', () => {
   }
 })
 
-test('manifest: PDF auto-open uses host-scoped DNR + on-demand host access', () => {
-  // the opt-in "open all PDFs automatically" redirect is host-scoped DNR, not the
-  // unrestricted declarativeNetRequest
-  assert.ok(m.permissions.includes('declarativeNetRequestWithHostAccess'),
-    'declarativeNetRequestWithHostAccess expected for the PDF redirect rule')
+test('manifest: PDFs use on-demand host access only — no navigation interception', () => {
+  // PDFs are opened manually (in-page toast / right-click), so we do NOT redirect
+  // navigations — no declarativeNetRequest of any kind
   assert.ok(!m.permissions.includes('declarativeNetRequest'),
-    'must not request the unrestricted declarativeNetRequest')
-  // broad host access for the viewer's cross-origin PDF fetch is OPTIONAL (requested
-  // on a user gesture), so the default install prompt stays minimal
+    'must not request declarativeNetRequest')
+  assert.ok(!m.permissions.includes('declarativeNetRequestWithHostAccess'),
+    'must not request declarativeNetRequestWithHostAccess (no auto-redirect)')
+  // the viewer's cross-origin PDF fetch uses host access requested on a user gesture,
+  // declared OPTIONAL so the default install prompt stays minimal
   assert.ok((m.optional_host_permissions || []).includes('*://*/*'),
     'broad host access must be optional, not granted at install')
   assert.ok(!m.host_permissions.includes('*://*/*'),
     'broad host access must not be in host_permissions (install-time)')
+})
+
+test('manifest: extension-pages CSP allows bundled WASM but no remote code', () => {
+  const csp = m.content_security_policy && m.content_security_policy.extension_pages
+  assert.ok(csp, 'extension_pages CSP must be set (Tesseract OCR WASM needs it)')
+  assert.match(csp, /'wasm-unsafe-eval'/, "CSP must allow 'wasm-unsafe-eval' for the OCR WebAssembly")
+  assert.match(csp, /script-src 'self'/, "script-src must stay 'self' (no remote code)")
+  assert.ok(!/https?:\/\//.test(csp), 'CSP must not allow any remote script origin')
 })
 
 test('manifest: PDF viewer page is web-accessible at a STABLE url', () => {

@@ -14,9 +14,9 @@ function allowedUrl(s) {
 
 // parse the viewer's location.hash into a validated PDF URL, or '' when absent /
 // malformed / a disallowed scheme. The hash is `file=<url>`, where the URL is
-// percent-encoded when the popup builds it but RAW when the auto-redirect
-// declarativeNetRequest rule builds it (DNR can't encode). So try the decoded form
-// first, then fall back to the raw form — whichever is a valid allowed URL wins.
+// normally percent-encoded by whoever opens the viewer; we try the decoded form
+// first and fall back to the raw form (so an un-encoded URL still works) —
+// whichever is a valid allowed URL wins.
 export function parsePdfTarget(hash) {
   if (typeof hash !== 'string') return ''
   const h = hash.replace(/^#/, '')

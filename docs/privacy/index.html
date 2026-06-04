@@ -62,6 +62,10 @@
       <p>These requests contain only the Chinese word or character being looked up. No identifiers,
         account information, or browsing history is attached to them. Pronunciation uses your
         browser's built-in speech synthesis and makes no network request to the developer.</p>
+      <p>When you open a PDF in Zilense's built-in viewer, the viewer fetches that PDF's own bytes
+        from its address in order to display it. Scanned PDFs are recognized by an OCR engine that is
+        bundled with the extension and runs <strong>entirely on your device</strong> — the page
+        image is never uploaded anywhere. Nothing about the PDF is sent to the developer.</p>
 
       <h2>What Zilense does NOT do</h2>
       <ul>
@@ -78,7 +82,9 @@
         you hover/select on a page (to look it up), <code>storage</code> (for the local data above),
         <code>sidePanel</code> and <code>contextMenus</code> (its user interface), and
         <code>activeTab</code> (to read the current tab's address when you open the panel). It does
-        not request broad host access to read or modify arbitrary sites in the background.</p>
+        not request broad host access to read or modify arbitrary sites in the background. Access to
+        a PDF's site is requested only on demand — when you choose to open that PDF in Zilense — and
+        can be declined or revoked.</p>
 
       <h2>Changes</h2>
       <p>If this policy changes, the "Last updated" date above will change and the new version will be

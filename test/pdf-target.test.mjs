@@ -3,22 +3,21 @@ import assert from 'node:assert/strict'
 import { parsePdfTarget, isFileTarget } from '../src/pdfviewer/target.js'
 
 /* parsePdfTarget reads the PDF viewer's URL hash (#file=<url>) into a validated,
-   allowed-scheme URL. The popup builds an ENCODED hash; the auto-redirect DNR rule
-   builds a RAW one — both must resolve. Disallowed schemes resolve to '' so the
-   viewer never fetches a javascript:/data:/extension URL. */
+   allowed-scheme URL. Callers build an ENCODED hash; we also accept a RAW
+   (un-encoded) URL as a fallback. Disallowed schemes resolve to '' so the viewer
+   never fetches a javascript:/data:/extension URL. */
 
-test('parsePdfTarget: decodes a popup-encoded https target', () => {
+test('parsePdfTarget: decodes an encoded https target', () => {
   const url = 'https://example.com/a b.pdf?v=2'
   assert.equal(parsePdfTarget('#file=' + encodeURIComponent(url)), url)
 })
 
-test('parsePdfTarget: accepts a raw (DNR-substituted) https target', () => {
-  // the DNR rule substitutes the whole matched URL with no percent-encoding
+test('parsePdfTarget: accepts a raw (un-encoded) https target', () => {
   assert.equal(parsePdfTarget('#file=https://example.com/doc.pdf'),
     'https://example.com/doc.pdf')
 })
 
-test('parsePdfTarget: accepts a raw query string in the DNR form', () => {
+test('parsePdfTarget: accepts a raw query string', () => {
   assert.equal(parsePdfTarget('#file=https://example.com/doc.pdf?id=7'),
     'https://example.com/doc.pdf?id=7')
 })

@@ -61,11 +61,7 @@ export default defineManifest({
   // activeTab lets the action popup read the active tab's URL (hostname for
   // "disable on this site") and id (to open the side panel) when the user clicks
   // the icon — no broad host permission needed.
-  // declarativeNetRequestWithHostAccess powers the OPT-IN "open all PDFs
-  // automatically" redirect (a dynamic rule that rewrites *.pdf navigations to the
-  // bundled viewer); it only acts on origins the user has granted host access to,
-  // so it's narrower than full declarativeNetRequest and adds no rule until enabled.
-  permissions: ['sidePanel', 'storage', 'contextMenus', 'activeTab', 'declarativeNetRequestWithHostAccess'],
+  permissions: ['sidePanel', 'storage', 'contextMenus', 'activeTab'],
   // Content scripts (hover lookup) inject everywhere via content_scripts.matches,
   // which needs NO host permission. host_permissions is only for the panel's
   // cross-origin fetches: example sentences (Tatoeba) and stroke data (jsDelivr).
@@ -90,10 +86,9 @@ export default defineManifest({
       matches: ['<all_urls>'],
       use_dynamic_url: true,
     },
-    // The PDF viewer must be at a STABLE URL (no use_dynamic_url): the opt-in
-    // auto-redirect declarativeNetRequest rule and the manual
-    // chrome.runtime.getURL navigation both target a fixed
-    // chrome-extension://<id>/src/pdfviewer/index.html.
+    // The PDF viewer is navigated to (from the in-page "Open in Zilense" toast and
+    // the right-click menu) via a fixed chrome.runtime.getURL, so it's a STABLE URL
+    // (no use_dynamic_url).
     {
       resources: ['src/pdfviewer/index.html'],
       matches: ['<all_urls>'],

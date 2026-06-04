@@ -146,22 +146,6 @@ export default function App() {
   }, [settings.accent, settings.hanFont, settings.toneColors])
 
   const setSetting = (k, v) => setSettings((s) => ({ ...s, [k]: v }))
-  // "Open all PDFs automatically": the viewer (an extension page) must fetch PDF
-  // bytes from any origin, so request *://*/* host access on THIS click (a user
-  // gesture chrome.permissions.request requires) before enabling. Only flip the
-  // setting if granted; the service worker mirrors it to its redirect rule. On
-  // disable, relinquish the broad grant.
-  const setPdfAutoOpen = async (on) => {
-    try {
-      if (on) {
-        const granted = await chrome.permissions.request({ origins: ['*://*/*'] })
-        if (!granted) return // declined — leave the toggle off
-      } else {
-        await chrome.permissions.remove({ origins: ['*://*/*'] })
-      }
-    } catch (e) { if (on) return } // request failed — don't enable without access
-    setSetting('pdfAutoOpen', on)
-  }
   const toggleSave = (q) => setSaved((s) => (s.includes(q) ? s.filter((x) => x !== q) : [q, ...s]))
   // the user sets a word's familiarity state (New / Learning / Known)
   const setFam = (q, state) => setFamiliarity((f) => setFamiliarityState(f, q, state))
@@ -221,7 +205,7 @@ export default function App() {
   return (
     <div className="panel" data-theme={dark ? 'dark' : 'light'}>
       {showSettings && (
-        <SettingsMenu settings={settings} onSetting={setSetting} onPdfAutoOpen={setPdfAutoOpen} onClose={() => setShowSettings(false)} />
+        <SettingsMenu settings={settings} onSetting={setSetting} onClose={() => setShowSettings(false)} />
       )}
 
       {/* Chrome's side-panel bar already shows the icon + name, so the app header
