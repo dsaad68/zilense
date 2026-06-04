@@ -4,6 +4,13 @@ All notable changes to **Zilense** are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/), and the project follows
 [Semantic Versioning](https://semver.org/).
 
+## [1.9.3] — 2026-06-04
+
+### Changed
+- The toolbar menu now shows the **Subtitles** section only on supported video
+  sites (YouTube / Coursera), where the feature actually does something; on every
+  other page the menu is just the dictionary controls.
+
 ## [1.9.2] — 2026-06-04
 
 ### Added

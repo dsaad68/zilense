@@ -15,6 +15,7 @@ import {
   loadSubsPrefs,
   saveSubsPrefs,
 } from '../lib/storage.js'
+import { detectPlatform } from '../content/subs/platforms.js'
 
 const $ = (id) => document.getElementById(id)
 
@@ -119,10 +120,14 @@ async function init() {
     siteBtn.style.cursor = 'default'
   }
 
-  // Subtitles (pinyin + lookup) — the on-video overlay. Master toggle plus two
-  // sub-toggles (dual subtitles, pinyin), persisted under mydict.subs (read live by
-  // the content script). The sub-rows dim when the feature is off, mirroring the
-  // reader's dependent rows.
+  // Subtitles (pinyin + lookup) — the on-video overlay. The whole section is shown
+  // ONLY on a supported video site (YouTube / Coursera), since that is the only
+  // place the feature does anything; detectPlatform is the same host check the
+  // content script uses. Master toggle plus two sub-toggles (dual subtitles,
+  // pinyin), persisted under mydict.subs (read live by the content script). The
+  // sub-rows dim when the feature is off, mirroring the reader's dependent rows.
+  if (host && detectPlatform(host)) {
+  $('subs-section').hidden = false
   const subs = await loadSubsPrefs()
   const subsBtn = $('subs-toggle')
   const subsDualBtn = $('subs-dual')
@@ -165,6 +170,7 @@ async function init() {
     setSwitch(subsPyBtn, subsPinyin)
     saveSubsPrefs({ pinyin: subsPinyin })
   })
+  } // end supported-video-site gate
 
   // Highlight HSK ≤ N — a one-shot action on the active tab's content script.
   const levelSel = $('hsk-level')
