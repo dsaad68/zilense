@@ -11,8 +11,12 @@
    storage listener starts/stops the engine without a reload. */
 
 // cheap pre-filter (the authoritative per-platform list lives in platforms.js,
-// loaded only inside the engine chunk). Keep these two in sync.
-const SUPPORTED_HOST = /(^|\.)(youtube(-nocookie)?\.com|coursera\.org)$/i
+// loaded only inside the engine chunk). Keep these two in sync. Only the hosts that
+// actually carry a video player are listed: matching a bare youtube.com subdomain
+// would also fire on accounts./studio./consent.youtube.com — login/creator frames
+// (and content.js runs all_frames) whose strict CSP blocks our dynamically-imported
+// engine chunk, and which never have a player anyway.
+const SUPPORTED_HOST = /^(((www|m|music)\.)?youtube\.com|(www\.)?youtube-nocookie\.com|([a-z0-9-]+\.)?coursera\.org)$/i
 const SUBS_KEY = 'mydict.subs'
 const DISABLED_KEY = 'mydict.disabledSites'
 

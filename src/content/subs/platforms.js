@@ -63,8 +63,10 @@ const coursera = {
   nativeHideSelector: '.vjs-text-track-display',
 }
 
+// kept in sync with index.js SUPPORTED_HOST: only the youtube hosts that carry a
+// player (www / m / music + the nocookie embed), NOT accounts./studio./consent.
 const ADAPTERS = [
-  { test: /(^|\.)youtube(-nocookie)?\.com$/i, adapter: youtube },
+  { test: /^(((www|m|music)\.)?youtube\.com|(www\.)?youtube-nocookie\.com)$/i, adapter: youtube },
   { test: /(^|\.)coursera\.org$/i, adapter: coursera },
 ]
 
