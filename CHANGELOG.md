@@ -4,6 +4,15 @@ All notable changes to **Zilense** are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/), and the project follows
 [Semantic Versioning](https://semver.org/).
 
+## [1.9.2] — 2026-06-04
+
+### Added
+- **Dual subtitles toggle** in the toolbar menu, with a **Second language** picker.
+  When dual is on and the video has the tracks, Chinese shows on top and a second
+  language below. The second line defaults to **English** and can be set to another
+  language; a chosen language falls back to English (or the next available track)
+  when a video doesn't carry it, so the second line never silently disappears.
+
 ## [1.9.1] — 2026-06-04
 
 ### Added
