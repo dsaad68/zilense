@@ -1,0 +1,764 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Zilense, Chinese Dictionary for Chrome</title>
+  <meta name="description" content="Zilense is a Chrome side-panel Chinese dictionary: hover or select any hanzi for tone-colored pinyin, meaning, stroke order, examples, names &amp; places, HSK flashcards with Anki export, a clean reader mode, hover/lookup in PDFs (incl. scanned via offline OCR), and experimental dual subtitles with pinyin on YouTube video.">
+  <link rel="icon" href="icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Noto+Serif+SC:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="wrap">
+
+    <nav class="nav">
+      <img src="icon.png" alt="">
+      <span class="name">Zilense</span>
+      <span class="spacer"></span>
+      <span class="links">
+        <a href="https://github.com/dsaad68/zilense">GitHub</a>
+        <a href="privacy">Privacy</a>
+      </span>
+    </nav>
+
+    <!-- ============ HERO ============ -->
+    <header class="hero">
+      <img class="logo" src="icon.png" alt="Zilense icon, the character 字 inside a magnifying glass">
+      <h1>Learn Chinese, anywhere you browse</h1>
+      <p class="zh" lang="zh">字 <span class="t4">zì</span> &nbsp;·&nbsp; look closely, read clearly</p>
+      <p class="tagline">Hover or select any Chinese character on a page and its tone-colored pinyin,
+        meaning, stroke order, and examples appear instantly, right in the Chrome side panel.</p>
+      <div class="cta">
+        <a class="btn btn-primary" href="https://github.com/dsaad68/zilense">View on GitHub</a>
+        <a class="btn btn-ghost" href="privacy">Privacy policy</a>
+      </div>
+      <p style="font-family:var(--font-ui);font-size:13px;color:var(--ink3);margin-top:14px">Coming to the Chrome Web Store</p>
+    </header>
+  </div><!-- /wrap -->
+
+  <!-- ============ SIGNATURE MOCKUP ============ -->
+  <div class="bw-stage">
+    <div class="bw" role="img" aria-label="Zilense side panel docked next to a Chinese article in Chrome">
+      <div class="bw-bar">
+        <span class="bw-lights"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i></span>
+        <span class="bw-tab"><span class="fav"></span><span class="tt" lang="zh">我的中文生活 · Reader</span></span>
+        <span class="bw-tab dim"><span class="fav" style="background:#3c4043"></span><span class="tt">New Tab</span></span>
+      </div>
+      <div class="bw-url"><span class="nav-ic"></span><span class="bw-urlbox">my-reader.app/reader/my-life-in-chinese</span></div>
+      <div class="bw-split">
+
+        <!-- article -->
+        <div class="page">
+          <div class="page-bar">
+            <span class="page-host">my-reader.app</span>
+            <span class="hint">Hover a character → it appears in the panel ↗</span>
+          </div>
+          <div class="post">
+            <div class="kicker">Graded reader · Beginner</div>
+            <h1 lang="zh">我的中文生活</h1>
+            <div class="byline">My Life in Chinese · 78 characters · ~2 min</div>
+            <p class="lead" lang="zh"><span class="tok word active" data-w="你好">你好</span><span class="punct">！</span><span class="tok" data-w="我">我</span><span class="tok" data-w="是">是</span><span class="tok word" data-w="一个">一个</span><span class="tok word" data-w="学生">学生</span><span class="punct">。</span><span class="tok" data-w="我">我</span><span class="tok" data-w="在">在</span><span class="tok word" data-w="中国">中国</span><span class="tok word" data-w="学习">学习</span><span class="tok word" data-w="中文">中文</span><span class="punct">。</span><span class="tok" data-w="我">我</span><span class="tok" data-w="很">很</span><span class="tok word" data-w="喜欢">喜欢</span><span class="tok word" data-w="喝茶">喝茶</span><span class="punct">。</span></p>
+            <p class="note">Reading tip: hover any single character for its meaning, or select a whole
+              word like <span lang="zh" style="color:#b23a2e;font-weight:500">朋友</span> for the word reading plus a
+              character-by-character breakdown.</p>
+            <div class="hoverpop" id="hoverpop" aria-hidden="true"></div>
+          </div>
+        </div>
+
+        <!-- docked panel -->
+        <div class="dock ui">
+          <div class="dock-head">Side panel</div>
+          <div class="p-head">
+            <div class="brand"><img class="seal" src="icon.png" alt=""><span class="brand-name">Zilense</span></div>
+            <div class="head-actions">
+              <button class="iconbtn" aria-label="Settings"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg></button>
+              <button class="iconbtn" aria-label="Dark mode"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z"/></svg></button>
+            </div>
+          </div>
+          <div class="searchbar"><span class="search-ic"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg></span><input placeholder="Search 汉字 or English…" readonly></div>
+          <div class="tabs"><button class="tab on">Dictionary</button><button class="tab">Saved</button></div>
+          <div class="p-body">
+            <div class="entry" id="demo-entry">
+              <div class="entry-head">
+                <div class="hanzi-big" lang="zh">你好</div>
+                <div class="entry-actions"><span class="iconbtn" aria-label="Pronounce"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 6a8 8 0 0 1 0 12"/></svg></span><span class="iconbtn" aria-label="Save"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 17.9 6.8 19.6l1-5.8L3.5 9.7l5.9-.9L12 3.5Z"/></svg></span></div>
+              </div>
+              <div class="pinyin-row" lang="zh"><span class="tone-3">nǐ</span> <span class="tone-3">hǎo</span></div>
+              <div class="meta-row"><span class="badge-hsk">HSK 1</span><span class="pos">interjection</span><span class="freq">· very common</span></div>
+              <ol class="defs"><li>hello</li><li>hi</li><li>how do you do</li></ol>
+              <div class="group-label">Characters · 2</div>
+              <div class="charcards">
+                <div class="charcard"><span class="cc-hanzi" lang="zh">你</span><span class="cc-body"><span class="cc-py" lang="zh"><span class="tone-3">nǐ</span></span><span class="cc-gloss">you (singular)</span></span><span class="cc-arrow"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span></div>
+                <div class="charcard"><span class="cc-hanzi" lang="zh">好</span><span class="cc-body"><span class="cc-py" lang="zh"><span class="tone-3">hǎo</span></span><span class="cc-gloss">good</span></span><span class="cc-arrow"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span></div>
+              </div>
+              <div class="group-label">Examples</div>
+              <div class="examples">
+                <div class="ex">
+                  <div class="ex-zh" lang="zh">你好，我叫小明。</div>
+                  <div class="ex-py" lang="zh"><span class="tone-3">Nǐ</span> <span class="tone-3">hǎo</span>, <span class="tone-3">wǒ</span> <span class="tone-4">jiào</span> <span class="tone-3">Xiǎo</span><span class="tone-2">míng</span>.</div>
+                  <div class="ex-en">Hi, my name is Xiaoming.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div><!-- /bw-stage -->
+
+  <div class="wrap">
+    <!-- ============ FEATURE SHOWCASE ============ -->
+    <div class="showcase">
+
+      <!-- hover & select -->
+      <section class="feat">
+        <div class="feat-text">
+          <p class="eyebrow">On any page</p>
+          <h2>Hover or select to look up</h2>
+          <p>Point at a character to read it, or select a whole word for its reading and a
+            character-by-character breakdown. Works on simplified and traditional pages
+            (<span lang="zh">中國</span> resolves to <span lang="zh">中国</span>).</p>
+          <p>An optional inline popup shows the meaning right where you're reading, no need to glance away.</p>
+        </div>
+        <div class="feat-visual">
+          <div class="ui popup-mock">
+            <div class="pm-hanzi" lang="zh">朋友</div>
+            <div class="pm-py" lang="zh"><span class="tone-2">péng</span> <span class="tone-5">you</span></div>
+            <div class="pm-def">1. friend &nbsp; 2. companion</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- tone colors -->
+      <section class="feat rev">
+        <div class="feat-text">
+          <p class="eyebrow">Pinyin that teaches</p>
+          <h2>Tone-colored pinyin</h2>
+          <p>Every syllable is colored by its tone, so pronunciation is visible at a glance and
+            the four tones (plus neutral) stick in memory as you read.</p>
+        </div>
+        <div class="feat-visual">
+          <div class="ui" style="text-align:center">
+            <div class="tonebig" lang="zh"><span class="tone-1">mā</span><span class="tone-2">má</span><span class="tone-3">mǎ</span><span class="tone-4">mà</span><span class="tone-5">ma</span></div>
+            <div class="tone-legend">
+              <span><b class="t1" style="color:var(--t1)">1st</b> high</span>
+              <span><b class="t2" style="color:var(--t2)">2nd</b> rising</span>
+              <span><b class="t3" style="color:var(--t3)">3rd</b> dipping</span>
+              <span><b class="t4" style="color:var(--t4)">4th</b> falling</span>
+              <span><b class="t5" style="color:var(--t5)">neutral</b></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- word + character breakdown -->
+      <section class="feat">
+        <div class="feat-text">
+          <p class="eyebrow">Whole words, broken down</p>
+          <h2>Word reading + every character</h2>
+          <p>Smart longest-match segmentation finds the real word under your cursor, even when it's
+            split across inline markup, then shows what each character contributes.</p>
+        </div>
+        <div class="feat-visual">
+          <div class="ui" style="width:300px">
+            <div class="entry-head"><div class="hanzi-big" lang="zh">喜欢</div></div>
+            <div class="pinyin-row" lang="zh"><span class="tone-3">xǐ</span> <span class="tone-1">huān</span></div>
+            <div class="meta-row"><span class="badge-hsk">HSK 1</span><span class="pos">verb</span></div>
+            <ol class="defs"><li>to like</li><li>to be fond of</li></ol>
+            <div class="charcards" style="margin-top:14px">
+              <div class="charcard"><span class="cc-hanzi" lang="zh">喜</span><span class="cc-body"><span class="cc-py" lang="zh"><span class="tone-3">xǐ</span></span><span class="cc-gloss">to like, to be fond of</span></span><span class="cc-arrow"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span></div>
+              <div class="charcard"><span class="cc-hanzi" lang="zh">欢</span><span class="cc-body"><span class="cc-py" lang="zh"><span class="tone-1">huān</span></span><span class="cc-gloss">joyful, merry</span></span><span class="cc-arrow"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- stroke order -->
+      <section class="feat rev">
+        <div class="feat-text">
+          <p class="eyebrow">Learn to write</p>
+          <h2>Animated stroke order</h2>
+          <p>Watch any character drawn stroke by stroke, with its radical and components highlighted.
+            Replay as many times as you like.</p>
+        </div>
+        <div class="feat-visual">
+          <div class="ui" style="display:flex;flex-direction:column;align-items:center;gap:12px">
+            <div class="stroke-box"><div class="stroke-grid"></div><div class="stroke-svg" id="stroke-target"></div></div>
+            <button class="ghostbtn" id="stroke-replay"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 2.6-6.3"/><path d="M3 4v4h4"/></svg> Replay</button>
+            <div class="radical"><span class="rad-char" lang="zh">子</span><span class="rad-meaning">radical · child</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- HSK -->
+      <section class="feat">
+        <div class="feat-text">
+          <p class="eyebrow">Study by level</p>
+          <h2>HSK levels &amp; one-tap highlighting</h2>
+          <p>Every entry shows its HSK 3.0 level, bands 1–6 and the advanced 7–9. From the toolbar,
+            highlight all HSK words up to a chosen level across the whole page, optionally colored band
+            by band.</p>
+        </div>
+        <div class="feat-visual">
+          <div class="ui" style="width:320px">
+            <div class="hsk-chips">
+              <span class="hsk-chip" style="background:rgba(244,143,137,.42)">HSK 1</span>
+              <span class="hsk-chip" style="background:rgba(255,224,130,.50)">HSK 2</span>
+              <span class="hsk-chip" style="background:rgba(255,183,122,.46)">HSK 3</span>
+              <span class="hsk-chip" style="background:rgba(197,225,112,.48)">HSK 4</span>
+              <span class="hsk-chip" style="background:rgba(129,199,132,.44)">HSK 5</span>
+              <span class="hsk-chip" style="background:rgba(197,153,222,.44)">HSK 6</span>
+              <span class="hsk-chip" style="background:rgba(144,195,245,.46)">HSK 7-9</span>
+            </div>
+            <p class="hsk-para" lang="zh">我<mark style="background:rgba(244,143,137,.42)">喜欢</mark>在<mark style="background:rgba(255,183,122,.46)">图书馆</mark><mark style="background:rgba(244,143,137,.42)">学习</mark><mark style="background:rgba(255,224,130,.50)">中文</mark>。</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- reader mode -->
+      <section class="feat rev">
+        <div class="feat-text">
+          <p class="eyebrow">Distraction-free</p>
+          <h2>Reader mode with pinyin ruby</h2>
+          <p>Open any article in a clean reader with selectable fonts, larger text, and column width.
+            Add tone-colored pinyin above every character, and the dictionary stays live as you read.</p>
+        </div>
+        <div class="feat-visual">
+          <div class="ui bare">
+            <div class="reader-mock" id="reader-mock">
+              <h3 lang="zh">我的中文生活</h3>
+              <p lang="zh" style="margin:0">
+                <ruby>我<rt class="tone-3">wǒ</rt></ruby><ruby>很<rt class="tone-3">hěn</rt></ruby><ruby>喜<rt class="tone-3">xǐ</rt></ruby><ruby>欢<rt class="tone-1">huān</rt></ruby><ruby>喝<rt class="tone-1">hē</rt></ruby><ruby>茶<rt class="tone-2">chá</rt></ruby>。
+              </p>
+              <div class="reader-tools">
+                <span class="theme-sw paper on" data-theme="" title="Paper"></span>
+                <span class="theme-sw sepia" data-theme="sepia" title="Sepia"></span>
+                <span class="theme-sw dark" data-theme="dark" title="Dark"></span>
+                <span class="segmini" style="margin-left:6px"><button class="on">Serif</button><button>Sans</button></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- pdf + ocr -->
+      <section class="feat rev">
+        <div class="feat-text">
+          <p class="eyebrow">PDFs, too</p>
+          <h2>Hover &amp; select in PDFs, even scanned ones</h2>
+          <p>Open a PDF and Zilense offers to reopen it in a built-in viewer where hover, lookup, and
+            selection work just like on a web page. Scanned or image-only PDFs (photographed
+            workbooks, textbooks) are recognized with <strong>offline OCR</strong>, a bundled Chinese
+            model, no network, so even pictures of text become hoverable.</p>
+        </div>
+        <div class="feat-visual">
+          <div class="ui bare">
+            <div class="reader-mock">
+              <p lang="zh" style="margin:0 0 14px;font-size:22px">
+                <ruby>好<rt class="tone-3">hǎo</rt></ruby><ruby>吃<rt class="tone-1">chī</rt></ruby>
+                <ruby>杯<rt class="tone-1">bēi</rt></ruby><ruby>子<rt class="tone-5">zi</rt></ruby>
+                <ruby>衣<rt class="tone-1">yī</rt></ruby><ruby>服<rt class="tone-2">fú</rt></ruby>
+              </p>
+              <div class="reader-tools" style="justify-content:space-between">
+                <span style="font-size:13px;opacity:.7">📄 Scanned PDF · OCR</span>
+                <span class="segmini"><button class="on">Open in Zilense</button></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- video subtitles (experimental) -->
+      <section class="feat">
+        <div class="feat-text">
+          <p class="eyebrow">On video, too</p>
+          <h2>Dual subtitles with pinyin <span class="tag-exp">Experimental</span></h2>
+          <p>On <strong>YouTube</strong>, the on-video captions get the same
+            tone-colored pinyin and <strong>clickable words</strong>. Hover or tap a word
+            (try it&nbsp;→) and it opens in the side panel, just like on a page.</p>
+          <p>Turn on <strong>dual subtitles</strong> to read <strong>Chinese on top and a second
+            language below</strong>. English by default, switchable in the toolbar menu. It's early
+            and leans on each site's player, so expect rough edges. <strong>Netflix support is coming
+            in a future release.</strong></p>
+        </div>
+        <div class="feat-visual">
+          <div class="ui bare" style="width:100%">
+            <div id="vid-stage" style="width:100%;background:#0d0d10;border-radius:12px;aspect-ratio:16/10;position:relative;overflow:hidden;display:flex;flex-direction:column">
+              <span style="position:absolute;top:12px;left:14px;font-size:12px;color:#cdd;opacity:.65;z-index:1">▶ YouTube</span>
+              <div style="flex:1;display:flex;align-items:center;justify-content:center;min-height:0">
+                <span style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px">▶</span>
+              </div>
+              <div style="text-align:center;padding:0 14px 22px">
+                <div class="vid-cap" id="vid-cap">
+                  <p lang="zh" class="vid-zh">
+                    <span class="vid-tok" data-vw="我"><ruby>我<rt class="tone-3">wǒ</rt></ruby></span><span class="vid-tok" data-vw="喜欢"><ruby>喜<rt class="tone-3">xǐ</rt></ruby><ruby>欢<rt class="tone-1">huān</rt></ruby></span><span class="vid-tok" data-vw="喝茶"><ruby>喝<rt class="tone-1">hē</rt></ruby><ruby>茶<rt class="tone-2">chá</rt></ruby></span>
+                  </p>
+                  <p class="vid-en">I like drinking tea</p>
+                </div>
+              </div>
+              <div class="vid-pop" id="vid-pop" aria-hidden="true"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- example sentences -->
+      <section class="feat">
+        <div class="feat-text">
+          <p class="eyebrow">See it in context</p>
+          <h2>Real example sentences</h2>
+          <p>Expand the Examples section on any entry to pull real-world sentences from the Tatoeba
+            corpus, each with tone-colored pinyin and an English translation, fetched on demand.</p>
+        </div>
+        <div class="feat-visual">
+          <div class="ui" style="width:340px">
+            <div class="group-label">Examples</div>
+            <div class="examples">
+              <div class="ex">
+                <div class="ex-zh" lang="zh">我很喜欢喝茶。</div>
+                <div class="ex-py" lang="zh"><span class="tone-3">Wǒ</span> <span class="tone-3">hěn</span> <span class="tone-3">xǐ</span><span class="tone-1">huān</span> <span class="tone-1">hē</span> <span class="tone-2">chá</span>.</div>
+                <div class="ex-en">I really like drinking tea.</div>
+              </div>
+              <div class="ex">
+                <div class="ex-zh" lang="zh">他是一个学生。</div>
+                <div class="ex-py" lang="zh"><span class="tone-1">Tā</span> <span class="tone-4">shì</span> <span class="tone-2">yí</span> <span class="tone-4">gè</span> <span class="tone-2">xué</span><span class="tone-1">shēng</span>.</div>
+                <div class="ex-en">He is a student.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- search -->
+      <section class="feat">
+        <div class="feat-text">
+          <p class="eyebrow">Find anything</p>
+          <h2>Search by hanzi, pinyin, or English</h2>
+          <p>Type characters, pinyin (tone marks optional, e.g. <code>nihao</code>), or an English word.
+            Results are ranked so common and HSK words come first.</p>
+        </div>
+        <div class="feat-visual">
+          <div class="ui" style="width:320px">
+            <div class="searchbar" style="margin:0 0 10px"><span class="search-ic"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg></span><input value="tea" readonly></div>
+            <div class="result"><span class="r-hanzi" lang="zh">茶</span><span class="r-body"><span class="r-top"><span class="tone-2">chá</span> <span class="r-hsk">HSK 1</span></span><span class="r-gloss">tea</span></span></div>
+            <div class="result"><span class="r-hanzi" lang="zh">喝茶</span><span class="r-body"><span class="r-top"><span class="tone-1">hē</span><span class="tone-2">chá</span></span><span class="r-gloss">to drink tea</span></span></div>
+            <div class="result"><span class="r-hanzi" lang="zh">绿茶</span><span class="r-body"><span class="r-top"><span class="tone-4">lǜ</span><span class="tone-2">chá</span></span><span class="r-gloss">green tea</span></span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- proper nouns -->
+      <section class="feat rev">
+        <div class="feat-text">
+          <p class="eyebrow">Names, places &amp; brands</p>
+          <h2>Proper nouns resolve, too</h2>
+          <p>Beyond everyday words, Zilense merges in <strong>CedPane</strong>, about 74,000
+            public-domain names, places, and brands, so people, cities, companies, and countries
+            resolve instead of coming up blank, each clearly marked as a proper noun.</p>
+        </div>
+        <div class="feat-visual">
+          <div class="ui" style="width:320px">
+            <div class="entry-head"><div class="hanzi-big" lang="zh">北京</div></div>
+            <div class="pinyin-row" lang="zh"><span class="tone-3">běi</span> <span class="tone-1">jīng</span></div>
+            <div class="meta-row"><span class="proper-tag">proper noun</span><span class="pos">place</span></div>
+            <ol class="defs"><li>Beijing, capital of China</li></ol>
+            <div class="charcards" style="margin-top:14px">
+              <div class="charcard"><span class="cc-hanzi" lang="zh">北</span><span class="cc-body"><span class="cc-py" lang="zh"><span class="tone-3">běi</span></span><span class="cc-gloss">north</span></span><span class="cc-arrow"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span></div>
+              <div class="charcard"><span class="cc-hanzi" lang="zh">京</span><span class="cc-body"><span class="cc-py" lang="zh"><span class="tone-1">jīng</span></span><span class="cc-gloss">capital city</span></span><span class="cc-arrow"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- saved deck -->
+      <section class="feat rev">
+        <div class="feat-text">
+          <p class="eyebrow">Build your deck</p>
+          <h2>Save words &amp; revisit history</h2>
+          <p>Star any entry to keep it in your deck, and every deliberate lookup is logged in history.
+            It all stays on your device.</p>
+        </div>
+        <div class="feat-visual">
+          <div class="ui" style="width:320px">
+            <div class="flash"><span class="f-hanzi" lang="zh">朋友</span><span><span class="cc-py" lang="zh"><span class="tone-2">péng</span> <span class="tone-5">you</span></span><div class="f-gloss">friend</div></span><span class="f-star">★</span></div>
+            <div class="flash"><span class="f-hanzi" lang="zh">学习</span><span><span class="cc-py" lang="zh"><span class="tone-2">xué</span> <span class="tone-2">xí</span></span><div class="f-gloss">to study, to learn</div></span><span class="f-star">★</span></div>
+            <div class="flash"><span class="f-hanzi" lang="zh">中文</span><span><span class="cc-py" lang="zh"><span class="tone-1">zhōng</span> <span class="tone-2">wén</span></span><div class="f-gloss">Chinese language</div></span><span class="f-star">★</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- flashcards -->
+      <section class="feat">
+        <div class="feat-text">
+          <p class="eyebrow">Study &amp; review</p>
+          <h2>Flashcards for HSK &amp; your saved words</h2>
+          <p>Open a full-page trainer and drill your <strong>starred words</strong> or any
+            <strong>HSK 3.0 level</strong>, built straight from the official lists, one card per entry
+            with its exact gloss, part of speech, and pinyin.</p>
+          <p>Study <strong>just one level</strong> or <strong>everything up to it</strong>, choose a pool
+            (unseen, recently or ever missed), flip with the keyboard, and export to <strong>Anki</strong>.
+            Progress stays on your device.</p>
+        </div>
+        <div class="feat-visual">
+          <div class="ui" style="width:320px">
+            <div class="fc-bar">
+              <span class="fc-deck">HSK 1 <span class="fc-caret">▾</span></span>
+              <span class="fc-scope"><button>Just this level</button><button class="on">Up to this level</button></span>
+            </div>
+            <div class="fc-card">
+              <div class="fc-py" lang="zh"><span class="tone-2">chá</span></div>
+              <div class="fc-hanzi" lang="zh">茶</div>
+              <div class="fc-back">
+                <span class="fc-mean">tea</span>
+                <span class="fc-pos">noun</span>
+              </div>
+            </div>
+            <div class="fc-actions">
+              <button class="fc-wrong">Missed ✗</button>
+              <button class="fc-ok">Got it ✓</button>
+              <span class="fc-count">12 / 20</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- open in window -->
+      <section class="feat rev">
+        <div class="feat-text">
+          <p class="eyebrow">Dock it or float it</p>
+          <h2>Side panel, or a window of its own</h2>
+          <p>Keep the dictionary docked in Chrome's <strong>side panel</strong>, or pop it out into a
+            <strong>detached window</strong> that floats free and stays put as you switch tabs.</p>
+          <p>Both share the same saved words, settings, and live hover &amp; selection lookups. Open
+            whichever fits how you read, or launch either with a <strong>keyboard shortcut</strong>.</p>
+        </div>
+        <div class="feat-visual">
+          <div class="ui" style="width:300px">
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line)">
+              <span class="bw-lights" style="padding:0"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i></span>
+              <span style="display:flex;align-items:center;gap:7px;font-family:var(--font-en);font-weight:700;font-size:14px;color:var(--ink)"><img class="seal" src="icon.png" alt="" style="width:20px;height:20px"> Zilense</span>
+            </div>
+            <div class="p-body" style="border-top:none">
+              <div class="entry">
+                <div class="entry-head"><div class="hanzi-big" lang="zh">字</div></div>
+                <div class="pinyin-row" lang="zh"><span class="tone-4">zì</span></div>
+                <div class="meta-row"><span class="badge-hsk">HSK 1</span><span class="pos">noun</span><span class="freq">· very common</span></div>
+                <ol class="defs"><li>character</li><li>word</li><li>letter</li></ol>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- customize -->
+      <section class="feat">
+        <div class="feat-text">
+          <p class="eyebrow">Make it yours</p>
+          <h2>Themes, fonts &amp; tone colors</h2>
+          <p>Pick an accent color, choose a serif or sans Chinese face, toggle tone colors, set your pin
+            key, and switch to dark mode. Try the controls →</p>
+        </div>
+        <div class="feat-visual">
+          <div class="ui settings-pop" id="customize-panel" style="width:280px">
+            <div class="set-title">Display</div>
+            <div class="set-row col">
+              <span class="set-label">Accent</span>
+              <div class="swatches">
+                <button class="swatch on" data-accent="#c8443a" style="background:#c8443a" aria-label="Vermilion">✓</button>
+                <button class="swatch" data-accent="#2f6f4f" style="background:#2f6f4f" aria-label="Jade"></button>
+                <button class="swatch" data-accent="#3b5b8c" style="background:#3b5b8c" aria-label="Indigo"></button>
+                <button class="swatch" data-accent="#b5862f" style="background:#b5862f" aria-label="Gold"></button>
+                <button class="swatch" data-accent="#4a4540" style="background:#4a4540" aria-label="Ink"></button>
+              </div>
+            </div>
+            <div class="set-row"><span class="set-label">Chinese face</span><span class="segmini"><button class="on">Sans</button><button>Serif</button></span></div>
+            <div class="set-row"><span class="set-label">Pinyin tone colors</span><button class="switch on" aria-label="Tone colors"><span class="knob"></span></button></div>
+            <div class="set-row"><span class="set-label">Familiarity tags</span><button class="switch on" aria-label="Familiarity tags"><span class="knob"></span></button></div>
+            <div class="set-row"><span class="set-label">Dark mode</span><button class="switch" id="customize-dark" aria-label="Dark mode"><span class="knob"></span></button></div>
+            <div class="set-row"><span class="set-label">Pin key (hover + press)</span><span class="keycap">p</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- familiarity / progress (experimental) -->
+      <section class="feat rev">
+        <div class="feat-text">
+          <p class="eyebrow">Spaced for memory</p>
+          <h2>Track what you know <span class="tag-exp">Experimental</span></h2>
+          <p>Turn on familiarity tracking and tag each word <strong>New</strong>,
+            <strong>Learning</strong>, or <strong>Known</strong> right from its entry. Zilense also
+            counts how many times you've seen it.</p>
+          <p>A <strong>Progress</strong> tab gathers every word you've met, filterable by how well you
+            know it, and the same filter sorts your saved deck. It all stays on your device.</p>
+        </div>
+        <div class="feat-visual">
+          <div class="ui" style="width:380px">
+            <div class="entry-head">
+              <div class="hanzi-big" lang="zh">学习</div>
+              <div class="fam-head">
+                <div class="fam-seg">
+                  <button class="fam-new">New</button>
+                  <button class="fam-learning on"><span class="fam-dot"></span>Learning</button>
+                  <button class="fam-known">Known</button>
+                </div>
+                <span class="fam-seen">seen 6×</span>
+              </div>
+            </div>
+            <div class="pinyin-row" lang="zh"><span class="tone-2">xué</span> <span class="tone-2">xí</span></div>
+            <div class="meta-row"><span class="badge-hsk">HSK 1</span><span class="pos">verb</span></div>
+            <div class="group-label" style="margin-top:18px">Progress · words you've met</div>
+            <div class="flash"><span class="f-hanzi" lang="zh">学习</span><span><span class="cc-py" lang="zh"><span class="tone-2">xué</span> <span class="tone-2">xí</span></span><div class="f-gloss"><span class="fam-dot fam-dot-learning"></span>to study, to learn</div></span></div>
+            <div class="flash"><span class="f-hanzi" lang="zh">中文</span><span><span class="cc-py" lang="zh"><span class="tone-1">zhōng</span> <span class="tone-2">wén</span></span><div class="f-gloss"><span class="fam-dot fam-dot-known"></span>Chinese language</div></span></div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- ============ PRIVACY ============ -->
+    <section class="privacy-strip">
+      <h2>Private by design</h2>
+      <p>Your saved words and settings stay on your device. No analytics, no tracking, nothing sent to
+        the developer. <a href="privacy">Read the privacy policy →</a></p>
+    </section>
+
+    <!-- ============ FOOTER ============ -->
+    <footer class="foot">
+      <div class="foot-top">
+        <div class="foot-brand">
+          <img src="icon.png" alt="" width="28" height="28">
+          <span class="foot-name">Zilense</span>
+        </div>
+        <nav class="foot-links">
+          <a href="https://github.com/dsaad68/zilense">GitHub</a>
+          <a href="privacy">Privacy</a>
+          <a href="https://github.com/dsaad68/zilense/blob/main/THIRD-PARTY-NOTICES.md">Third-party notices</a>
+        </nav>
+      </div>
+      <p class="foot-attr">Open source under the MIT License. Dictionary data: CC-CEDICT (CC BY-SA 4.0) ·
+        stroke data: makemeahanzi · examples: Tatoeba · fonts: Noto SC / Source Serif 4 (OFL).</p>
+      <p class="foot-vibe">Vibe coded by a <a href="https://verybad.engineer/">verybad.engineer</a>
+        <span class="foot-sep">•</span> 99% Claude, 1% actual skill</p>
+    </footer>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5.0/dist/hanzi-writer.min.js"></script>
+  <script>
+    // ---- Live hover demo: hovering a word in the article updates the side panel ----
+    var DEMO = {
+      '你好': { h: '你好', py: [['nǐ',3],['hǎo',3]], hsk: 1, pos: 'interjection', freq: 'very common',
+        defs: ['hello','hi','how do you do'],
+        chars: [{h:'你',py:[['nǐ',3]],g:'you (singular)'},{h:'好',py:[['hǎo',3]],g:'good'}],
+        ex: { zh:'你好，我叫小明。', py:'<span class="tone-3">Nǐ</span> <span class="tone-3">hǎo</span>, <span class="tone-3">wǒ</span> <span class="tone-4">jiào</span> <span class="tone-3">Xiǎo</span><span class="tone-2">míng</span>.', en:'Hi, my name is Xiaoming.' } },
+      '我': { h:'我', py:[['wǒ',3]], hsk:1, pos:'pronoun', defs:['I','me'] },
+      '是': { h:'是', py:[['shì',4]], hsk:1, pos:'verb', defs:['to be','is / are / am'] },
+      '一个': { h:'一个', py:[['yí',2],['gè',4]], pos:'phrase', defs:['one (item)','a'],
+        chars:[{h:'一',py:[['yī',1]],g:'one'},{h:'个',py:[['gè',4]],g:'measure word'}] },
+      '学生': { h:'学生', py:[['xué',2],['shēng',1]], hsk:1, pos:'noun', defs:['student','pupil'],
+        chars:[{h:'学',py:[['xué',2]],g:'to study'},{h:'生',py:[['shēng',1]],g:'to be born; life'}] },
+      '在': { h:'在', py:[['zài',4]], hsk:1, pos:'preposition', defs:['at, in, on','to be located at'] },
+      '中国': { h:'中国', py:[['zhōng',1],['guó',2]], hsk:1, pos:'proper noun', defs:['China'],
+        chars:[{h:'中',py:[['zhōng',1]],g:'middle; center'},{h:'国',py:[['guó',2]],g:'country'}] },
+      '学习': { h:'学习', py:[['xué',2],['xí',2]], hsk:1, pos:'verb', defs:['to study','to learn'],
+        chars:[{h:'学',py:[['xué',2]],g:'to study'},{h:'习',py:[['xí',2]],g:'to practice'}] },
+      '中文': { h:'中文', py:[['zhōng',1],['wén',2]], hsk:1, pos:'noun', defs:['Chinese language'],
+        chars:[{h:'中',py:[['zhōng',1]],g:'middle; center'},{h:'文',py:[['wén',2]],g:'language; writing'}] },
+      '很': { h:'很', py:[['hěn',3]], hsk:1, pos:'adverb', defs:['very','quite'] },
+      '喜欢': { h:'喜欢', py:[['xǐ',3],['huān',1]], hsk:1, pos:'verb', freq:'very common', defs:['to like','to be fond of'],
+        chars:[{h:'喜',py:[['xǐ',3]],g:'to like, to be fond of'},{h:'欢',py:[['huān',1]],g:'joyful, merry'}] },
+      '喝茶': { h:'喝茶', py:[['hē',1],['chá',2]], pos:'verb phrase', defs:['to drink tea'],
+        chars:[{h:'喝',py:[['hē',1]],g:'to drink'},{h:'茶',py:[['chá',2]],g:'tea'}],
+        ex:{ zh:'我们一起喝茶吧。', py:'<span class="tone-3">Wǒ</span><span class="tone-5">men</span> <span class="tone-4">yì</span><span class="tone-3">qǐ</span> <span class="tone-1">hē</span> <span class="tone-2">chá</span> <span class="tone-5">ba</span>.', en:"Let's drink tea together." } }
+    };
+    // add example sentences to the multi-character words
+    DEMO['学生'].ex = { zh:'他是一个学生。', py:'<span class="tone-1">Tā</span> <span class="tone-4">shì</span> <span class="tone-2">yí</span> <span class="tone-4">gè</span> <span class="tone-2">xué</span><span class="tone-1">shēng</span>.', en:'He is a student.' };
+    DEMO['中国'].ex = { zh:'我在中国学习。', py:'<span class="tone-3">Wǒ</span> <span class="tone-4">zài</span> <span class="tone-1">Zhōng</span><span class="tone-2">guó</span> <span class="tone-2">xué</span><span class="tone-2">xí</span>.', en:'I study in China.' };
+    DEMO['学习'].ex = { zh:'我喜欢学习中文。', py:'<span class="tone-3">Wǒ</span> <span class="tone-3">xǐ</span><span class="tone-1">huān</span> <span class="tone-2">xué</span><span class="tone-2">xí</span> <span class="tone-1">Zhōng</span><span class="tone-2">wén</span>.', en:'I like studying Chinese.' };
+    DEMO['中文'].ex = { zh:'中文很有意思。', py:'<span class="tone-1">Zhōng</span><span class="tone-2">wén</span> <span class="tone-3">hěn</span> <span class="tone-3">yǒu</span> <span class="tone-4">yì</span><span class="tone-5">si</span>.', en:'Chinese is very interesting.' };
+    DEMO['喜欢'].ex = { zh:'我很喜欢喝茶。', py:'<span class="tone-3">Wǒ</span> <span class="tone-3">hěn</span> <span class="tone-3">xǐ</span><span class="tone-1">huān</span> <span class="tone-1">hē</span> <span class="tone-2">chá</span>.', en:'I really like drinking tea.' };
+
+    // SVG icons matching the extension (icons.jsx)
+    var ICON = {
+      speaker: '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 6a8 8 0 0 1 0 12"/></svg>',
+      star: '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 17.9 6.8 19.6l1-5.8L3.5 9.7l5.9-.9L12 3.5Z"/></svg>',
+      chevron: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>',
+      replay: '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 2.6-6.3"/><path d="M3 4v4h4"/></svg>'
+    };
+    function pyHtml(arr) { return arr.map(function (p) { return '<span class="tone-' + p[1] + '">' + p[0] + '</span>'; }).join(' '); }
+    function renderEntry(d) {
+      var cs = d.h.match(/./gu) || [];
+      var meta = (d.hsk ? '<span class="badge-hsk">HSK ' + d.hsk + '</span>' : '') +
+                 (d.pos ? '<span class="pos">' + d.pos + '</span>' : '') +
+                 (d.freq ? '<span class="freq">· ' + d.freq + '</span>' : '');
+      var chars = (d.chars && d.chars.length)
+        ? '<div class="group-label">Characters · ' + d.chars.length + '</div><div class="charcards">' +
+          d.chars.map(function (c) {
+            return '<div class="charcard"><span class="cc-hanzi" lang="zh">' + c.h +
+              '</span><span class="cc-body"><span class="cc-py" lang="zh">' + pyHtml(c.py) +
+              '</span><span class="cc-gloss">' + c.g + '</span></span><span class="cc-arrow">' + ICON.chevron + '</span></div>';
+          }).join('') + '</div>'
+        : '';
+      // stroke order for every character in the entry (one animated box each)
+      var stroke = '<div class="group-label">Stroke order</div><div class="stroke-row">' +
+        cs.map(function (c, i) {
+          return '<div class="stroke-box"><div class="stroke-grid"></div><div class="stroke-svg" id="panel-stroke-' + i + '"></div></div>';
+        }).join('') +
+        '</div><button class="ghostbtn" id="panel-replay" style="margin-top:10px">' + ICON.replay + ' Replay</button>';
+      var ex = d.ex
+        ? '<div class="group-label">Examples</div><div class="examples"><div class="ex"><div class="ex-zh" lang="zh">' +
+          d.ex.zh + '</div><div class="ex-py" lang="zh">' + d.ex.py + '</div><div class="ex-en">' + d.ex.en + '</div></div></div>'
+        : '';
+      return '<div class="entry-head"><div class="hanzi-big" lang="zh">' + d.h +
+        '</div><div class="entry-actions"><span class="iconbtn" aria-label="Pronounce">' + ICON.speaker + '</span><span class="iconbtn" aria-label="Save">' + ICON.star + '</span></div></div>' +
+        '<div class="pinyin-row" lang="zh">' + pyHtml(d.py) + '</div>' +
+        '<div class="meta-row">' + meta + '</div>' +
+        '<ol class="defs">' + d.defs.map(function (x) { return '<li>' + x + '</li>'; }).join('') + '</ol>' +
+        chars + stroke + ex;
+    }
+    (function () {
+      var entry = document.getElementById('demo-entry');
+      if (!entry) return;
+      var toks = document.querySelectorAll('.bw .tok');
+      var pop = document.getElementById('hoverpop');
+      var post = document.querySelector('.bw .post');
+      var lead = document.querySelector('.bw .lead');
+
+      function popup(t, d) {
+        if (!pop || !post) return;
+        pop.innerHTML = '<div class="hp-hanzi" lang="zh">' + d.h + '</div>' +
+          '<div class="hp-py" lang="zh">' + pyHtml(d.py) + '</div>' +
+          '<div class="hp-def">' + d.defs.slice(0, 2).map(function (x, i) { return (i + 1) + '. ' + x; }).join('&nbsp; ') + '</div>';
+        pop.classList.add('show');
+        var pr = post.getBoundingClientRect(), tr = t.getBoundingClientRect();
+        var left = tr.left - pr.left;
+        left = Math.max(0, Math.min(left, post.clientWidth - pop.offsetWidth));
+        pop.style.left = left + 'px';
+        pop.style.top = (tr.bottom - pr.top + 9) + 'px';
+      }
+      function panelStroke(d) {
+        if (!window.HanziWriter) return;
+        var cs = d.h.match(/./gu) || [];
+        var writers = [];
+        cs.forEach(function (c, i) {
+          if (!document.getElementById('panel-stroke-' + i)) return;
+          writers.push(HanziWriter.create('panel-stroke-' + i, c, {
+            width: 150, height: 150, padding: 8, strokeColor: '#c8443a', radicalColor: '#a9781a',
+            showOutline: true, delayBetweenStrokes: 120,
+          }));
+        });
+        writers.forEach(function (w) { w.animateCharacter(); });
+        var rb = document.getElementById('panel-replay');
+        if (rb) rb.addEventListener('click', function () { writers.forEach(function (w) { w.animateCharacter(); }); });
+      }
+      function show(t, scroll) {
+        var d = DEMO[t.getAttribute('data-w')];
+        if (!d) return;
+        toks.forEach(function (x) { x.classList.remove('active'); });
+        t.classList.add('active');
+        entry.innerHTML = renderEntry(d);
+        entry.parentNode.scrollTop = 0;
+        panelStroke(d);
+        popup(t, d);
+      }
+      toks.forEach(function (t) {
+        t.addEventListener('mouseenter', function () { show(t); });
+        t.addEventListener('click', function () { show(t); });
+      });
+      if (lead && pop) lead.addEventListener('mouseleave', function () { pop.classList.remove('show'); });
+
+      // initial render (so the panel uses the SVG icons + sections from the start)
+      var initial = document.querySelector('.bw .tok.active') || toks[0];
+      if (initial) { var d0 = DEMO[initial.getAttribute('data-w')]; if (d0) { entry.innerHTML = renderEntry(d0); panelStroke(d0); } }
+    })();
+
+    // Live stroke-order animation (progressive enhancement; static box if it fails).
+    (function () {
+      if (!window.HanziWriter) return;
+      var target = document.getElementById('stroke-target');
+      if (!target) return;
+      var writer = HanziWriter.create('stroke-target', '学', {
+        width: 150, height: 150, padding: 8,
+        strokeColor: '#c8443a', radicalColor: '#a9781a',
+        showOutline: true, delayBetweenStrokes: 130, strokeAnimationSpeed: 1.1,
+      });
+      writer.animateCharacter();
+      var replay = document.getElementById('stroke-replay');
+      if (replay) replay.addEventListener('click', function () { writer.animateCharacter(); });
+    })();
+
+    // Customize panel: live accent recolor + dark-mode toggle.
+    var panel = document.getElementById('customize-panel');
+    document.querySelectorAll('#customize-panel .swatch').forEach(function (sw) {
+      sw.addEventListener('click', function () {
+        var c = sw.getAttribute('data-accent');
+        panel.style.setProperty('--accent', c);
+        panel.style.setProperty('--accent-soft', c + '1a');
+        document.querySelectorAll('#customize-panel .swatch').forEach(function (x) {
+          x.classList.toggle('on', x === sw);
+          x.textContent = x === sw ? '✓' : '';
+        });
+      });
+    });
+    var darkToggle = document.getElementById('customize-dark');
+    if (darkToggle) darkToggle.addEventListener('click', function () {
+      var on = panel.classList.toggle('dark');
+      darkToggle.classList.toggle('on', on);
+    });
+
+    // Video caption: hover/click a word to show its reading + meaning (clickable-words demo).
+    (function () {
+      var stage = document.getElementById('vid-stage');
+      var pop = document.getElementById('vid-pop');
+      var cap = document.getElementById('vid-cap');
+      if (!stage || !pop || !cap) return;
+      var VWORDS = {
+        '我': { h: '我', py: [['wǒ', 3]], def: 'I, me' },
+        '喜欢': { h: '喜欢', py: [['xǐ', 3], ['huān', 1]], def: 'to like, to be fond of' },
+        '喝茶': { h: '喝茶', py: [['hē', 1], ['chá', 2]], def: 'to drink tea' }
+      };
+      var toks = stage.querySelectorAll('.vid-tok');
+      function show(t) {
+        var d = VWORDS[t.getAttribute('data-vw')];
+        if (!d) return;
+        toks.forEach(function (x) { x.classList.remove('on'); });
+        t.classList.add('on');
+        pop.innerHTML = '<div class="vp-hanzi" lang="zh">' + d.h + '</div>' +
+          '<div class="vp-py" lang="zh">' + pyHtml(d.py) + '</div>' +
+          '<div class="vp-def">' + d.def + '</div>';
+        pop.classList.add('show');
+        var sr = stage.getBoundingClientRect(), tr = t.getBoundingClientRect();
+        var center = tr.left - sr.left + tr.width / 2;
+        var left = Math.max(8, Math.min(center - pop.offsetWidth / 2, stage.clientWidth - pop.offsetWidth - 8));
+        pop.style.left = left + 'px';
+        pop.style.top = (tr.top - sr.top - pop.offsetHeight - 12) + 'px';
+        pop.style.setProperty('--arrow', (center - left - 6) + 'px');
+      }
+      toks.forEach(function (t) {
+        t.addEventListener('mouseenter', function () { show(t); });
+        t.addEventListener('click', function () { show(t); });
+      });
+      cap.addEventListener('mouseleave', function () {
+        pop.classList.remove('show');
+        toks.forEach(function (x) { x.classList.remove('on'); });
+      });
+      // initial: highlight a word so the demo is visible at rest
+      var initial = stage.querySelector('.vid-tok[data-vw="喜欢"]');
+      if (initial) show(initial);
+    })();
+
+    // Reader mock: theme switch.
+    document.querySelectorAll('.theme-sw').forEach(function (t) {
+      t.addEventListener('click', function () {
+        var rm = document.getElementById('reader-mock');
+        rm.className = 'reader-mock ' + t.getAttribute('data-theme');
+        document.querySelectorAll('.theme-sw').forEach(function (x) { x.classList.toggle('on', x === t); });
+      });
+    });
+  </script>
+</body>
+</html>

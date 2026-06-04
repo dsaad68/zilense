@@ -1,0 +1,384 @@
+/* panel.css — extracted from the design's style block
+   (MyDict - Chinese Dictionary Side Panel.html), keeping only the rules for the
+   panel itself. Mock-browser rules (stage, split, page, post, dock, tok) were
+   dropped; they belonged to the prototype fake webpage, not the extension.
+   Fonts are loaded from Google Fonts via index.html (same as the design). */
+
+:root {
+  --font-han: "Noto Sans SC", sans-serif;
+  --font-en: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-ui: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  font-family: var(--font-ui);
+  color: #2a2520;
+  -webkit-font-smoothing: antialiased;
+}
+#root { height: 100%; }
+[lang="zh"] { font-family: var(--font-han); }
+
+/* ================= PANEL THEME ================= */
+.panel[data-theme="light"] {
+  --bg: #f5efe3; --bg2: #efe7d6; --card: #fbf7ee; --card2: #f1e9da;
+  --ink: #2a2520; --ink2: #6b6258; --ink3: #9a9082; --line: #e3d9c6; --line2: #d8ccb5;
+  --accent: #c8443a; --accent-ink: #fff; --accent-soft: rgba(200,68,58,.10);
+  --t1:#a9781a; --t2:#3f7d4f; --t3:#2f6f8f; --t4:#c8443a; --t5:#9a8f7e;
+  /* familiarity: new = neutral taupe, learning = amber, known = green */
+  --fam-new:#7c7468; --fam-learning:#a8761a; --fam-known:#3f7d4f;
+}
+.panel[data-theme="dark"] {
+  --bg: #211e19; --bg2: #29251f; --card: #2c2822; --card2: #332e26;
+  --ink: #ece3d2; --ink2: #b3a896; --ink3: #877d6d; --line: #393429; --line2: #453f33;
+  --accent: #e0685c; --accent-ink: #211e19; --accent-soft: rgba(224,104,92,.15);
+  --t1:#d8a93c; --t2:#74b886; --t3:#74b2d0; --t4:#e0685c; --t5:#a59a88;
+  --fam-new:#a59a88; --fam-learning:#d8a93c; --fam-known:#74b886;
+}
+.panel {
+  height: 100%; overflow: hidden; background: var(--bg); color: var(--ink);
+  display: flex; flex-direction: column; font-family: var(--font-ui);
+  transition: background .2s, color .2s; position: relative;
+}
+
+/* settings popover */
+.set-overlay { position: absolute; inset: 0; z-index: 30; }
+.settings-pop {
+  position: absolute; top: 56px; right: 14px; z-index: 31; width: 268px;
+  background: var(--card); border: 1px solid var(--line2); border-radius: 14px;
+  box-shadow: 0 14px 40px rgba(0,0,0,.22), 0 0 0 1px rgba(0,0,0,.03);
+  padding: 14px; display: flex; flex-direction: column; gap: 14px;
+  opacity: 1; transform-origin: top right; animation: popin .16s ease-out;
+}
+@keyframes popin { from { transform: translateY(-6px) scale(.98); } to { transform: none; } }
+.set-title { font-family: var(--font-ui); text-transform: uppercase; letter-spacing: .12em;
+  font-size: 10px; font-weight: 700; color: var(--ink3); }
+.set-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.set-row.col { flex-direction: column; align-items: stretch; gap: 9px; }
+.set-privacy { font-family: var(--font-ui); font-size: 10.5px; line-height: 1.5; color: var(--ink3);
+  margin: 4px 0 0; padding-top: 10px; border-top: 1px solid var(--line, var(--ink3)); }
+.set-credits { border-top: 0; padding-top: 2px; }
+.set-licenses { color: var(--accent, #c8443a); text-decoration: none; white-space: nowrap; }
+.set-licenses:hover { text-decoration: underline; }
+.set-label { font-family: var(--font-en); font-size: 14px; color: var(--ink); }
+.set-sub { font-family: var(--font-ui); font-size: 10.5px; line-height: 1.5; color: var(--ink3); }
+.swatches { display: flex; gap: 8px; }
+.swatch { width: 34px; height: 34px; border-radius: 9px; border: 2px solid transparent; cursor: pointer;
+  display: grid; place-items: center; color: #fff; transition: transform .12s; box-shadow: inset 0 0 0 1px rgba(0,0,0,.08); }
+.swatch:hover { transform: scale(1.07); }
+.swatch.on { border-color: var(--ink); }
+.sw-check { font-size: 15px; font-weight: 700; text-shadow: 0 1px 2px rgba(0,0,0,.3); }
+.segmini { display: flex; background: var(--bg2); border-radius: 8px; padding: 3px; }
+.segmini button { font-family: var(--font-ui); font-size: 12.5px; font-weight: 600; color: var(--ink2);
+  background: none; border: none; cursor: pointer; padding: 5px 13px; border-radius: 6px; transition: all .14s; }
+.segmini button.on { background: var(--card); color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+.switch { width: 42px; height: 24px; flex: none; border-radius: 999px; border: none; cursor: pointer; padding: 0;
+  background: var(--line2); position: relative; transition: background .16s; }
+.switch.on { background: var(--accent); }
+.switch .knob { position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%;
+  background: #fff; transition: transform .16s; box-shadow: 0 1px 3px rgba(0,0,0,.3); }
+.switch.on .knob { transform: translateX(18px); }
+.keycap { width: 30px; height: 28px; text-align: center; font-family: var(--font-ui); font-size: 13px;
+  font-weight: 700; color: var(--ink); text-transform: lowercase; background: var(--bg2);
+  border: 1px solid var(--line2); border-radius: 6px; cursor: text; }
+.keycap:focus { outline: none; border-color: var(--accent); }
+.tone-1{color:var(--t1)} .tone-2{color:var(--t2)} .tone-3{color:var(--t3)}
+.tone-4{color:var(--t4)} .tone-5{color:var(--t5)}
+
+/* header */
+.iconbtn {
+  width: 32px; height: 32px; border-radius: 8px; border: 1px solid transparent;
+  background: transparent; color: var(--ink2); cursor: pointer;
+  display: grid; place-items: center; transition: all .14s;
+}
+.iconbtn:hover { background: var(--card2); color: var(--ink); }
+.iconbtn.on { color: var(--accent); }
+
+/* brand header — only shown when opened as a detached window (WINDOW_MODE),
+   where there's no side-panel bar to supply the icon + name */
+.win-head {
+  flex-shrink: 0; display: flex; align-items: center; gap: 8px;
+  padding: 12px 14px 0; font-weight: 700; font-size: 14px; color: var(--ink);
+}
+.win-seal {
+  width: 22px; height: 22px; border-radius: 7px; object-fit: cover; display: block;
+  background: var(--accent); box-shadow: 0 2px 8px var(--accent-soft);
+}
+.win-title { letter-spacing: .01em; }
+
+/* search */
+.searchbar {
+  flex-shrink: 0; margin: 14px 14px 0; display: flex; align-items: center; gap: 8px;
+  background: var(--card); border: 1px solid var(--line2); border-radius: 10px; padding: 0 6px 0 12px;
+  transition: border-color .14s, box-shadow .14s;
+}
+/* thin divider between the query and the trailing settings / theme controls */
+.bar-sep { width: 1px; align-self: stretch; margin: 7px 0; background: var(--line2); }
+.searchbar .iconbtn { width: 30px; height: 30px; flex-shrink: 0; }
+.searchbar:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.search-ic { color: var(--ink3); display: flex; }
+.searchbar input {
+  flex: 1; border: none; background: transparent; outline: none;
+  padding: 10px 0; font-size: 14.5px; color: var(--ink); font-family: var(--font-ui);
+}
+.searchbar input::placeholder { color: var(--ink3); }
+.clr { border: none; background: none; color: var(--ink3); font-size: 20px; cursor: pointer; line-height: 1; padding: 0 2px; }
+.clr:hover { color: var(--ink); }
+
+/* tabs */
+.tabs { flex-shrink: 0; display: flex; flex-wrap: wrap; gap: 4px; padding: 12px 14px 0; }
+.tab {
+  font-family: var(--font-ui); font-size: 13px; font-weight: 600; color: var(--ink3);
+  background: none; border: none; cursor: pointer; padding: 7px 10px 11px; position: relative;
+  border-radius: 8px 8px 0 0; display: flex; align-items: center; gap: 6px;
+}
+.tab:hover { color: var(--ink2); }
+.tab.on { color: var(--accent); }
+.tab.on::after { content: ""; position: absolute; left: 8px; right: 8px; bottom: 0; height: 2.5px;
+  background: var(--accent); border-radius: 2px; }
+.tabcount { background: var(--accent-soft); color: var(--accent); font-size: 11px; font-weight: 700;
+  border-radius: 999px; padding: 1px 7px; }
+
+.p-body { flex: 1; overflow-y: auto; border-top: 1px solid var(--line); }
+.p-body::-webkit-scrollbar { width: 9px; }
+.p-body::-webkit-scrollbar-thumb { background: var(--line2); border-radius: 9px; border: 2px solid var(--bg); }
+
+/* ----- entry ----- */
+.entry { padding: 20px 18px 40px; }
+.backbtn { display: inline-flex; align-items: center; gap: 4px; font-family: var(--font-ui);
+  font-size: 12.5px; font-weight: 600; color: var(--ink2); background: none; border: none;
+  cursor: pointer; padding: 0 0 14px; margin: -2px 0 0; }
+.backbtn:hover { color: var(--accent); }
+.entry-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px 14px; flex-wrap: wrap; }
+/* the right column stacks the action icons over the familiarity control, both
+   right-aligned so they tuck into the top-right out of the reading flow */
+.entry-head-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+.fam-head { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
+.hanzi-big { font-size: 60px; font-weight: 700; line-height: 1; color: var(--ink); letter-spacing: 2px; white-space: nowrap; }
+.hanzi-trad { font-size: 26px; font-weight: 500; color: var(--ink2); margin-left: 10px; letter-spacing: 1px; vertical-align: baseline; }
+.hanzi-trad::before { content: "繁 "; font-size: 12px; color: var(--ink2); }
+.entry-actions { display: flex; gap: 2px; padding-top: 4px; }
+
+.pinyin-row { margin-top: 14px; font-weight: 500; }
+
+/* familiarity control (New / Learning / Known): a compact row of quiet labels;
+   the active state shows as a soft tinted badge (same language as the HSK badge)
+   in its state color — grey / amber / green — with a matching dot. */
+.fam-seg { background: transparent; padding: 0; gap: 3px; flex-wrap: wrap; justify-content: flex-end; }
+.fam-seg button { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 600;
+  color: var(--ink3); background: transparent; padding: 4px 9px; border-radius: 7px; }
+.fam-seg button:hover { color: var(--ink); background: var(--card2); }
+.fam-seg button.on { box-shadow: none; }
+.fam-seg .fam-dot { width: 6px; height: 6px; background: currentColor; }
+.fam-seg button.fam-new.on { color: var(--fam-new); background: color-mix(in srgb, var(--fam-new) 16%, transparent); }
+.fam-seg button.fam-learning.on { color: var(--fam-learning); background: color-mix(in srgb, var(--fam-learning) 16%, transparent); }
+.fam-seg button.fam-known.on { color: var(--fam-known); background: color-mix(in srgb, var(--fam-known) 18%, transparent); }
+.fam-seen { font-family: var(--font-ui); font-size: 11px; color: var(--ink3); }
+
+/* a color-coded familiarity status dot, reused in pills and list rows */
+.fam-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; flex: none; }
+.fam-dot-new { background: var(--fam-new); }
+.fam-dot-learning { background: var(--fam-learning); }
+.fam-dot-known { background: var(--fam-known); }
+
+/* familiarity filter pills (Progress tab + Saved deck) */
+.fam-filter { display: flex; flex-wrap: wrap; gap: 6px; padding: 12px 14px 4px; }
+.fam-pill { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-ui);
+  font-size: 12px; font-weight: 600; color: var(--ink2); background: var(--card);
+  border: 1px solid var(--line2); border-radius: 999px; padding: 5px 11px; cursor: pointer;
+  transition: border-color .14s, background .14s, color .14s; }
+.fam-pill:hover { border-color: var(--ink3); color: var(--ink); }
+.fam-pill.on { background: var(--bg2); border-color: var(--ink3); color: var(--ink); }
+.fam-pill-new.on { border-color: var(--fam-new); }
+.fam-pill-learning.on { border-color: var(--fam-learning); }
+.fam-pill-known.on { border-color: var(--fam-known); }
+.fam-pill-n { font-size: 11px; font-weight: 700; color: var(--ink3); }
+.fam-pill.on .fam-pill-n { color: var(--ink2); }
+.fam-empty { font-family: var(--font-ui); font-size: 13px; color: var(--ink3); padding: 22px 16px; text-align: center; }
+
+/* a saved/progress row's gloss carries a small leading state dot; the Progress
+   row shows its seen-count on the right */
+.f-gloss .fam-dot { margin-right: 5px; vertical-align: middle; }
+.f-seen { margin-left: auto; align-self: center; font-family: var(--font-ui);
+  font-size: 11.5px; color: var(--ink3); white-space: nowrap; }
+
+.meta-row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+/* a CedPane name/place/brand marker: a soft tinted pill in a distinct teal hue
+   (so proper nouns read at a glance and don't blend with the HSK badge), with a
+   small leading dot and an uppercase tracked label */
+.proper-tag { display: inline-flex; align-items: center; gap: 5px; font-family: var(--font-ui);
+  font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--t3); background: color-mix(in srgb, var(--t3) 13%, transparent);
+  border: none; border-radius: 999px; padding: 4px 10px; }
+.proper-tag::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+.badge.hsk { font-family: var(--font-ui); font-size: 11px; font-weight: 700; letter-spacing: .03em;
+  background: var(--accent-soft); color: var(--accent); border-radius: 6px; padding: 3px 8px; }
+.pos { font-family: var(--font-en); font-style: italic; font-size: 14px; color: var(--ink2); }
+.freq { font-size: 12.5px; color: var(--ink3); }
+.measure { font-family: var(--font-en); font-size: 13.5px; color: var(--ink2); }
+.measure b { font-family: var(--font-han); font-weight: 500; color: var(--ink); }
+
+.defs { font-family: var(--font-en); margin: 16px 0 4px; padding-left: 22px; }
+.defs li { font-size: 18px; line-height: 1.5; color: var(--ink); margin-bottom: 4px; }
+.defs li::marker { color: var(--accent); font-size: 13px; }
+
+/* meanings as one continuously-numbered list, grouped by source. A single CSS
+   counter on the container increments only on .defs-item, so the numbering runs
+   unbroken across the HSK / CC-CEDICT / Other group headers. */
+.defs-grouped { counter-reset: defn; font-family: var(--font-en); margin: 16px 0 4px; }
+.defs-group-label { font-family: var(--font-ui); text-transform: uppercase; letter-spacing: .12em;
+  font-size: 10px; font-weight: 700; color: var(--ink3); margin: 13px 0 6px; }
+.defs-grouped > .defs-group-label:first-child { margin-top: 0; }
+.defs-item { counter-increment: defn; display: flex; align-items: baseline; gap: 8px;
+  line-height: 1.5; color: var(--ink); margin-bottom: 4px; }
+.defs-item::before { content: counter(defn) "."; flex: none; min-width: 18px; text-align: right;
+  font-family: var(--font-ui); font-size: 13px; color: var(--accent); }
+.defs-item-text { font-size: 17px; }
+/* alternate-reading item keeps the old "Other readings" look (pinyin line +
+   muted defs); reset the standalone .alt block's spacing inside the numbered row */
+.defs-item > .alt { margin-top: 0; padding-left: 0; }
+
+/* official HSK gloss(es) (from the HSK 3.0 word lists), under a small caption.
+   No divider — the level/POS already sit in the meta row above for single-sense
+   words; multi-sense words repeat the level + POS per reading. */
+.hsk-def { margin: 14px 0 4px; }
+.hsk-def-label { margin-bottom: 6px; font-family: var(--font-ui); font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .12em; color: var(--ink3); }
+.hsk-sense { display: flex; align-items: baseline; gap: 8px; margin-bottom: 5px; font-family: var(--font-en); }
+.hsk-sense-lvl { flex: none; font-family: var(--font-ui); font-size: 10px; font-weight: 700;
+  letter-spacing: .04em; color: var(--accent); background: var(--accent-soft); border-radius: 5px; padding: 2px 6px; }
+.hsk-sense-pos { flex: none; font-family: var(--font-en); font-size: 13px; font-style: italic; color: var(--ink3); }
+.hsk-sense-def { font-size: 16px; line-height: 1.5; color: var(--ink); }
+
+/* additional readings (CC-CEDICT homographs) */
+.alt { margin-top: 10px; padding-left: 2px; }
+.alt-py { font-weight: 500; margin-bottom: 2px; }
+.alt-trad { margin-left: 8px; font-size: 13px; font-weight: 500; color: var(--ink2); }
+.alt-trad::before { content: "繁 "; font-size: 10px; color: var(--ink2); }
+.alt-defs { font-family: var(--font-en); font-size: 14.5px; color: var(--ink2); line-height: 1.5; }
+
+.charcards { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+.charcard { display: flex; align-items: center; gap: 12px; text-align: left;
+  background: var(--card); border: 1px solid var(--line); border-radius: 11px; padding: 12px;
+  cursor: pointer; transition: all .14s; font-family: var(--font-ui); }
+.charcard:hover { border-color: var(--accent); transform: translateX(2px); }
+.cc-hanzi { font-size: 34px; font-weight: 700; line-height: 1; color: var(--ink); min-width: 40px;
+  text-align: center; white-space: nowrap; flex: none; }
+.cc-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.cc-gloss { font-family: var(--font-en); font-size: 14.5px; color: var(--ink2); }
+.cc-arrow { color: var(--ink3); font-size: 22px; }
+
+/* sections */
+.section { margin-top: 26px; }
+.section-label { font-family: var(--font-ui); text-transform: uppercase; letter-spacing: .12em;
+  font-size: 10.5px; font-weight: 700; color: var(--ink3); margin-bottom: 12px; }
+.disclosure { display: flex; align-items: center; justify-content: space-between; width: 100%;
+  background: none; border: none; padding: 0; cursor: pointer; }
+.disclosure .section-label { margin-bottom: 0; transition: color .14s; }
+.disclosure:hover .section-label, .disclosure:hover .chev { color: var(--accent); }
+.chev { display: flex; color: var(--ink3); transition: transform .2s, color .14s; }
+.chev.open { transform: rotate(90deg); }
+.disclosure + .stroke-wrap { margin-top: 14px; }
+
+.stroke-wrap { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+.stroke-box { position: relative; width: 150px; height: 150px; background: var(--card);
+  border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.stroke-grid { position: absolute; inset: 0; }
+.stroke-grid span { position: absolute; background: repeating-linear-gradient(0deg, var(--line2), var(--line2) 2px, transparent 2px, transparent 7px); }
+.stroke-grid span:nth-child(1){ left:50%; top:0; bottom:0; width:1px; transform:translateX(-.5px);
+  background: repeating-linear-gradient(180deg,var(--line2),var(--line2) 5px,transparent 5px,transparent 11px); }
+.stroke-grid span:nth-child(2){ top:50%; left:0; right:0; height:1px; transform:translateY(-.5px);
+  background: repeating-linear-gradient(90deg,var(--line2),var(--line2) 5px,transparent 5px,transparent 11px); }
+.stroke-grid .d1, .stroke-grid .d2 { top:50%; left:50%; width:212px; height:1px; transform-origin:left center; opacity:.6;
+  background: repeating-linear-gradient(90deg,var(--line2),var(--line2) 5px,transparent 5px,transparent 11px); }
+.stroke-grid .d1 { transform: translate(-50%,-50%) rotate(45deg); }
+.stroke-grid .d2 { transform: translate(-50%,-50%) rotate(-45deg); }
+.stroke-svg { position: absolute; inset: 0; display: grid; place-items: center; }
+.stroke-msg { position: absolute; inset: 0; display: grid; place-items: center; font-size: 11px;
+  color: var(--ink3); font-family: var(--font-ui); }
+.stroke-msg.ghost { font-family: var(--font-han); font-size: 60px; color: var(--line2); }
+.stroke-msg.ghost small { position: absolute; bottom: 10px; font-family: var(--font-ui); font-size: 10px; color: var(--ink3); }
+
+.ghostbtn { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-ui);
+  font-size: 12.5px; font-weight: 600; color: var(--ink2); background: var(--card);
+  border: 1px solid var(--line2); border-radius: 8px; padding: 7px 12px; cursor: pointer; transition: all .14s; }
+.ghostbtn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.ghostbtn:disabled { opacity: .45; cursor: default; }
+
+.radline { display: flex; align-items: stretch; gap: 12px; flex-wrap: wrap; }
+.radical { display: flex; align-items: center; gap: 9px; background: var(--accent-soft);
+  border-radius: 10px; padding: 8px 12px; }
+.rad-char { font-family: var(--font-han); font-size: 26px; color: var(--accent); line-height: 1; }
+.rad-meaning { font-family: var(--font-en); font-size: 13.5px; color: var(--ink2); }
+.comps { display: flex; gap: 7px; flex-wrap: wrap; }
+.comp { display: flex; flex-direction: column; align-items: center; gap: 3px;
+  background: var(--card); border: 1px solid var(--line); border-radius: 9px; padding: 8px 11px; min-width: 50px; }
+.comp-char { font-family: var(--font-han); font-size: 22px; color: var(--ink); line-height: 1; }
+.comp-gloss { font-family: var(--font-en); font-size: 11px; color: var(--ink3); white-space: nowrap; }
+.strokes-count { font-family: var(--font-ui); font-size: 12px; color: var(--ink3); margin-top: 10px; }
+
+.examples { display: flex; flex-direction: column; gap: 14px; }
+.ex { border-left: 2px solid var(--line2); padding-left: 14px; }
+.ex-zh { font-family: var(--font-han); font-size: 19px; color: var(--ink); line-height: 1.5; }
+.ex-py { margin: 3px 0; }
+.ex-en { font-family: var(--font-en); font-size: 14.5px; font-style: italic; color: var(--ink2); }
+.ex-msg { font-family: var(--font-ui); font-size: 12.5px; color: var(--ink3); padding: 2px 0; }
+.ex-credit { display: inline-block; margin-top: 14px; font-family: var(--font-ui); font-size: 11.5px;
+  font-weight: 600; color: var(--ink3); text-decoration: none; }
+.ex-credit:hover { color: var(--accent); }
+.grammar-note { font-family: var(--font-en); font-size: 14.5px; line-height: 1.55; color: var(--ink2); margin: 0; }
+
+/* results */
+.results { padding: 12px 14px 40px; }
+.results-label, .saved-count { font-family: var(--font-ui); text-transform: uppercase; letter-spacing: .1em;
+  font-size: 10.5px; font-weight: 700; color: var(--ink3); margin: 4px 4px 10px; }
+.saved-count { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.saved-tools { display: inline-flex; gap: 16px; flex-shrink: 0; }
+/* Saved (Study / Export) + History (Clear) share one low-key text-action style */
+.hist-clear { font-family: var(--font-ui); text-transform: uppercase; letter-spacing: .08em;
+  font-size: 10.5px; font-weight: 700; color: var(--accent); background: none; border: none;
+  cursor: pointer; padding: 2px 4px; }
+.hist-clear:hover { text-decoration: underline; }
+.result { width: 100%; display: flex; align-items: center; gap: 12px; text-align: left;
+  background: none; border: none; border-radius: 10px; padding: 11px 10px; cursor: pointer; transition: background .12s; }
+.result:hover { background: var(--card); }
+.r-hanzi { font-family: var(--font-han); font-size: 28px; font-weight: 500; color: var(--ink); min-width: 56px;
+  flex: none; white-space: nowrap; text-align: center; line-height: 1; }
+.r-body { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.r-top { display: flex; align-items: center; gap: 7px; font-weight: 500; }
+.r-star { color: var(--accent); display: flex; }
+.r-gloss { font-family: var(--font-en); font-size: 14.5px; color: var(--ink2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.r-hsk { font-family: var(--font-ui); font-size: 10.5px; font-weight: 700; color: var(--ink3); }
+
+/* saved */
+.saved-list { padding: 12px 14px 40px; display: flex; flex-direction: column; gap: 9px; }
+/* Saved view owns the padding + the same 9px flex gap as History's list, so the
+   header (count + Study/Export) gets identical spacing above the first card. The
+   nested card list then resets its own padding. */
+.saved-view { padding: 12px 14px 40px; display: flex; flex-direction: column; gap: 9px; }
+.saved-view .saved-list { padding: 0; }
+/* One clean card surface (like History); the whole card highlights on hover so the
+   star never reads as a separate compartment. */
+.flash { display: flex; align-items: stretch; background: var(--card); border: 1px solid var(--line);
+  border-radius: 12px; overflow: hidden; transition: background .12s; }
+.flash:hover { background: var(--card2); }
+.flash-main { flex: 1; display: flex; align-items: center; gap: 14px; text-align: left;
+  background: none; border: none; padding: 14px; cursor: pointer; }
+.f-hanzi { font-family: var(--font-han); font-size: 30px; font-weight: 500; color: var(--ink); line-height: 1;
+  flex: none; white-space: nowrap; }
+.f-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.f-gloss { font-family: var(--font-en); font-size: 14.5px; color: var(--ink2); }
+/* star · a trailing action on the same surface — no divider, subtle accent-soft on hover */
+.f-remove { flex: none; width: 44px; border: none; background: none;
+  color: var(--accent); cursor: pointer; display: grid; place-items: center; transition: background .12s; }
+.f-remove:hover { background: var(--accent-soft); }
+
+/* empty states */
+.empty { padding: 60px 32px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.empty-mark { font-family: var(--font-han); width: 64px; height: 64px; border-radius: 50%;
+  border: 2px dashed var(--line2); display: grid; place-items: center; font-size: 30px; color: var(--ink3); margin-bottom: 8px; }
+/* icon variant (e.g. the Saved empty-state star) — a centered SVG, so it doesn't
+   inherit the CJK font's off-center glyph metrics like a text ★ would */
+.empty-mark-icon svg { width: 30px; height: 30px; display: block; }
+.empty-title { font-family: var(--font-en); font-size: 18px; font-weight: 600; color: var(--ink); }
+.empty-sub { font-family: var(--font-en); font-size: 14.5px; line-height: 1.55; color: var(--ink2); max-width: 280px; }

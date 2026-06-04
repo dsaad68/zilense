@@ -1,0 +1,41 @@
+{
+  "name": "zilense",
+  "private": true,
+  "version": "1.9.5",
+  "type": "module",
+  "license": "MIT",
+  "description": "Zilense - Chinese dictionary in the Chrome side panel (hover, select, search & save)",
+  "scripts": {
+    "convert:chars": "node assets/scripts/convert-chars.mjs",
+    "convert:hsk": "node assets/scripts/convert-hsk.mjs",
+    "fetch:fonts": "node assets/scripts/fetch-fonts.mjs",
+    "build:dict": "node assets/scripts/build-dict.mjs",
+    "predev": "node assets/scripts/build-dict.mjs",
+    "prebuild": "node assets/scripts/build-dict.mjs",
+    "dev": "vite",
+    "build": "vite build",
+    "postbuild": "node assets/scripts/copy-notices.mjs",
+    "pack": "npm run build && node assets/scripts/pack.mjs",
+    "preview": "vite preview",
+    "pretest": "node assets/scripts/build-dict.mjs",
+    "test": "node --test",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "@mozilla/readability": "0.6.0",
+    "hanzi-writer": "3.7.3",
+    "pdfjs-dist": "6.0.227",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
+    "tesseract.js": "7.0.0"
+  },
+  "devDependencies": {
+    "@crxjs/vite-plugin": "2.4.0",
+    "@happy-dom/global-registrator": "20.10.1",
+    "@playwright/test": "1.60.0",
+    "@vitejs/plugin-react": "4.7.0",
+    "cc-cedict": "1.1.1",
+    "happy-dom": "20.10.1",
+    "vite": "7.3.5"
+  }
+}

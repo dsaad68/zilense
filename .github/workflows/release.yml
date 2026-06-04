@@ -1,0 +1,69 @@
+name: Release
+
+# When something lands on main (e.g. a merged PR), publish a GitHub release for the
+# current package.json version — but only if that version hasn't been released yet,
+# so ordinary main pushes that don't bump the version are no-ops. The release notes
+# are the matching CHANGELOG.md section, and the packed extension zip is attached.
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write # create releases + tags
+
+concurrency:
+  group: release-main
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Install (clean, from lockfile)
+        run: npm ci
+
+      # gate the release on green checks
+      - name: Unit tests
+        run: npm test
+      - name: Build the extension
+        run: npm run build
+
+      - name: Resolve version & whether it's already released
+        id: meta
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION="$(node -p "require('./package.json').version")"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          if gh release view "v$VERSION" >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::Release v$VERSION already exists — nothing to publish."
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Extract changelog notes
+        if: steps.meta.outputs.exists == 'false'
+        run: node assets/scripts/changelog-section.mjs "${{ steps.meta.outputs.version }}" > RELEASE_NOTES.md
+
+      - name: Package the extension zip
+        if: steps.meta.outputs.exists == 'false'
+        # build already ran above; pack.mjs zips the existing dist/ -> release/zilense-<version>.zip
+        run: node assets/scripts/pack.mjs
+
+      - name: Create GitHub release
+        if: steps.meta.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "v${{ steps.meta.outputs.version }}" \
+            "release/zilense-${{ steps.meta.outputs.version }}.zip" \
+            --title "v${{ steps.meta.outputs.version }}" \
+            --notes-file RELEASE_NOTES.md \
+            --target "${{ github.sha }}"

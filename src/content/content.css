@@ -1,0 +1,43 @@
+/* content.css — on-page highlights, mirroring the design's .tok treatment
+   (hover = soft, pinned = solid accent, like .tok.active). The CSS Custom
+   Highlight API supports color / background-color / text-decoration, which is
+   all these effects need.
+
+   These are the DEFAULT colors. content.js reads the panel's accent setting and
+   injects an override (<style id="mydict-hl-accent">) so the highlight follows
+   the chosen swatch; these rules apply until that resolves / when storage is
+   unavailable. */
+
+/* hover: the word under the cursor — soft tint + the archived beige underline
+   (text-decoration is one of the few properties ::highlight() supports) */
+::highlight(mydict-tok) {
+  background-color: #f6e4df;
+  color: #b23a2e;
+  text-decoration: underline;
+  text-decoration-color: #e7d4a8;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
+/* pinned: a word locked by clicking it. content.js also paints a rounded overlay
+   box (shadow + gold dot) over this; the highlight is the readable fallback. */
+::highlight(mydict-pin) {
+  background-color: #c8443a;
+  color: #fff;
+}
+
+/* HSK vocabulary highlight (toolbar "highlight HSK ≤ N" action) — a distinct
+   non-red tint so it never reads like the hover/pin highlight. background-color
+   only (no underline) and semi-transparent so it sits over light and dark pages.
+   `mydict-hsk` is the single-color mode; `mydict-hsk-1…7` are the per-band colors
+   for the "color by level" mode — pastel hues of each New HSK textbook's dominant
+   cover color (1 red · 2 yellow · 3 orange · 4 lime · 5 dark green · 6 purple ·
+   7–9 blue). Semi-transparent so they read on light and dark pages. */
+::highlight(mydict-hsk)   { background-color: rgba(46, 139, 87, .28); }
+::highlight(mydict-hsk-1) { background-color: rgba(244, 143, 137, .42); } /* HSK 1 · red */
+::highlight(mydict-hsk-2) { background-color: rgba(255, 224, 130, .50); } /* HSK 2 · yellow */
+::highlight(mydict-hsk-3) { background-color: rgba(255, 183, 122, .46); } /* HSK 3 · orange */
+::highlight(mydict-hsk-4) { background-color: rgba(197, 225, 112, .48); } /* HSK 4 · lime */
+::highlight(mydict-hsk-5) { background-color: rgba(129, 199, 132, .44); } /* HSK 5 · dark green */
+::highlight(mydict-hsk-6) { background-color: rgba(197, 153, 222, .44); } /* HSK 6 · purple */
+::highlight(mydict-hsk-7) { background-color: rgba(144, 195, 245, .46); } /* HSK 7–9 · blue */

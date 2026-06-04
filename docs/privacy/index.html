@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Privacy Policy · Zilense</title>
+  <meta name="description" content="Zilense privacy policy: no analytics, no tracking, no data collection. Saved words and settings stay on your device.">
+  <link rel="icon" href="../icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="wrap">
+
+    <nav class="nav">
+      <a href="../"><img src="../icon.png" alt=""></a>
+      <a class="name" href="../" style="color:inherit">Zilense</a>
+      <span class="spacer"></span>
+      <span class="links">
+        <a href="https://github.com/dsaad68/zilense">GitHub</a>
+        <a href="../">Home</a>
+      </span>
+    </nav>
+
+    <article class="prose">
+      <div class="section-label">Privacy</div>
+      <h1>Privacy Policy</h1>
+      <p class="updated">Last updated: 2 June 2026</p>
+
+      <p>Zilense is a Chinese-dictionary browser extension. This policy explains what data it handles
+        and what it does not.</p>
+
+      <div class="callout"><strong>In short:</strong> Zilense does not collect, transmit, sell, or
+        share any personal information, and it has no analytics or tracking of any kind.</div>
+
+      <h2>What is stored, and where</h2>
+      <p>The following are stored <strong>locally on your device</strong> using the browser's
+        <code>chrome.storage</code> API. They never leave your device and are not sent to the
+        developer or any third party:</p>
+      <ul>
+        <li><strong>Saved words</strong>, the deck of entries you star.</li>
+        <li><strong>Settings</strong>, your display preferences (accent color, Chinese font, tone
+          colors, traditional/simplified, hover popup, pin key, Reader-mode appearance).</li>
+        <li><strong>Recent lookups / history</strong>, words you have looked up, kept locally so the
+          panel can show them again.</li>
+      </ul>
+      <p>You can clear this data at any time by removing the saved words in the panel or by removing
+        the extension from your browser.</p>
+
+      <h2>Network requests</h2>
+      <p>Zilense works offline for its core dictionary. It makes outbound network requests
+        <strong>only on demand</strong>, and only to the following services, when you explicitly
+        expand the corresponding section:</p>
+      <ul>
+        <li><code>tatoeba.org</code>, to fetch example sentences when you open the Examples section
+          for a word.</li>
+        <li><code>cdn.jsdelivr.net</code>, to fetch stroke-order path data when you open the Stroke
+          order section for a character.</li>
+      </ul>
+      <p>These requests contain only the Chinese word or character being looked up. No identifiers,
+        account information, or browsing history is attached to them. Pronunciation uses your
+        browser's built-in speech synthesis and makes no network request to the developer.</p>
+      <p>When you open a PDF in Zilense's built-in viewer, the viewer fetches that PDF's own bytes
+        from its address in order to display it. Scanned PDFs are recognized by an OCR engine that is
+        bundled with the extension and runs <strong>entirely on your device</strong> — the page
+        image is never uploaded anywhere. Nothing about the PDF is sent to the developer.</p>
+
+      <h2>What Zilense does NOT do</h2>
+      <ul>
+        <li>It does <strong>not</strong> use analytics, telemetry, cookies, or tracking pixels.</li>
+        <li>It does <strong>not</strong> collect personally identifiable information.</li>
+        <li>It does <strong>not</strong> transmit the pages you visit, your selections, or your saved
+          words to any server.</li>
+        <li>It does <strong>not</strong> sell or share any data with third parties.</li>
+        <li>It does <strong>not</strong> serve ads.</li>
+      </ul>
+
+      <h2>Permissions</h2>
+      <p>Zilense requests the minimum permissions needed to function: reading the character or word
+        you hover/select on a page (to look it up), <code>storage</code> (for the local data above),
+        <code>sidePanel</code> and <code>contextMenus</code> (its user interface), and
+        <code>activeTab</code> (to read the current tab's address when you open the panel). It does
+        not request broad host access to read or modify arbitrary sites in the background. Access to
+        a PDF's site is requested only on demand — when you choose to open that PDF in Zilense — and
+        can be declined or revoked.</p>
+
+      <h2>Changes</h2>
+      <p>If this policy changes, the "Last updated" date above will change and the new version will be
+        published at this URL.</p>
+
+      <h2>Contact</h2>
+      <p>Questions about privacy: <a href="mailto:me@verybad.engineer">me@verybad.engineer</a></p>
+    </article>
+
+    <footer class="foot">
+      <p>Zilense, Chinese dictionary for Chrome ·
+        <a href="https://github.com/dsaad68/zilense">source on GitHub</a> ·
+        <a href="../">home</a></p>
+    </footer>
+
+  </div>
+</body>
+</html>
