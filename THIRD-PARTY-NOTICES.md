@@ -27,6 +27,18 @@ and libraries — **not** the application code.
   the dictionary data and any adaptation of it remain under CC BY-SA 4.0. CC BY-SA
   4.0 §3(a) expressly permits providing the license by hyperlink, as done here.
 
+### CedPane
+- **Used for:** a second dictionary source covering names and proper nouns (people,
+  places, brands, etc.) so those resolve alongside CC-CEDICT. Fetched at build time
+  and merged into `src/data/cedict.json` by `assets/scripts/build-dict.mjs`, where
+  each entry is tagged as a proper noun (and ranked below everyday words).
+- **Source / attribution:** CedPane (Chinese-English Dictionary Public-domain
+  Additions for Names Etc) by Silas S. Brown — <https://github.com/ssb22/CedPane>
+  and <https://ssb22.user.srcf.net/cedpane/>.
+- **License:** released into the **public domain** (the Unlicense) — the verbatim
+  dedication that ships with the project is in
+  [`licenses/cedpane-LICENSE.txt`](./licenses/cedpane-LICENSE.txt).
+
 ### HSK 3.0 word lists
 - **Used for:** HSK level, part-of-speech, and official English gloss
   (`assets/hsk-vocab/hsk-data.json`, merged into `cedict.json`).
@@ -106,6 +118,34 @@ and libraries — **not** the application code.
   <https://github.com/facebook/react>.
 - **License:** MIT — see [`licenses/react-LICENSE.txt`](./licenses/react-LICENSE.txt)
   and [`licenses/react-dom-LICENSE.txt`](./licenses/react-dom-LICENSE.txt).
+
+### pdfjs-dist (PDF.js)
+- **Used for:** rendering PDFs with a real, hoverable text layer in the bundled PDF
+  viewer (`src/pdfviewer/`), so hover-to-define works on PDFs — Chrome's native PDF
+  viewer exposes no hoverable text. The PDF.js web worker is bundled, not fetched.
+- **Source / attribution:** Mozilla and contributors —
+  <https://github.com/mozilla/pdf.js>.
+- **License:** Apache License 2.0 — full text at
+  <https://www.apache.org/licenses/LICENSE-2.0>; the notice that ships with the
+  package is in [`licenses/pdfjs-dist-LICENSE.txt`](./licenses/pdfjs-dist-LICENSE.txt).
+
+### Tesseract.js & tesseract.js-core
+- **Used for:** offline OCR of **scanned** PDFs in the bundled viewer
+  (`src/pdfviewer/ocr.js`). Scanned pages are images with no text layer, so the
+  viewer recognizes the page image (engine + WebAssembly core bundled under
+  `/tesseract`, no network) and synthesizes a text layer for hover/selection.
+- **Source / attribution:** Tesseract.js contributors —
+  <https://github.com/naptha/tesseract.js> — wrapping the Tesseract OCR engine.
+- **License:** Apache License 2.0 — full text at
+  <https://www.apache.org/licenses/LICENSE-2.0>; the bundled notice is in
+  [`licenses/tesseract.js-core-LICENSE.txt`](./licenses/tesseract.js-core-LICENSE.txt).
+
+### Tesseract `chi_sim` trained data
+- **Used for:** the Simplified-Chinese model the OCR engine loads, bundled at
+  `/tesseract/chi_sim.traineddata` so scanned-PDF OCR works fully offline.
+- **Source / attribution:** the Tesseract OCR project (`tessdata_fast`) —
+  <https://github.com/tesseract-ocr/tessdata_fast>.
+- **License:** Apache License 2.0 — <https://www.apache.org/licenses/LICENSE-2.0>.
 
 ---
 

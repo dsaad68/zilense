@@ -1,7 +1,7 @@
 {
   "name": "zilense",
   "private": true,
-  "version": "1.0.1",
+  "version": "1.8.5",
   "type": "module",
   "license": "MIT",
   "description": "Zilense - Chinese dictionary in the Chrome side panel (hover, select, search & save)",
@@ -24,8 +24,10 @@
   "dependencies": {
     "@mozilla/readability": "^0.6.0",
     "hanzi-writer": "^3.5.0",
+    "pdfjs-dist": "^4.10.38",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "tesseract.js": "^7.0.0"
   },
   "devDependencies": {
     "@crxjs/vite-plugin": "^2.0.0-beta.28",

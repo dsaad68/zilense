@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'node:path'
-import { lookup, segmentLongest, searchEntries, compMeaning, buildIndex, hskWordsUpTo, segmentText } from '../src/lib/dict-core.js'
+import { lookup, segmentLongest, searchEntries, compMeaning, buildIndex, hskWordsUpTo, hskWordsAtBand, hskRank, segmentText } from '../src/lib/dict-core.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 let DB, INDEX
@@ -366,4 +366,35 @@ test('segmentText: empty / no-db / window + cap bounds', () => {
   // maxCP truncates the input (the reader passes a hard cap for its web-accessible
   // payload); only the first code point survives here
   assert.deepEqual(segmentText(DB, '你好', { maxCP: 1 }).map((t) => t.t).join(''), '你')
+})
+
+test('hskWordsAtBand: a word counts for every band it has a sense at (not cumulative)', () => {
+  const b3 = hskWordsAtBand(DB, 3)
+  assert.ok(b3.length > 0, 'HSK band 3 is non-empty')
+  for (const [w, rank] of b3) {
+    assert.equal(rank, 3)
+    // membership is by sense level now, not the primary (lowest) band: every
+    // returned word carries an actual band-3 HSK sense
+    const ss = DB.hskSenses[w]
+    assert.ok(ss && ss.some((s) => hskRank(s.lvl) === 3), `${w} has a band-3 HSK sense`)
+  }
+  // band 1 is the lowest band: a word with a level-1 sense necessarily has level 1
+  // as its primary, so "at band 1" still equals "up to band 1"
+  assert.equal(hskWordsAtBand(DB, 1).length, hskWordsUpTo(DB, 1).length)
+  // a word listed at more than one level appears in each of those band decks
+  const multi = Object.keys(DB.hskSenses).find((w) => {
+    const ranks = new Set(DB.hskSenses[w].map((s) => hskRank(s.lvl)))
+    return ranks.size > 1
+  })
+  if (multi) {
+    for (const r of new Set(DB.hskSenses[multi].map((s) => hskRank(s.lvl)))) {
+      assert.ok(hskWordsAtBand(DB, r).some(([w]) => w === multi), `${multi} appears in band ${r}`)
+    }
+  }
+  // band 7 captures the advanced 7–9 set, stored as the string "7-9"
+  const b7 = hskWordsAtBand(DB, 7)
+  assert.ok(b7.length > 0, 'HSK 7–9 band is non-empty')
+  for (const [w] of b7) assert.ok(DB.hskSenses[w].some((s) => s.lvl === '7-9'))
+  // guard: no band/zero input returns nothing
+  assert.deepEqual(hskWordsAtBand(DB, 0), [])
 })

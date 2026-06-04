@@ -29,9 +29,8 @@ body {
   padding: 2px 2px 8px; border-bottom: 1px solid var(--line);
 }
 .seal {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 24px; height: 24px; border-radius: 7px; color: #fff; font-size: 14px;
-  background: var(--accent); box-shadow: 0 2px 8px rgba(200, 68, 58, .3);
+  width: 24px; height: 24px; border-radius: 7px; object-fit: cover; display: block;
+  box-shadow: 0 2px 8px rgba(200, 68, 58, .3);
 }
 
 .action {

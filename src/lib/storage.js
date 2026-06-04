@@ -10,6 +10,7 @@ const DISABLED_KEY = 'mydict.disabledSites'
 const PENDING_KEY = 'mydict.pendingLookup'
 const READER_KEY = 'mydict.reader'
 const SUBS_KEY = 'mydict.subs'
+const FAMILIARITY_KEY = 'mydict.familiarity'
 
 const HISTORY_MAX = 100 // cap recent lookups so the list stays bounded
 
@@ -17,11 +18,12 @@ export const DEFAULT_SETTINGS = {
   accent: '#c8443a',
   hanFont: 'sans', // 'sans' | 'serif'
   toneColors: true,
-  showTrad: true, // show the traditional form (繁) beside simplified headwords
+  showTrad: false, // show the traditional form (繁) beside simplified headwords
   inlinePopup: true, // show a small on-page popup near the hovered word
   pinKey: 'p', // press this key while hovering a word to pin it (works on links)
   hskFirst: false, // show the official HSK gloss above the CC-CEDICT defs
   hskColorByLevel: false, // "highlight HSK ≤ N": color matches by band vs one color
+  showFamiliarity: false, // show the New/Learning/Known control + Progress tab
   dark: false,
 }
 
@@ -75,6 +77,88 @@ export function pushHistory(history, q, t) {
   if (!q) return history
   const rest = history.filter((h) => h.q !== q)
   return [{ q, t: t || 0 }, ...rest].slice(0, HISTORY_MAX)
+}
+
+/* Familiarity tracking. A separate mydict.* map, keyed by headword (the same `q`
+   the saved deck uses), recording how well the user knows each word:
+     mydict.familiarity = { "<word>": { state, seen, lastSeen }, … }
+   `state` is 'new' | 'learning' | 'known' (the user sets it); `seen` is an
+   auto-incrementing lookup counter; `lastSeen` is an epoch-ms timestamp. Absent
+   words default to 'new' WITHOUT being written, so the map only ever holds words
+   the user has actually touched, and an older install with no map just reads as
+   all-new. The pure helpers (get / set / bump) operate on an in-memory map and
+   return a new one, so they're unit-testable like toggleSite / pushHistory;
+   loadFamiliarity / saveFamiliarity wrap chrome.storage.local. */
+export const FAMILIARITY_STATES = ['new', 'learning', 'known']
+export const DEFAULT_FAMILIARITY = { state: 'new', seen: 0, lastSeen: 0 }
+// keep the auto-tracked map bounded so it can't grow without limit; words the
+// user has explicitly tagged (learning / known) are never pruned, only the
+// untagged 'new' auto-records, dropping the least-recently-seen first.
+export const FAMILIARITY_MAX = 500
+
+function pruneFamiliarity(map) {
+  const keys = Object.keys(map)
+  if (keys.length <= FAMILIARITY_MAX) return map
+  const removable = keys
+    .filter((k) => map[k].state === 'new')
+    .sort((a, b) => (map[a].lastSeen || 0) - (map[b].lastSeen || 0))
+  const drop = Math.min(keys.length - FAMILIARITY_MAX, removable.length)
+  if (drop <= 0) return map
+  const pruned = { ...map }
+  for (let i = 0; i < drop; i++) delete pruned[removable[i]]
+  return pruned
+}
+
+// coerce any stored (or missing / corrupted) record into a valid one
+function normFamiliarity(rec) {
+  const state = rec && FAMILIARITY_STATES.includes(rec.state) ? rec.state : 'new'
+  const seen = rec && Number.isFinite(rec.seen) && rec.seen > 0 ? Math.floor(rec.seen) : 0
+  const lastSeen = rec && Number.isFinite(rec.lastSeen) && rec.lastSeen > 0 ? rec.lastSeen : 0
+  return { state, seen, lastSeen }
+}
+
+/* the familiarity record for a word: an absent or malformed entry falls back to
+   the default ('new', never seen) without mutating the map. */
+export function getFamiliarity(map, word) {
+  return normFamiliarity(map ? map[word] : null)
+}
+
+/* set a word's state ('new' | 'learning' | 'known'); seen / lastSeen are kept.
+   Pure: returns a new map. An unknown state is coerced to 'new'. */
+export function setFamiliarityState(map, word, state) {
+  if (!word) return map
+  const next = FAMILIARITY_STATES.includes(state) ? state : 'new'
+  const cur = getFamiliarity(map, word)
+  return { ...(map || {}), [word]: { ...cur, state: next } }
+}
+
+/* record one lookup of a word: increment `seen` and stamp `lastSeen`, preserving
+   the user-set state (this NEVER auto-promotes to 'known'). Pure: returns a new
+   map. `now` is an epoch-ms timestamp. */
+export function bumpFamiliarity(map, word, now) {
+  if (!word) return map
+  const cur = getFamiliarity(map, word)
+  const next = { ...(map || {}), [word]: { ...cur, seen: cur.seen + 1, lastSeen: now || 0 } }
+  return pruneFamiliarity(next)
+}
+
+export async function loadFamiliarity() {
+  if (hasChrome) {
+    const got = await getLocal([FAMILIARITY_KEY])
+    const v = got[FAMILIARITY_KEY]
+    return v && typeof v === 'object' && !Array.isArray(v) ? v : {}
+  }
+  try {
+    const v = JSON.parse(localStorage.getItem(FAMILIARITY_KEY) || '{}')
+    return v && typeof v === 'object' && !Array.isArray(v) ? v : {}
+  } catch {
+    return {}
+  }
+}
+
+export async function saveFamiliarity(map) {
+  if (hasChrome) return setLocal({ [FAMILIARITY_KEY]: map })
+  try { localStorage.setItem(FAMILIARITY_KEY, JSON.stringify(map)) } catch {}
 }
 
 /* Per-site hover disable. The toolbar popup adds/removes the current hostname

@@ -47,9 +47,25 @@ is factual and matches the shipped code (`manifest.config.js`, `src/`) and the
 > - **Pronunciation** — hear Mandarin via your browser's speech synthesis.
 > - **Saved deck** — star words to build your own study list; it stays on your
 >   device.
+> - **Side panel or floating window** — use the dictionary docked in Chrome's side
+>   panel, or pop it out into a detached window that floats free and stays put as
+>   you switch tabs. Both share your saved words, settings, and live lookups, and
+>   **keyboard shortcuts** can open either one directly (rebindable in Chrome).
+> - **Flashcards** — study your starred words or any HSK 3.0 level on a full-page
+>   trainer with flip cards and keyboard shortcuts. HSK decks come from the
+>   official word lists (exact gloss, part of speech, and pinyin per entry); pick
+>   just one level or everything up to it, choose a pool (all / unseen / recently
+>   or ever missed), size, order, and prompt direction. Progress stays on your
+>   device and can be exported or imported.
+> - **Export to Anki** — turn your starred words into a tab-separated file Anki
+>   imports directly.
 > - **Reader mode** — open the current article in a clean, distraction-free
 >   reader with selectable fonts, larger text, and optional tone-colored pinyin
 >   above every character — with the dictionary still live as you read.
+> - **PDFs** — open a PDF and Zilense offers to reopen it in a built-in viewer
+>   where hover, lookup, and selection work just like on a web page. Scanned or
+>   image-only PDFs are recognized with offline OCR (a bundled Chinese model — no
+>   network), so even photographed pages become hoverable.
 > - **HSK highlighting** and a customizable look (accent color, Chinese serif/
 >   sans face, tone colors, dark mode).
 >
@@ -59,8 +75,9 @@ is factual and matches the shipped code (`manifest.config.js`, `src/`) and the
 > example-sentences or stroke-order section for a specific word. See the privacy
 > policy for details.
 >
-> Dictionary data: CC-CEDICT (CC BY-SA 4.0). Built with open data and fonts;
-> full attribution is included with the extension.
+> Dictionary data: CC-CEDICT (CC BY-SA 4.0), with names and proper nouns from
+> CedPane (public domain). Built with open data and fonts; full attribution is
+> included with the extension.
 
 ---
 
@@ -73,9 +90,10 @@ One line each — paste into the corresponding dashboard field.
 | **`activeTab`** | Read the active tab's URL and id only when the user clicks the toolbar icon — to open the side panel for that tab and to offer "disable on this site." No background access to tabs. |
 | **`storage`** | Persist the user's saved-word deck, display settings, and recent lookups locally on the device. No data leaves the device. |
 | **`sidePanel`** | The side panel is the extension's primary UI, where dictionary entries are displayed. |
-| **`contextMenus`** | Add right-click items: "Look up '…' in Zilense" for selected text, and "Open in Zilense Reader" for the page. |
+| **`contextMenus`** | Add right-click items: "Look up '…' in Zilense" for selected text, "Open in Zilense Reader" for the page, and "Open this PDF in Zilense" on PDF links/pages. |
 | **Host permission `https://tatoeba.org/*`** | Fetch example sentences for a looked-up word, on demand, only when the user expands the Examples section. |
 | **Host permission `https://cdn.jsdelivr.net/*`** | Fetch stroke-order path data (open hanzi-writer data) for a character, on demand, only when the user expands the Stroke order section. |
+| **Optional host permission `*://*/*`** | **Not granted at install.** Requested on a user gesture only when the user chooses to open a cross-origin PDF in Zilense's viewer (the viewer, an extension page, must fetch the PDF's bytes to display it). Only the specific PDF's origin is requested at that moment; the user can decline, and revoke it later. |
 
 ### Content script on `<all_urls>` (justification for the reviewer)
 
@@ -96,9 +114,21 @@ One line each — paste into the corresponding dashboard field.
 > web-accessible. It is served with `use_dynamic_url: true` (a per-session random
 > URL), so web pages cannot hardcode or fingerprint it or feed it a crafted
 > payload. The article hand-off to the reader goes through the extension's
-> service worker with a one-time nonce, never through the host page. The other
-> web-accessible entry is the CRXJS-generated content-script chunk, added
-> automatically by the build.
+> service worker with a one-time nonce, never through the host page. The PDF
+> viewer page (`src/pdfviewer/index.html`) is also web-accessible — the tab is
+> navigated to it to open a PDF — at a **stable** URL because the redirect rule and
+> the navigation both need a fixed target. The other web-accessible entry is the
+> CRXJS-generated content-script chunk, added automatically by the build.
+
+### Content Security Policy — `'wasm-unsafe-eval'` (justification for the reviewer)
+
+> `content_security_policy.extension_pages` adds `'wasm-unsafe-eval'` to
+> `script-src` (kept otherwise at `'self'`) solely so the bundled **Tesseract.js**
+> OCR engine's WebAssembly can compile. This is required to read **scanned/image
+> PDFs**, which have no text layer. All OCR code, the WebAssembly core, and the
+> Chinese language model are **bundled in the package** (under `/tesseract`) and
+> run locally — **no remote code is fetched or executed**, and the page image
+> never leaves the device.
 
 ---
 
@@ -118,7 +148,7 @@ Answers for the "Privacy practices" tab.
 | Location | **No** | |
 | Web history | **No** | Lookup history is stored locally only and never transmitted. |
 | User activity (clicks, mouse position, keystroke logging, etc.) | **No** | |
-| Website content (text, images, the pages the user visits) | **No** | The looked-up word/character is sent only to Tatoeba/jsDelivr on demand to fetch examples/stroke data; nothing is stored or sent to the developer. |
+| Website content (text, images, the pages the user visits) | **No** | The looked-up word/character is sent only to Tatoeba/jsDelivr on demand to fetch examples/stroke data; nothing is stored or sent to the developer. PDFs opened in the viewer (and any OCR of scanned pages) are processed entirely on the device. |
 
 **Certifications (check all three — true for Zilense):**
 - ☑ I do not sell or transfer user data to third parties, outside of the approved use cases.
@@ -131,16 +161,21 @@ Answers for the "Privacy practices" tab.
 
 ## Notes for the reviewer (free-text box)
 
-> 1. **No remote code.** All executable code is bundled in the package. The only
->    network requests are to `tatoeba.org` (example sentences) and
->    `cdn.jsdelivr.net` (stroke-order **data**, JSON path coordinates — not
->    script). These are fetched on demand for a specific looked-up word and are
->    data, not code; they are not eval'd or executed.
+> 1. **No remote code.** All executable code — including the PDF.js viewer and the
+>    Tesseract OCR engine + its WebAssembly core — is bundled in the package. The
+>    `'wasm-unsafe-eval'` CSP only lets that **bundled** WASM compile; nothing is
+>    fetched and eval'd. The only network requests are to `tatoeba.org` (example
+>    sentences) and `cdn.jsdelivr.net` (stroke-order **data**, JSON path
+>    coordinates — not script), fetched on demand for a specific looked-up word.
+>    When the user opens a PDF in the viewer, the viewer fetches that PDF's bytes
+>    from its origin (with the user's granted access) to display it — the PDF is
+>    rendered and, if scanned, OCR'd entirely on the device.
 >
-> 2. **Bundle size.** The package includes the full CC-CEDICT dictionary
->    (`cedict.json`, ~13 MB) so lookups work offline and privately. It is loaded
->    by the service worker on demand. This is data the extension's core function
->    depends on, not unused payload.
+> 2. **Bundle size.** The package includes the full CC-CEDICT dictionary plus
+>    CedPane name/proper-noun additions (`cedict.json`, ~20 MB) so lookups work
+>    offline and privately, and the bundled OCR engine + Chinese model (~9 MB under
+>    `/tesseract`) so scanned PDFs work offline. Both are loaded on demand. This is
+>    data the extension's core function depends on, not unused payload.
 >
 > 3. **`<all_urls>` content script** is required for on-page hover/selection
 >    lookup (see the permission justification above). It only detects the
@@ -148,9 +183,9 @@ Answers for the "Privacy practices" tab.
 >    it does not exfiltrate page content.
 >
 > 4. **Open data & attribution.** Dictionary, character, and font data are open
->    (CC-CEDICT under CC BY-SA 4.0, makemeahanzi, Noto/Source Serif under the
->    SIL OFL). Full attribution ships in the package as `THIRD-PARTY-NOTICES.md`
->    and is linked from the in-app Settings.
+>    (CC-CEDICT under CC BY-SA 4.0, CedPane in the public domain, makemeahanzi,
+>    Noto/Source Serif under the SIL OFL). Full attribution ships in the package
+>    as `THIRD-PARTY-NOTICES.md` and is linked from the in-app Settings.
 
 ---
 

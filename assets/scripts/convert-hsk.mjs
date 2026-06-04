@@ -1,21 +1,31 @@
 /* convert-hsk.mjs — one-off: turn the messy HSK spreadsheets in
    assets/hsk-vocab/ into one clean, committed JSON:
-     word -> { lvl, pos, senses: [{ lvl, pos, def }, ...] }
+     word -> { lvl, pos, senses: [{ lvl, pos, def, py }, ...] }
    `lvl`/`pos` are the primary (lowest-band) reading for the meta badge; `senses`
-   lists every DISTINCT official gloss the word carries (a word like 会 has both
-   [verb] "can" and [noun] "meeting"), each with its own level + POS, sorted by
-   level then first appearance.
+   lists ONE entry per source row — nothing is collapsed. A word that appears in
+   more than one level's list is kept at each level with that list's own meaning (so
+   flashcards can show it in every band it belongs to); a word like 会 with two
+   meanings at one level keeps both ([verb] "can", [noun] "meeting"); and rows that
+   share a level and gloss but differ in POS each survive. Each sense carries its own
+   level + POS, sorted by level then first appearance. The total sense count for a
+   band therefore equals that file's row count.
 
    The files are .xlsx (OOXML zip) despite the .xls extension. We read the two
    relevant parts with the `unzip` CLI and parse them directly — no spreadsheet
    library, and (importantly) nothing here runs during the normal build:
    build-dict.mjs only consumes the JSON this produces.
 
-   Columns per sheet: A 词语(word) · B 拼音 · C 翻译(gloss) · D 词性(POS) · E 所在等级(level) · F 是否标记
-   The level cell looks like "YCT4,HSK3,New HSK2,New HSK4"; we keep the smallest
-   `New HSK<n>` and ignore rows with no New HSK tag. The POS cell (词性) holds
-   Chinese abbreviations like "动、名" which we map to English ("verb; noun"). The
-   翻译 cell is the concise official English gloss ("to love", "cup; glass; mug").
+   A word's HSK band is the FILE it sits in: HSK-1-vocab.xls … HSK-6-vocab.xls and
+   the advanced HSK-7-9-vocab.xls. So a word listed in more than one file (e.g. 会 in
+   both HSK-1 and HSK-3) is recorded at each of those bands, with that file's own
+   gloss — we do NOT read the band out of the per-row 所在等级 cell (column E), which
+   mixes YCT / old-HSK / multiple New-HSK tags and would collapse such words.
+
+   Columns per sheet: A 词语(word) · B 拼音(pinyin) · C 翻译(gloss) · D 词性(POS) · E 所在等级 · F 是否标记
+   We read A (word), B (tone-marked pinyin -> `py`), C (gloss -> `def`) and D (POS).
+   The POS cell holds Chinese abbreviations like "动、名" which we map to English
+   ("verb; noun"). The 翻译 cell is the concise official English gloss ("to love",
+   "cup; glass; mug"). Column E is not used (the band comes from the filename).
 
    Run:  npm run convert:hsk   (re-run only when hsk-vocab/*.xls change) */
 
@@ -91,49 +101,45 @@ function cellValue(cellXml, type, shared) {
   return v ? decode(v[1]) : ''
 }
 
-/* HSK 3.0 band for a 所在等级 string, as a rank 1–7 (7 = the combined 7–9
-   advanced band), or null. Bands 1–6 come from "New HSK<n>"; the advanced band
-   is tagged "HSK7-9" (no "New" prefix — old HSK 2.0 had no 7–9, so it can only be
-   3.0). We return the LOWEST band the word appears at. */
-function hskBand(levelStr) {
-  let min = null
-  for (const m of levelStr.matchAll(/New HSK(\d+)/g)) {
-    const n = +m[1]
-    if (min === null || n < min) min = n
-  }
-  if (min !== null) return min // introduced at a 1–6 band
-  if (/HSK7-9/.test(levelStr)) return 7 // advanced-only word → 7–9 band
-  return null
+/* HSK 3.0 band from a vocab filename, as a rank 1–7 (7 = the combined 7–9 advanced
+   band), or null for an unrecognized file. The file IS the authoritative band:
+   HSK-1-vocab.xls … HSK-6-vocab.xls, HSK-7-9-vocab.xls. */
+function fileBand(name) {
+  const m = name.match(/HSK-(\d+(?:-\d+)?)-vocab/i)
+  if (!m) return null
+  if (m[1] === '7-9') return 7 // the combined advanced band
+  const n = +m[1]
+  return n >= 1 && n <= 6 ? n : null
 }
 
 // rank 1–6 -> number; rank 7 -> the "7-9" band label
 const bandLabel = (rank) => (rank <= 6 ? rank : '7-9')
 
-function parseSheet(xml, shared, into) {
+function parseSheet(xml, shared, into, rank) {
   for (const row of xml.matchAll(/<row[^>]*r="(\d+)"[^>]*>([\s\S]*?)<\/row>/g)) {
     if (row[1] === '1') continue // header
-    let word = null, def = '', pos = '', level = null
+    let word = null, py = '', def = '', pos = ''
     for (const c of row[2].matchAll(/<c\s+r="([A-Z]+)\d+"([^>]*)>([\s\S]*?)<\/c>/g)) {
       const col = c[1]
-      if (col !== 'A' && col !== 'C' && col !== 'D' && col !== 'E') continue
+      if (col !== 'A' && col !== 'B' && col !== 'C' && col !== 'D') continue
       const tMatch = c[2].match(/\bt="([^"]+)"/)
       const val = cellValue(c[3], tMatch ? tMatch[1] : null, shared)
       if (col === 'A') word = val.trim()
+      else if (col === 'B') py = val.trim()
       else if (col === 'C') def = val.trim()
       else if (col === 'D') pos = val
-      else if (col === 'E') level = val
     }
-    if (!word || !def || !level) continue
-    const rank = hskBand(level)
-    if (rank === null) continue
-    // collect one sense PER DISTINCT MEANING (keyed by gloss), keeping the lowest
-    // band that meaning appears at. `_r` is the numeric rank for sorting; `_o` the
-    // first-seen order for a stable tiebreak. Both stripped before writing.
+    if (!word || !def) continue
+    // the row's band is the file it came from (passed in as `rank`). We keep one
+    // sense PER ROW with no collapsing, so every line in every list survives: a word
+    // listed in several files is kept at each band, and rows sharing a band+gloss but
+    // differing in POS each survive instead of one overwriting the other. The per-
+    // band sense count therefore equals the file's row count. `_r` is the numeric
+    // rank for sorting; `_o` the first-seen order for a stable tiebreak. Both
+    // stripped before writing.
     let w = into[word]
-    if (!w) into[word] = w = { senses: new Map() }
-    const prev = w.senses.get(def)
-    if (!prev) w.senses.set(def, { _r: rank, _o: w.senses.size, lvl: bandLabel(rank), pos: mapPos(pos), def })
-    else if (rank < prev._r) { prev._r = rank; prev.lvl = bandLabel(rank); if (!prev.pos) prev.pos = mapPos(pos) }
+    if (!w) into[word] = w = { senses: [] }
+    w.senses.push({ _r: rank, _o: w.senses.length, lvl: bandLabel(rank), pos: mapPos(pos), def, py })
   }
 }
 
@@ -146,16 +152,21 @@ function main() {
 
   const map = Object.create(null)
   for (const f of files) {
+    const rank = fileBand(f)
+    if (rank === null) {
+      console.warn(`[convert-hsk] skipping ${f}: filename has no HSK band (expected HSK-<level>-vocab.xls)`)
+      continue
+    }
     const path = join(srcDir, f)
     const shared = parseSharedStrings(unzipPart(path, 'xl/sharedStrings.xml'))
-    parseSheet(unzipPart(path, 'xl/worksheets/sheet1.xml'), shared, map)
+    parseSheet(unzipPart(path, 'xl/worksheets/sheet1.xml'), shared, map, rank)
   }
 
-  // sort keys for a stable, diff-friendly committed file; flatten each word's
-  // sense Map to a level-sorted array and lift the lowest sense as the primary
+  // sort keys for a stable, diff-friendly committed file; level-sort each word's
+  // sense list and lift the lowest sense as the primary
   const sorted = {}
   for (const k of Object.keys(map).sort()) {
-    const senses = [...map[k].senses.values()].sort((a, b) => a._r - b._r || a._o - b._o)
+    const senses = map[k].senses.sort((a, b) => a._r - b._r || a._o - b._o)
     const primary = senses[0]
     sorted[k] = {
       lvl: primary.lvl,
