@@ -278,8 +278,8 @@
           <p class="eyebrow">On video, too</p>
           <h2>Dual subtitles with pinyin <span class="tag-exp">Experimental</span></h2>
           <p>On <strong>YouTube</strong>, the on-video captions get the same
-            tone-colored pinyin and <strong>clickable words</strong>. Tap one and it opens in the
-            side panel, just like on a page.</p>
+            tone-colored pinyin and <strong>clickable words</strong>. Hover or tap a word
+            (try it&nbsp;→) and it opens in the side panel, just like on a page.</p>
           <p>Turn on <strong>dual subtitles</strong> to read <strong>Chinese on top and a second
             language below</strong>. English by default, switchable in the toolbar menu. It's early
             and leans on each site's player, so expect rough edges. <strong>Netflix support is coming
@@ -287,19 +287,20 @@
         </div>
         <div class="feat-visual">
           <div class="ui bare" style="width:100%">
-            <div style="width:100%;background:#0d0d10;border-radius:12px;aspect-ratio:16/10;position:relative;overflow:hidden;display:flex;flex-direction:column">
+            <div id="vid-stage" style="width:100%;background:#0d0d10;border-radius:12px;aspect-ratio:16/10;position:relative;overflow:hidden;display:flex;flex-direction:column">
               <span style="position:absolute;top:12px;left:14px;font-size:12px;color:#cdd;opacity:.65;z-index:1">▶ YouTube</span>
               <div style="flex:1;display:flex;align-items:center;justify-content:center;min-height:0">
                 <span style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px">▶</span>
               </div>
               <div style="text-align:center;padding:0 14px 22px">
-                <div style="display:inline-block;background:rgba(6,6,8,.82);border-radius:12px;padding:9px 18px 11px;line-height:1.45;box-shadow:0 6px 18px rgba(0,0,0,.4)">
-                  <p lang="zh" style="margin:0;font-size:24px;font-weight:500;color:#fff">
-                    <ruby>我<rt class="tone-3">wǒ</rt></ruby><ruby>喜<rt class="tone-3">xǐ</rt></ruby><ruby>欢<rt class="tone-1">huān</rt></ruby><ruby>喝<rt class="tone-1">hē</rt></ruby><ruby>茶<rt class="tone-2">chá</rt></ruby>
+                <div class="vid-cap" id="vid-cap">
+                  <p lang="zh" class="vid-zh">
+                    <span class="vid-tok" data-vw="我"><ruby>我<rt class="tone-3">wǒ</rt></ruby></span><span class="vid-tok" data-vw="喜欢"><ruby>喜<rt class="tone-3">xǐ</rt></ruby><ruby>欢<rt class="tone-1">huān</rt></ruby></span><span class="vid-tok" data-vw="喝茶"><ruby>喝<rt class="tone-1">hē</rt></ruby><ruby>茶<rt class="tone-2">chá</rt></ruby></span>
                   </p>
-                  <p style="margin:8px auto 0;padding-top:7px;border-top:1px solid rgba(255,255,255,.14);font-size:15px;color:#e7e1d6">I like drinking tea</p>
+                  <p class="vid-en">I like drinking tea</p>
                 </div>
               </div>
+              <div class="vid-pop" id="vid-pop" aria-hidden="true"></div>
             </div>
           </div>
         </div>
@@ -708,6 +709,47 @@
       var on = panel.classList.toggle('dark');
       darkToggle.classList.toggle('on', on);
     });
+
+    // Video caption: hover/click a word to show its reading + meaning (clickable-words demo).
+    (function () {
+      var stage = document.getElementById('vid-stage');
+      var pop = document.getElementById('vid-pop');
+      var cap = document.getElementById('vid-cap');
+      if (!stage || !pop || !cap) return;
+      var VWORDS = {
+        '我': { h: '我', py: [['wǒ', 3]], def: 'I, me' },
+        '喜欢': { h: '喜欢', py: [['xǐ', 3], ['huān', 1]], def: 'to like, to be fond of' },
+        '喝茶': { h: '喝茶', py: [['hē', 1], ['chá', 2]], def: 'to drink tea' }
+      };
+      var toks = stage.querySelectorAll('.vid-tok');
+      function show(t) {
+        var d = VWORDS[t.getAttribute('data-vw')];
+        if (!d) return;
+        toks.forEach(function (x) { x.classList.remove('on'); });
+        t.classList.add('on');
+        pop.innerHTML = '<div class="vp-hanzi" lang="zh">' + d.h + '</div>' +
+          '<div class="vp-py" lang="zh">' + pyHtml(d.py) + '</div>' +
+          '<div class="vp-def">' + d.def + '</div>';
+        pop.classList.add('show');
+        var sr = stage.getBoundingClientRect(), tr = t.getBoundingClientRect();
+        var center = tr.left - sr.left + tr.width / 2;
+        var left = Math.max(8, Math.min(center - pop.offsetWidth / 2, stage.clientWidth - pop.offsetWidth - 8));
+        pop.style.left = left + 'px';
+        pop.style.top = (tr.top - sr.top - pop.offsetHeight - 12) + 'px';
+        pop.style.setProperty('--arrow', (center - left - 6) + 'px');
+      }
+      toks.forEach(function (t) {
+        t.addEventListener('mouseenter', function () { show(t); });
+        t.addEventListener('click', function () { show(t); });
+      });
+      cap.addEventListener('mouseleave', function () {
+        pop.classList.remove('show');
+        toks.forEach(function (x) { x.classList.remove('on'); });
+      });
+      // initial: highlight a word so the demo is visible at rest
+      var initial = stage.querySelector('.vid-tok[data-vw="喜欢"]');
+      if (initial) show(initial);
+    })();
 
     // Reader mock: theme switch.
     document.querySelectorAll('.theme-sw').forEach(function (t) {

@@ -4,6 +4,14 @@ All notable changes to **Zilense** are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/), and the project follows
 [Semantic Versioning](https://semver.org/).
 
+## [1.9.5] — 2026-06-04
+
+### Changed
+- Landing page: reworked the dual-subtitles section. The video mock now fills its
+  column, the dual caption is a single overlay card, and its words are hoverable
+  (hover or tap to preview a word's reading and meaning, like the clickable-words
+  feature). Copy updated and the Coursera mention removed.
+
 ## [1.9.4] — 2026-06-04
 
 ### Fixed
