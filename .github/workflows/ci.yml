@@ -25,6 +25,8 @@ jobs:
           cache: npm
       - name: Install (clean, from lockfile)
         run: npm ci
+      - name: Lint
+        run: npm run lint
       - name: Unit tests
         run: npm test
       - name: Build the extension

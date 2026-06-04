@@ -1,10 +1,15 @@
-/* build-dict.mjs — parse the CC-CEDICT data that the `cc-cedict` package
-   downloads on install into a compact index bundled with the extension.
+/* build-dict.mjs — parse the vendored CC-CEDICT source into a compact index
+   bundled with the extension.
 
-   Source: node_modules/cc-cedict/data/all.js
-     export default { all: RawEntry[], classifierLookup: [trad, simp, pinyin][] }
+   Source: assets/cedict/cedict_ts.u8 — a pinned, committed copy of the raw
+     CC-CEDICT export (see its `#! date=` / `#! entries=` header for the version).
+     Parsed by assets/scripts/cedict-parse.mjs into:
+       { all: RawEntry[], classifierLookup: [simp, trad, pinyin][] }
      RawEntry = [traditional, simplified, pinyin, meanings(string|string[]),
                  variantIndices[], classifierIndices[]]   // e[4]=variants, e[5]=classifiers
+     Vendoring the raw source (instead of letting the `cc-cedict` package fetch
+     a fresh copy from MDBG at install time) makes the generated index fully
+     reproducible and the build offline.
 
    Output: src/data/cedict.json
      { entries: { "<simplified>": [ [pinyinNumbered, [defs...], measures|0, trad?], ... ] },
@@ -18,12 +23,13 @@
    lines (homographs / multiple readings); each becomes one sense tuple. */
 
 import { writeFile, mkdir, access, readFile } from 'node:fs/promises'
-import { fileURLToPath, pathToFileURL } from 'node:url'
+import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'node:path'
+import { parseCedict } from './cedict-parse.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const root = resolve(__dirname, '../..') // assets/scripts -> repo root
-const dataSrc = resolve(root, 'node_modules/cc-cedict/data/all.js')
+const dataSrc = resolve(root, 'assets/cedict/cedict_ts.u8')
 const hskSrc = resolve(root, 'assets/hsk-vocab/hsk-data.json')
 const charSrc = resolve(root, 'assets/char-data/char-data.json')
 const outDir = resolve(root, 'src/data')
@@ -95,16 +101,12 @@ async function main() {
     await access(dataSrc)
   } catch {
     console.error(
-      '[build-dict] Cannot find node_modules/cc-cedict/data/all.js.\n' +
-        '  Run `npm install` first (cc-cedict downloads its data on postinstall).'
+      '[build-dict] Cannot find assets/cedict/cedict_ts.u8 (the vendored CC-CEDICT source).'
     )
     process.exit(1)
   }
 
-  const mod = await import(pathToFileURL(dataSrc).href)
-  const data = mod.default || mod
-  const all = data.all || []
-  const classifierLookup = data.classifierLookup || []
+  const { all, classifierLookup } = parseCedict(await readFile(dataSrc, 'utf8'))
 
   // simplified -> array of sense tuples [pinyin, defs[], measureWords[]|0, trad?]
   const entries = Object.create(null)

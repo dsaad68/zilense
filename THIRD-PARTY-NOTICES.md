@@ -17,7 +17,8 @@ and libraries — **not** the application code.
 
 ### CC-CEDICT
 - **Used for:** the core Chinese–English dictionary (entries, pinyin, definitions,
-  classifiers, traditional↔simplified mapping). Parsed by
+  classifiers, traditional↔simplified mapping). A pinned copy of the raw
+  `cedict_ts.u8` export is vendored at `assets/cedict/cedict_ts.u8` and parsed by
   `assets/scripts/build-dict.mjs` into `src/data/cedict.json` and bundled.
 - **Source / attribution:** CC-CEDICT, maintained by MDBG — <https://www.mdbg.net/chinese/dictionary?page=cc-cedict>
   and <https://cc-cedict.org/>.
@@ -26,6 +27,15 @@ and libraries — **not** the application code.
 - **Note:** This license requires attribution (given above) and is *share-alike*:
   the dictionary data and any adaptation of it remain under CC BY-SA 4.0. CC BY-SA
   4.0 §3(a) expressly permits providing the license by hyperlink, as done here.
+
+### cc-cedict parser (build-time only)
+- **Used for:** the CC-CEDICT line/meaning/classifier parsing in
+  `assets/scripts/cedict-parse.mjs` is adapted from the `cc-cedict` npm package's
+  build step. The package itself is no longer a dependency (it downloaded the
+  dictionary from MDBG at install time, which broke build reproducibility); only
+  its parsing logic is vendored, with the raw data pinned above.
+- **Source / attribution:** `cc-cedict` by edvardsr — <https://github.com/edvardsr/cc-cedict>.
+- **License:** MIT.
 
 ### CedPane
 - **Used for:** a second dictionary source covering names and proper nouns (people,
@@ -150,6 +160,6 @@ and libraries — **not** the application code.
 ---
 
 *Build-time-only tooling (Vite, CRXJS, @vitejs/plugin-react, Playwright,
-happy-dom, the `cc-cedict` npm loader) is not redistributed in the packaged
-extension and is therefore not listed above; those packages remain under their
-own licenses in `node_modules`.*
+happy-dom, ESLint) is not redistributed in the packaged extension and is
+therefore not listed above; those packages remain under their own licenses in
+`node_modules`.*

@@ -4,6 +4,19 @@ All notable changes to **Zilense** are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/), and the project follows
 [Semantic Versioning](https://semver.org/).
 
+## [1.9.6] — 2026-06-04
+
+### Changed
+- Dictionary build is now reproducible and offline: the raw CC-CEDICT source
+  (`cedict_ts.u8`) is vendored and pinned under `assets/cedict/` and parsed
+  directly, instead of the `cc-cedict` package downloading a fresh copy from MDBG
+  at install time. The `cc-cedict` dependency was removed; `npm run refresh:cedict`
+  updates the pinned source deliberately.
+
+### Added
+- ESLint (flat config) with a `npm run lint` script, wired into CI.
+- Unit tests for the new CC-CEDICT parser (`test/cedict-parse.test.mjs`).
+
 ## [1.9.5] — 2026-06-04
 
 ### Changed

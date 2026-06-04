@@ -14,20 +14,24 @@ instantly, with tone-colored pinyin, search, stroke order, and a saved deck.
 
 Recreated from a Claude Design prototype as a real extension with
 **Vite + React + CRXJS**, backed by
-**CC-CEDICT** (~121k entries) via the [`cc-cedict`](https://github.com/edvardsr/cc-cedict)
-package, plus **CedPane** (~74k public-domain names and proper nouns) merged in at
-build time so people, places, and brands resolve too.
+**[CC-CEDICT](https://cc-cedict.org/)** (~125k entries) — a pinned copy of the raw
+`cedict_ts.u8` export is vendored at `assets/cedict/` and parsed at build time
+(no install-time download), so the dictionary index is fully reproducible — plus
+**CedPane** (~74k public-domain names and proper nouns) merged in at build time so
+people, places, and brands resolve too.
 
 ## Develop / build
 
 ```bash
-npm install          # also downloads CC-CEDICT data (cc-cedict postinstall)
+npm install          # no network beyond the registry; no dictionary download
 npm run fetch:fonts  # vendor Google Fonts -> src/sidepanel/fonts/ (one-off; committed)
-npm run build:dict   # parse CC-CEDICT -> src/data/cedict.json  (auto-runs on dev/build)
+npm run build:dict   # parse vendored CC-CEDICT -> src/data/cedict.json  (auto-runs on dev/build)
+npm run lint         # ESLint (flat config)
 npm run dev          # CRXJS dev server with hot reload  ->  dist/
 npm run build        # production build  ->  dist/
 npm test             # unit tests (Node's runner)
 npm run test:e2e     # Playwright smoke test (loads dist/ in Chromium; build first)
+npm run refresh:cedict  # (maintenance) pull a newer CC-CEDICT from MDBG into assets/cedict/
 ```
 
 ## Load in Chrome
@@ -141,7 +145,9 @@ npm run test:e2e     # Playwright smoke test (loads dist/ in Chromium; build fir
   Tatoeba. **Traditional→simplified** maps are built into `cedict.json` so
   traditional input resolves. Still missing: word **frequency** (a level proxy
   is used in ranking) and bundled audio (pronunciation uses the browser's TTS).
-  The derived JSON is committed, so the build needs no source files.
+  The raw CC-CEDICT source (`assets/cedict/cedict_ts.u8`) is vendored and pinned,
+  so the derived `cedict.json` — though git-ignored and rebuilt on `dev`/`build`/
+  `test` — is reproducible offline from committed inputs.
 - **Names & proper nouns** come from **CedPane** (public domain), merged into
   `cedict.json` at build time and tagged as proper nouns. To keep a name homograph
   from beating the everyday word, proper nouns are ranked below ordinary/HSK words
