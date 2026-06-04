@@ -309,14 +309,17 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   }
   if (info.menuItemId !== MENU_ID) return
   const q = (info.selectionText || '').trim()
-  // Stash the query BEFORE opening so a cold panel (listener not yet registered)
-  // still picks it up on mount via takePendingLookup(). Then also message the
-  // panel directly — the fast path when it's already open.
-  if (q) await setPendingLookup(q)
-  try {
-    await chrome.sidePanel.open({ tabId: tab.id })
-  } catch (e) {
-    console.error('[mydict] sidePanel.open', e)
+  // Open the panel FIRST, synchronously, so the right-click stays a user gesture:
+  // an `await` before sidePanel.open() consumes the activation and Chrome rejects
+  // the call ("may only be called in response to a user gesture"). Then stash the
+  // query and message the panel only AFTER the write resolves — a cold panel sees
+  // the word via takePendingLookup() on mount, an open one gets the direct 'lookup'
+  // (same ordering as dispatchPanel).
+  if (tab && tab.id != null) {
+    chrome.sidePanel.open({ tabId: tab.id }).catch((e) => console.error('[mydict] sidePanel.open', e))
   }
-  if (q) chrome.runtime.sendMessage({ type: 'lookup', q }, () => void chrome.runtime.lastError)
+  if (q) {
+    await setPendingLookup(q)
+    chrome.runtime.sendMessage({ type: 'lookup', q }, () => void chrome.runtime.lastError)
+  }
 })
