@@ -4,6 +4,22 @@ All notable changes to **Zilense** are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/), and the project follows
 [Semantic Versioning](https://semver.org/).
 
+## [1.9.1] — 2026-06-04
+
+### Added
+- A **Pinyin tone colors** toggle in the toolbar menu. It turns tone coloring on/off
+  everywhere at once — the side panel and Reader, and the on-video subtitle overlay
+  (which previously had no way to switch its tone colors off).
+
+### Fixed
+- The subtitle engine no longer tries to load on YouTube login/creator subdomains
+  (`accounts.`/`studio.`/`consent.youtube.com`). Those frames have no video player
+  and a strict CSP that blocked the dynamically-imported engine chunk; the feature
+  now runs only on the surfaces that actually have a player.
+- Right-click **look up selection** no longer fails to open the side panel with "may
+  only be called in response to a user gesture" — the panel is now opened within the
+  click gesture before any async work.
+
 ## [1.9.0] — 2026-06-04
 
 ### Added
