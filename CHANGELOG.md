@@ -4,6 +4,13 @@ All notable changes to **Zilense** are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/), and the project follows
 [Semantic Versioning](https://semver.org/).
 
+## [1.9.9] — 2026-06-05
+
+### Changed
+- Renamed the extension to **Zilense - Chinese Dictionary & HSK Trainer** to
+  reflect the HSK study features (official HSK 3.0 flashcard decks, HSK levels on
+  entries, HSK highlighting). Store listing copy reworked around HSK exam learners.
+
 ## [1.9.8] — 2026-06-04
 
 ### Added
