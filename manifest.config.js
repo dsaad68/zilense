@@ -3,7 +3,7 @@ import pkg from './package.json' with { type: 'json' }
 
 export default defineManifest({
   manifest_version: 3,
-  name: 'Zilense - Chinese Dictionary',
+  name: 'Zilense - Chinese Dictionary & HSK Trainer',
   version: pkg.version,
   description: pkg.description,
   author: { email: 'me@verybad.engineer' },

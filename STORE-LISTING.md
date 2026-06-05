@@ -4,7 +4,7 @@ Copy-paste source for the Chrome Web Store developer dashboard. Everything here
 is factual and matches the shipped code (`manifest.config.js`, `src/`) and the
 [privacy policy](./docs/privacy.md).
 
-- **Name:** Zilense - Chinese Dictionary
+- **Name:** Zilense - Chinese Dictionary & HSK Trainer
 - **Category:** Productivity (alt: Education)
 - **Privacy policy URL:** https://zilense.com/privacy
 - **Default language:** English
@@ -14,65 +14,77 @@ is factual and matches the shipped code (`manifest.config.js`, `src/`) and the
 ## Single-purpose description
 
 > Zilense has one purpose: to look up Chinese words and characters and show
-> their reading and meaning. Hovering or selecting Chinese text on a page, or
-> typing a query, opens a dictionary entry (pinyin, definition, stroke order,
-> example sentences) in the browser side panel.
+> their reading and meaning — including the official HSK level and gloss.
+> Hovering or selecting Chinese text on a page, or typing a query, opens a
+> dictionary entry (pinyin, definition, HSK level, stroke order, example
+> sentences) in the browser side panel; starred and official HSK words can be
+> reviewed as flashcards.
 
 ---
 
 ## Short description (≤ 132 characters)
 
-> Hover or select any Chinese on a page to see pinyin, meaning, stroke order &
-> examples in the side panel. Save words to your deck.
+> Hover any Chinese for pinyin, meaning & HSK level. Study official HSK 3.0
+> decks, highlight HSK words, and export to Anki.
 
 ---
 
 ## Detailed description (store listing body)
 
-> **Zilense turns any web page into a Chinese reading aid.** Hover a Chinese
-> character — or select a whole word — and its tone-colored pinyin and English
-> meaning appear instantly in the Chrome side panel. No copy-paste, no leaving
-> the page.
+> **Zilense turns the whole web into Chinese reading practice — and a daily HSK
+> study tool.** Hover a character or select a word and its tone-colored pinyin,
+> English meaning, and **official HSK level** appear instantly in the Chrome side
+> panel. No copy-paste, no leaving the page. Then drill the official HSK 3.0 word
+> lists as flashcards, highlight every HSK word on a page, and export anything you
+> star to Anki.
 >
-> **Features**
+> **Built for HSK exam learners**
+> - **Official HSK 3.0 flashcard decks** — study any level, or everything up to
+>   it, on a full-page trainer with flip cards and keyboard shortcuts. Decks come
+>   straight from the official HSK word lists, with the exact gloss, part of
+>   speech, and pinyin for each entry. Choose a pool (all / unseen / recently or
+>   ever missed), size, order, and prompt direction (character ↔ meaning, pinyin
+>   on top).
+> - **HSK level on every entry** — looked-up words show their HSK band and the
+>   official HSK gloss, with an option to show the HSK meaning first.
+> - **Highlight HSK words on any page** — one click highlights every HSK word up
+>   to the level you choose, color-coded by band, so you can see at a glance which
+>   words you should already know while reading real articles.
+> - **HSK-first search** — search by hanzi, pinyin (tone marks optional, e.g.
+>   "nihao"), or English; results are ranked so common and HSK words come first.
+> - **Track what you know** — mark words New / Learning / Known and watch your
+>   progress build. Your study data stays on your device and can be exported or
+>   imported.
+> - **Export to Anki** — turn your starred or HSK words into a tab-separated file
+>   Anki imports directly.
+>
+> **Read Chinese anywhere — and learn as you go**
 > - **Hover & select lookup** — point at a character to highlight and read it;
 >   select a phrase to get the whole-word reading and a character-by-character
 >   breakdown. Works on simplified and traditional pages (中國 resolves to 中国).
 > - **Smart word detection** — greedy longest-match segmentation finds the
 >   actual word under your cursor, even when it is split across inline markup.
-> - **Search** — by hanzi, pinyin (tone marks optional, e.g. "nihao"), or
->   English, ranked so common and HSK words come first.
 > - **Stroke order** — animated stroke-by-stroke diagrams for any character.
 > - **Example sentences** — real usage from the Tatoeba corpus, on demand.
 > - **Pronunciation** — hear Mandarin via your browser's speech synthesis.
-> - **Saved deck** — star words to build your own study list; it stays on your
->   device.
-> - **Side panel or floating window** — use the dictionary docked in Chrome's side
->   panel, or pop it out into a detached window that floats free and stays put as
->   you switch tabs. Both share your saved words, settings, and live lookups, and
->   **keyboard shortcuts** can open either one directly (rebindable in Chrome).
-> - **Flashcards** — study your starred words or any HSK 3.0 level on a full-page
->   trainer with flip cards and keyboard shortcuts. HSK decks come from the
->   official word lists (exact gloss, part of speech, and pinyin per entry); pick
->   just one level or everything up to it, choose a pool (all / unseen / recently
->   or ever missed), size, order, and prompt direction. Progress stays on your
->   device and can be exported or imported.
-> - **Export to Anki** — turn your starred words into a tab-separated file Anki
->   imports directly.
 > - **Reader mode** — open the current article in a clean, distraction-free
 >   reader with selectable fonts, larger text, and optional tone-colored pinyin
 >   above every character — with the dictionary still live as you read.
 > - **PDFs** — open a PDF and Zilense offers to reopen it in a built-in viewer
 >   where hover, lookup, and selection work just like on a web page. Scanned or
 >   image-only PDFs are recognized with offline OCR (a bundled Chinese model — no
->   network), so even photographed pages become hoverable.
-> - **Video subtitles (experimental)** — on YouTube (and Coursera), the on-video
->   captions get tone-colored pinyin and clickable words that look up in the panel,
->   and an optional **dual-subtitle** mode shows Chinese on top with a second
->   language (English by default, switchable) below. This feature is experimental
->   and depends on each site's player; **Netflix support is planned for later.**
-> - **HSK highlighting** and a customizable look (accent color, Chinese serif/
->   sans face, tone colors, dark mode).
+>   network), so even photographed HSK textbooks and past papers become hoverable.
+> - **Video subtitles (experimental)** — on YouTube, the on-video captions get
+>   tone-colored pinyin and clickable words that look up in the panel, and an
+>   optional **dual-subtitle** mode shows Chinese on top with a second language
+>   (English by default, switchable) below. This feature is experimental and
+>   depends on each site's player; **Netflix support is planned for later.**
+> - **Side panel or floating window** — use the dictionary docked in Chrome's side
+>   panel, or pop it out into a detached window that floats free and stays put as
+>   you switch tabs. Both share your saved words, settings, and live lookups, and
+>   **keyboard shortcuts** can open either one directly (rebindable in Chrome).
+> - **Saved deck** and a customizable look (accent color, Chinese serif/sans face,
+>   tone colors, dark mode).
 >
 > **Private by design.** Your saved words, settings, and history stay on your
 > device. Zilense has no analytics and no tracking, and it never sends the
@@ -200,11 +212,14 @@ Capture fresh screenshots against a real Chinese article, cropped to the require
 size. Suggested set:
 
 1. **Hover lookup** — cursor over a highlighted character, side panel showing the
-   entry (pinyin + meaning).
-2. **Word selection** — a selected multi-character word with its breakdown.
-3. **Stroke order** — the animated stroke diagram expanded.
+   entry with pinyin, meaning, and **HSK level**.
+2. **HSK flashcards** — the full-page trainer on an official HSK 3.0 deck (deck/
+   level picker visible, a flip card showing character ↔ meaning).
+3. **Highlight HSK words** — a real article with HSK words highlighted, color-
+   coded by band, from the toolbar action.
 4. **Reader mode** — the clean reader with tone-colored pinyin ruby.
-5. **Settings / dark mode** — the appearance options (accent, serif/sans, tones).
+5. **PDF / YouTube** — hover lookup working in the built-in PDF viewer or on a
+   YouTube dual-subtitle (HSK textbooks, past papers, and video all covered).
 
 Optional store assets: small promo tile 440×280 (recommended for better
 placement); the 128×128 store icon is already in `public/icons/icon-128.png`.
