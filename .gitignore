@@ -21,6 +21,10 @@ playwright-report/
 # Personal pre-publish checklist (not part of the repo)
 todo.md
 
+# Internal failure-mode / debugging notes (not part of the repo)
+FAILURE-POINTS.md
+docs/screenshots/
+
 # OS
 .DS_Store
 
