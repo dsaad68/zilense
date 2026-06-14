@@ -4,6 +4,13 @@ All notable changes to **Zilense** are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/), and the project follows
 [Semantic Versioning](https://semver.org/).
 
+## [2.0.0] — 2026-06-14
+
+### Fixed
+- Release workflow now verifies `manifest.json` is at the zip root before
+  publishing to GitHub, preventing a malformed extension zip from being attached
+  to a release.
+
 ## [1.9.9] — 2026-06-05
 
 ### Changed

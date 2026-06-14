@@ -57,6 +57,16 @@ jobs:
         # build already ran above; pack.mjs zips the existing dist/ -> release/zilense-<version>.zip
         run: node assets/scripts/pack.mjs
 
+      - name: Verify zip structure
+        if: steps.meta.outputs.exists == 'false'
+        run: |
+          ZIP="release/zilense-${{ steps.meta.outputs.version }}.zip"
+          if ! unzip -p "$ZIP" manifest.json > /dev/null 2>&1; then
+            echo "::error::manifest.json not found at zip root in $ZIP — aborting release"
+            exit 1
+          fi
+          echo "manifest.json confirmed at zip root"
+
       - name: Create GitHub release
         if: steps.meta.outputs.exists == 'false'
         env:
