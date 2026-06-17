@@ -6,9 +6,9 @@
 
 **Hover or select any Chinese on a page → tone-colored pinyin, meaning, stroke order & a clean reader, right in the Chrome side panel.**
 
-[![Available in the Chrome Web Store](https://img.shields.io/badge/Chrome%20Web%20Store-Add%20to%20Chrome-4285F4?logo=googlechrome&logoColor=white)](https://chromewebstore.google.com/detail/zilense-chinese-dictionar/pkjoclepeeappjkaaclajjoemhhnodai)
-&nbsp;
-[![Website](https://img.shields.io/badge/Website-zilense.com-2f6f4f)](https://zilense.com)
+<a href="https://chromewebstore.google.com/detail/zilense-chinese-dictionar/pkjoclepeeappjkaaclajjoemhhnodai"><img alt="Available in the Chrome Web Store" src="docs/chrome-web-store-badge.png" width="206" height="58"></a>
+
+[zilense.com](https://zilense.com) · [Privacy](https://zilense.com/privacy)
 
 </div>
 
