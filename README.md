@@ -6,6 +6,10 @@
 
 **Hover or select any Chinese on a page → tone-colored pinyin, meaning, stroke order & a clean reader, right in the Chrome side panel.**
 
+[![Available in the Chrome Web Store](https://img.shields.io/badge/Chrome%20Web%20Store-Add%20to%20Chrome-4285F4?logo=googlechrome&logoColor=white)](https://chromewebstore.google.com/detail/zilense-chinese-dictionar/pkjoclepeeappjkaaclajjoemhhnodai)
+&nbsp;
+[![Website](https://img.shields.io/badge/Website-zilense.com-2f6f4f)](https://zilense.com)
+
 </div>
 
 A Chrome MV3 extension that lives in the **side panel**: hover any Chinese
@@ -19,6 +23,13 @@ Recreated from a Claude Design prototype as a real extension with
 (no install-time download), so the dictionary index is fully reproducible — plus
 **CedPane** (~74k public-domain names and proper nouns) merged in at build time so
 people, places, and brands resolve too.
+
+## Install
+
+**[Add Zilense to Chrome from the Chrome Web Store →](https://chromewebstore.google.com/detail/zilense-chinese-dictionar/pkjoclepeeappjkaaclajjoemhhnodai)**
+
+For development or to run an unpacked build, see [Develop / build](#develop--build)
+and [Load in Chrome](#load-in-chrome) below.
 
 ## Develop / build
 
